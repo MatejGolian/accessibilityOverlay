@@ -52,7 +52,7 @@ advancedTab.addHotspotButton("Pokročilé tlačidlo 2", 120, 320)
 mainTabControl.addTabs(GeneralTab, advancedTab)
 notepadOverlay.translate("Slovak")
 
-#hotIf winActive("ahk_exe notepad.exe") ; Restrict the script to Notepad
+#hotIf winActive("ahk_exe notepad.exe")
 
 tab::notepadOverlay.focusNextControl()
 +tab::notepadOverlay.focusPreviousControl()
