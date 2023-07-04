@@ -45,7 +45,7 @@ ctrl::accessibilityOverlay.stopSpeech() ; Stops SAPI (does not do anything in ca
 ```
 ### Firing Extra/Custom Functions
 When creating elements such as buttons and tabs, you can optionally supply the names of functions that will be executed either after the given control receives focus or once its activated. These functions are always the last parameters expected by the constructors and the calling object is automatically passed on to them as a parameter. Tab objects only support firing functions on focus, while buttons support firing functions on activation as well.
-For instance, here is how to create an overlay with buttons that fires user defined functions:
+For instance, here is how to create an overlay with buttons that fire user defined functions:
 ```
 #include accessibilityOverlay.ahk ; Include the overlay classes in the script
 
