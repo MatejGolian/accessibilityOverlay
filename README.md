@@ -33,6 +33,8 @@ advancedTab.addHotspotButton("Advanced button 2", 716, 480) ; Add a second butto
 advancedTab.addHotspotButton("Advanced button 3", 790, 480) ; Add a third button
 mainTabControl.addTabs(basicTab, advancedTab) ; Add the 2 previously created tabs to the tab control object we defined before
 
+#hotIf winActive("ahk_exe notepad.exe") ; Restrict the script to Notepad
+
 ; Set up keyboard shortcuts and navigation (items wrap automatically)
 tab::Overlay.focusNextControl() ; Move focus to the next control
 +tab::Overlay.focusPreviousControl() ; Move focus to the previous control
@@ -54,6 +56,8 @@ accessibilityOverlay.speak(appName . " ready") ; Make NVDA or SAPI report that y
 overlay := accessibilityOverlay() ; Create a new overlay object
 overlay.addHotspotButton("Button 1", 120, 180, "focusButton", "activateButton") ; Add a button that will get clicked at the coordinates specified once the button is activated and make it trigger the "focusButton" and "activateButton" functions
 overlay.addHotspotButton("Button 2", 180, 180, "focusButton", "activateButton") ; Add a second button
+
+#hotIf winActive("ahk_exe notepad.exe") ; Restrict the script to Notepad
 
 ; Set up keyboard shortcuts and navigation (items wrap automatically)
 tab::Overlay.focusNextControl() ; Move focus to the next control

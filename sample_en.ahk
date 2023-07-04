@@ -51,7 +51,7 @@ advancedTabControl.addTabs(OptionsTab, appearanceTab)
 advancedTab.addHotspotButton("Advanced button 2", 120, 320)
 mainTabControl.addTabs(GeneralTab, advancedTab)
 
-#HotIf winActive("ahk_exe notepad.exe")
+#hotIf winActive("ahk_exe notepad.exe") ; Restrict the script to Notepad
 
 tab::notepadOverlay.focusNextControl()
 +tab::notepadOverlay.focusPreviousControl()
