@@ -43,7 +43,7 @@ ctrl::AccessibilityOverlay.stopSpeech() ; Stops SAPI (does not do anything in ca
 ```
 ### Firing Custom Functions
 When creating elements such as buttons and tabs, you can optionally supply the names of functions that will be executed either after the given control receives focus or once its activated. These functions are always the last parameters expected by the constructors and the calling object is automatically passed on to them as a parameter. Tab objects only support firing functions on focus, while buttons support firing functions on activation as well.
-For instance, here is how to create an overlay with a button that fires user defined functions:
+For instance, here is how to create an overlay with buttons that fires user defined functions:
 ```
 #include accessibilityOverlay.ahk ; Include the overlay classes in the script
 
@@ -77,7 +77,7 @@ activateButton(button) { ; Define function
 * hotspotTab - Creates a tab that clicks the mouse coordinates specified up on focus and optionally triggers custom functions.
 * graphicTab - Creates a tab that looks for images and reports an error if the specified graphics are not found.
 ## Translating Overlays
-By calling the "translate" metod of an accessibilityOverlay object it's possible to translate that object to different languages. The currently supported languages are English, Slovak and Swedish. Note that this method does not translate the user labels of the added elements - just predefined information mainly related to control type and state announcement.
+By calling the "translate" metod of an accessibilityOverlay object it's possible to translate that object to different languages. The currently supported languages are English, Slovak and Swedish. Note that this method does not translate the user labels of the added elements - just predefined information mostly related to control type and state announcement.
 To translate an accessibilityOverlay object, call the “translate” method once you have added all control elements to it and supply the desired language as a parameter like so:
 ```
 overlay := accessibilityOverlay() ; Create a new overlay object
