@@ -3,7 +3,7 @@ This set of classes written in AutoHotkey 2 makes it possible to simulate access
 ## What You'll Need
 1. AutoHotkey version 2
 2. The NVDA screen reader or Microsoft SAPI voices installed on your system
-3. In case you want to use NVDA for speech output, you'll need a copy of the nvdaControllerClient DLL depending on which build of AutoHotkey you want to use.
+3. In case you want to use NVDA for speech output, you'll need a copy of the nvdaControllerClient DLL depending on the build of AutoHotkey you want to use.
    * nvdaControllerClient32.dll for the 32-bit version of AutoHotkey
    * nvdaControllerClient64.dll  for the 64-bit version of AutoHotkey
    * Both files can be downloaded at the following location: http://www.nvda-project.org/nvdaControllerClient/nvdaControllerClient_20100219.7z
@@ -41,7 +41,7 @@ left::Overlay.focusPreviousTab() ; If the current control is a tab control use t
 enter::Overlay.activateCurrentControl() ; Activate the currently focused control
 ctrl::AccessibilityOverlay.stopSpeech() ; Stops SAPI (does not do anything in case of NVDA, since that's not needed)
 ```
-### Firing Custom Functions
+### Firing Extra/Custom Functions
 When creating elements such as buttons and tabs, you can optionally supply the names of functions that will be executed either after the given control receives focus or once its activated. These functions are always the last parameters expected by the constructors and the calling object is automatically passed on to them as a parameter. Tab objects only support firing functions on focus, while buttons support firing functions on activation as well.
 For instance, here is how to create an overlay with buttons that fires user defined functions:
 ```
@@ -88,11 +88,12 @@ overlay.addHotspotButton("Button 2", 180, 180) ; Add a second button
 overlay.reset() ; Reset the overlay object to its initial state
 ```
 ## Defined Classes
+Here is a list of all classes currently defined in the "accessibilityOverlay.ahk" file:
 * accessibilityOverlay - Creates an overlay object that can serve as a container for other controls.
 * customControl - Creates a completely custom control that does absolutely nothing on its own (instead it relies on the 2 custom functions specified).
 * customButton - Creates a button that only uses a label and 2 custom actions when it gets focused or activated.
-* hotspotButton - Creates a button that clicks the mouse coordinates specified up on activation and optionally triggers custom functions.
-* graphicButton - Creates a button that looks for images and reports an error if the specified graphics are not found.
+* hotspotButton - Creates a button that clicks the mouse coordinates specified up on activation and optionally triggers extra functions up on focus and/or activation.
+* graphicButton - Creates a button that looks for images, reports an error if the specified graphics are not found and optionally triggers extra functions up on focus and/or activation.
 * tabControl - Creates an element for attaching tabs on to.
-* hotspotTab - Creates a tab that clicks the mouse coordinates specified up on focus and optionally triggers custom functions.
-* graphicTab - Creates a tab that looks for images and reports an error if the specified graphics are not found.
+* hotspotTab - Creates a tab that clicks the mouse coordinates specified and optionally triggers an extra function up on focus.
+* graphicTab - Creates a tab that looks for images, reports an error if the specified graphics are not found and optionally triggers an extra function up on focus.
