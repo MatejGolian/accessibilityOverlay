@@ -67,16 +67,7 @@ activateButton(button) { ; Define function
     msgBox(button.label) ; Dysplay a standard AHK message box with the label of the button
 }
 ```
-## Defined Classes
-* accessibilityOverlay - Creates an overlay object that can serve as a container for other controls.
-* customControl - Creates a completely custom control that does absolutely nothing on its own (instead it relies on the 2 custom functions specified).
-* customButton - Creates a button that only uses a label and 2 custom actions when it gets focused or activated.
-* hotspotButton - Creates a button that clicks the mouse coordinates specified up on activation and optionally triggers custom functions.
-* graphicButton - Creates a button that looks for images and reports an error if the specified graphics are not found.
-* tabControl - Creates an element for attaching tabs on to.
-* hotspotTab - Creates a tab that clicks the mouse coordinates specified up on focus and optionally triggers custom functions.
-* graphicTab - Creates a tab that looks for images and reports an error if the specified graphics are not found.
-## Translating Overlays
+### Translating Overlays
 By calling the "translate" metod of an accessibilityOverlay object it's possible to translate that object to different languages. The currently supported languages are English, Slovak and Swedish. Note that this method does not translate the user labels of the added elements - just predefined information mostly related to control type and state announcement.
 To translate an accessibilityOverlay object, call the “translate” method once you have added all control elements to it and supply the desired language as a parameter like so:
 ```
@@ -87,7 +78,7 @@ overlay.translate("Slovak") ; Translate the overlay object to Slovak
 overlay.translate("Swedish") ; Translate the overlay object to Swedish
 overlay.translate("English") ; Translate the overlay object back to English
 ```
-## Resetting Overlays
+### Resetting Overlays
 The "reset" method resets a given accessibilityOverlay object to its initial state. This means that the overlay is going to behave as if you had launched a fresh instance of your script.
 To reset an accessibilityOverlay, create an overlay object and call the "reset" method when needed:
 ```
@@ -96,3 +87,12 @@ overlay.addHotspotButton("Button 1", 120, 180) ; Add a button that will get clic
 overlay.addHotspotButton("Button 2", 180, 180) ; Add a second button
 overlay.reset() ; Reset the overlay object to its initial state
 ```
+## Defined Classes
+* accessibilityOverlay - Creates an overlay object that can serve as a container for other controls.
+* customControl - Creates a completely custom control that does absolutely nothing on its own (instead it relies on the 2 custom functions specified).
+* customButton - Creates a button that only uses a label and 2 custom actions when it gets focused or activated.
+* hotspotButton - Creates a button that clicks the mouse coordinates specified up on activation and optionally triggers custom functions.
+* graphicButton - Creates a button that looks for images and reports an error if the specified graphics are not found.
+* tabControl - Creates an element for attaching tabs on to.
+* hotspotTab - Creates a tab that clicks the mouse coordinates specified up on focus and optionally triggers custom functions.
+* graphicTab - Creates a tab that looks for images and reports an error if the specified graphics are not found.
