@@ -1,3 +1,5 @@
+# accessibilityOverlay
+This set of classes written in AutoHotkey 2 makes it possible to simulate accessible user interface elements by combining AutoHotkey functionality with screen reader output. It was specifically written to address the needs of blind users who often require a large number of keyboard shortcuts when creating AHK-based accessibility solutions for otherwise inaccessible applications.
 ## What You'll Need
 1. AutoHotkey version 2
 2. The NVDA screen reader or Microsoft SAPI voices installed on your system
@@ -40,7 +42,7 @@ enter::Overlay.activateCurrentControl() ; Activate the currently focused control
 ctrl::AccessibilityOverlay.stopSpeech() ; Stops SAPI (does not do anything in case of NVDA, since that's not needed)
 ```
 ### Firing Custom Functions
-When creating elements such as buttons and tabs, you can optionally supply the names of functions that will be executed either after the given control receives focus or once its activated. These functions are always the last parameters expected by the constructor and the calling object is automatically passed on to them as a parameter. Tab objects only support firing functions on focus, while buttons support firing functions on activation as well.
+When creating elements such as buttons and tabs, you can optionally supply the names of functions that will be executed either after the given control receives focus or once its activated. These functions are always the last parameters expected by the constructors and the calling object is automatically passed on to them as a parameter. Tab objects only support firing functions on focus, while buttons support firing functions on activation as well.
 For instance, here is how to create an overlay with a button that fires user defined functions:
 ```
 #include accessibilityOverlay.ahk ; Include the overlay classes in the script
@@ -50,8 +52,8 @@ appName := "My App"
 accessibilityOverlay.speak(appName . " ready") ; Make NVDA or SAPI report that your script has been launched
 
 overlay := accessibilityOverlay() ; Create a new overlay object
-overlay.addHotspotButton("Main button 1", 120, 180, "focusButton", "activateButton") ; Add a button that will get clicked at the coordinates specified once the button is activated and make it trigger the "focusButton" and "activateButton" functions
-overlay.addHotspotButton("Main button 2", 180, 180, "focusButton", "activateButton") ; Add a second button
+overlay.addHotspotButton("Button 1", 120, 180, "focusButton", "activateButton") ; Add a button that will get clicked at the coordinates specified once the button is activated and make it trigger the "focusButton" and "activateButton" functions
+overlay.addHotspotButton("Button 2", 180, 180, "focusButton", "activateButton") ; Add a second button
 
 return ; End auto-execute section
 
@@ -74,3 +76,23 @@ activateButton(button) { ; Define function
 * tabControl - Creates an element for attaching tabs on to.
 * hotspotTab - Creates a tab that clicks the mouse coordinates specified up on focus and optionally triggers custom functions.
 * graphicTab - Creates a tab that looks for images and reports an error if the specified graphics are not found.
+## Translating Overlays
+By calling the "translate" metod of an accessibilityOverlay object it's possible to translate that object to different languages. The currently supported languages are English, Slovak and Swedish. Note that this method does not translate the user labels of the added elements - just predefined information mainly related to control type and state announcement.
+To translate an accessibilityOverlay object, call the “translate” method once you have added all control elements to it and supply the desired language as a parameter like so:
+```
+overlay := accessibilityOverlay() ; Create a new overlay object
+overlay.addHotspotButton("Button 1", 120, 180) ; Add a button that will get clicked at the coordinates specified once the button is activated
+overlay.addHotspotButton("Button 2", 180, 180) ; Add a second button
+overlay.translate("Slovak") ; Translate the overlay object to Slovak
+overlay.translate("Swedish") ; Translate the overlay object to Swedish
+overlay.translate("English") ; Translate the overlay object back to English
+```
+## Resetting Overlays
+The "reset" method resets a given accessibilityOverlay object to its initial state. This means that the overlay is going to behave as if you had launched a fresh instance of your script.
+To reset an accessibilityOverlay, create an overlay object and call the "reset" method when needed:
+```
+overlay := accessibilityOverlay() ; Create a new overlay object
+overlay.addHotspotButton("Button 1", 120, 180) ; Add a button that will get clicked at the coordinates specified once the button is activated
+overlay.addHotspotButton("Button 2", 180, 180) ; Add a second button
+overlay.reset() ; Reset the overlay object to its initial state
+```
