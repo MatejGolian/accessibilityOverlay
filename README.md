@@ -39,7 +39,7 @@ tab::Overlay.focusNextControl() ; Move focus to the next control
 right::Overlay.focusNextTab() ; If the current control is a tab control use the right arrow to focus the next tab
 left::Overlay.focusPreviousTab() ; If the current control is a tab control use the left arrow to focus the previous tab
 enter::Overlay.activateCurrentControl() ; Activate the currently focused control
-ctrl::AccessibilityOverlay.stopSpeech() ; Stops SAPI (does not do anything in case of NVDA, since that's not needed)
+ctrl::accessibilityOverlay.stopSpeech() ; Stops SAPI (does not do anything in case of NVDA, since that's not needed)
 ```
 ### Firing Extra/Custom Functions
 When creating elements such as buttons and tabs, you can optionally supply the names of functions that will be executed either after the given control receives focus or once its activated. These functions are always the last parameters expected by the constructors and the calling object is automatically passed on to them as a parameter. Tab objects only support firing functions on focus, while buttons support firing functions on activation as well.
@@ -54,6 +54,14 @@ accessibilityOverlay.speak(appName . " ready") ; Make NVDA or SAPI report that y
 overlay := accessibilityOverlay() ; Create a new overlay object
 overlay.addHotspotButton("Button 1", 120, 180, "focusButton", "activateButton") ; Add a button that will get clicked at the coordinates specified once the button is activated and make it trigger the "focusButton" and "activateButton" functions
 overlay.addHotspotButton("Button 2", 180, 180, "focusButton", "activateButton") ; Add a second button
+
+; Set up keyboard shortcuts and navigation (items wrap automatically)
+tab::Overlay.focusNextControl() ; Move focus to the next control
++tab::Overlay.focusPreviousControl() ; Move focus to the previous control
+right::Overlay.focusNextTab() ; If the current control is a tab control use the right arrow to focus the next tab
+left::Overlay.focusPreviousTab() ; If the current control is a tab control use the left arrow to focus the previous tab
+enter::Overlay.activateCurrentControl() ; Activate the currently focused control
+ctrl::accessibilityOverlay.stopSpeech() ; Stops SAPI (does not do anything in case of NVDA, since that's not needed)
 
 return ; End auto-execute section
 
