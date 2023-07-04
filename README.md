@@ -1,5 +1,3 @@
-# About
- An AutoHotkey 2 script created for the needs of blind users that makes it possible to simulate accessible user interface elements.
 ## What You'll Need
 1. AutoHotkey version 2
 2. The NVDA screen reader or Microsoft SAPI voices installed on your system
@@ -8,7 +6,7 @@
    * nvdaControllerClient64.dll  for the 64-bit version of AutoHotkey
    * Both files can be downloaded at the following location: http://www.nvda-project.org/nvdaControllerClient/nvdaControllerClient_20100219.7z
 ## How It Works
- You define elements using the classes in the "accessibilityOverlay.ahk" file. These elements then get automatically voiced either by NVDA or Microsoft SAPI.
+You define elements using the classes in the "accessibilityOverlay.ahk" file. These elements then get automatically voiced either by NVDA or Microsoft SAPI.
 * If NVDA is running and if the appropriate copy of the nvdaControllerClient DLL is located in your script directory, the elements are automatically voiced using NVDA.
 * If NVDA is not running or if the appropriate copy of the nvdaControllerClient DLL can not be found in your script directory, the elements are automatically voiced using Microsoft SAPI.
 ### Basic Usage Example
@@ -42,7 +40,7 @@ enter::Overlay.activateCurrentControl() ; Activate the currently focused control
 ctrl::AccessibilityOverlay.stopSpeech() ; Stops SAPI (does not do anything in case of NVDA, since that's not needed)
 ```
 ### Firing Custom Functions
- When creating elements such as buttons and tabs, you can optionally supply the names of functions that will be executed either when the given control receives focus or once its activated. These 2 functions are always the 2 last parameters expected by the constructor method and once they get triggered, the calling object is automatically passed on to them as a parameter.
+When creating elements such as buttons and tabs, you can optionally supply the names of functions that will be executed either after the given control receives focus or once its activated. These functions are always the last parameters expected by the constructor and the calling object is automatically passed on to them as a parameter. Tab objects only support firing functions on focus, while buttons support firing functions on activation as well.
 For instance, here is how to create an overlay with a button that fires user defined functions:
 ```
 #include accessibilityOverlay.ahk ; Include the overlay classes in the script
@@ -57,12 +55,12 @@ overlay.addHotspotButton("Main button 2", 180, 180, "focusButton", "activateButt
 
 return ; End auto-execute section
 
-focusButton(button) {
+focusButton(button) { ; Define function
     ; Do something when a given button receives focus, like
     msgBox(button.label) ; Dysplay a standard AHK message box with the label of the currently focused button
 }
 
-activateButton(button) {
+activateButton(button) { ; Define function
     ; Do something when a given button is activated, like
     msgBox(button.label) ; Dysplay a standard AHK message box with the label of the button
 }
