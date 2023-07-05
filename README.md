@@ -3,7 +3,7 @@ This set of classes written in AutoHotkey 2 makes it possible to simulate access
 ## Requirements
 1. AutoHotkey version 2
 2. The NVDA screen reader or Microsoft SAPI voices installed on your system
-3. In case you want to use NVDA for speech output, you'll need a copy of the nvdaControllerClient DLL depending on the build of AutoHotkey you want to use. The nvdaControllerClient DLL is available both in 32 and 64-bit and both versions can be downloaded at the following location: http://www.nvda-project.org/nvdaControllerClient/nvdaControllerClient_20100219.7z
+3. In case you want to use NVDA for speech output, you'll need a copy of the nvdaControllerClient DLL depending on your build of AutoHotkey. The nvdaControllerClient DLL is available both in 32 and 64-bit and both versions can be downloaded at the following location: http://www.nvda-project.org/nvdaControllerClient/nvdaControllerClient_20100219.7z
    * Use nvdaControllerClient32.dll with the 32-bit version of AutoHotkey.
    * Use nvdaControllerClient64.dll with the 64-bit version of AutoHotkey.
 ## How It Works
