@@ -1,12 +1,12 @@
 # What It Is
 This set of classes written in AutoHotkey 2 makes it possible to simulate accessible user interface elements by combining AutoHotkey functionality with screen reader output. It was specifically written to address the needs of blind users who often require a large number of keyboard shortcuts when creating AHK-based accessibility solutions for otherwise inaccessible applications.
 ## Requirements
-1. AutoHotkey version 2
-2. The NVDA screen reader or Microsoft SAPI voices installed on your system
-3. In case you want to use NVDA for speech output, you'll need a copy of the nvdaControllerClient DLL depending on the build of AutoHotkey you want to use.
-   * nvdaControllerClient32.dll for the 32-bit version of AutoHotkey
+ 1. AutoHotkey version 2
+ 2. The NVDA screen reader or Microsoft SAPI voices installed on your system
+ 3. In case you want to use NVDA for speech output, you'll need a copy of the nvdaControllerClient DLL depending on the build of AutoHotkey you want to use.
+    * nvdaControllerClient32.dll for the 32-bit version of AutoHotkey
    * nvdaControllerClient64.dll  for the 64-bit version of AutoHotkey
-   Both files can be downloaded at the following location: http://www.nvda-project.org/nvdaControllerClient/nvdaControllerClient_20100219.7z
+  Both files can be downloaded at the following location: http://www.nvda-project.org/nvdaControllerClient/nvdaControllerClient_20100219.7z
 ## How It Works
 You define elements using the classes in the "accessibilityOverlay.ahk" file. These elements then get automatically voiced either by NVDA or Microsoft SAPI.
 * If NVDA is running and if the appropriate copy of the nvdaControllerClient DLL is located in your script directory, the elements are automatically voiced using NVDA.
