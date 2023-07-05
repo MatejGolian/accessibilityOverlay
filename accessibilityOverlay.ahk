@@ -182,7 +182,7 @@ class accessibilityOverlay {
                     currentControl.focus(currentControl.controlID)
                     return 1
                 }
-                }
+            }
         }
         return 0
     }
@@ -335,6 +335,9 @@ class accessibilityOverlay {
         "customButton", map(
         "controlTypeLabel", "button",
         "unlabelledString", "unlabelled"),
+        "customTab", map(
+        "controlTypeLabel", "tab",
+        "unlabelledString", "unlabelled"),
         "graphicButton", map(
         "controlTypeLabel", "button",
         "notFoundString", "not found",
@@ -363,6 +366,9 @@ class accessibilityOverlay {
         "customButton", map(
         "controlTypeLabel", "tlačidlo",
         "unlabelledString", "bez názvu"),
+        "customTab", map(
+        "controlTypeLabel", "záložka",
+        "unlabelledString", "bez názvu"),
         "graphicButton", map(
         "controlTypeLabel", "tlačidlo",
         "notFoundString", "nenájdené",
@@ -390,6 +396,9 @@ class accessibilityOverlay {
         "unlabelledString", ""),
         "customButton", map(
         "controlTypeLabel", "knapp",
+        "unlabelledString", "namnlös"),
+        "customTab", map(
+        "controlTypeLabel", "flik",
         "unlabelledString", "namnlös"),
         "graphicButton", map(
         "controlTypeLabel", "knapp",
@@ -547,6 +556,35 @@ class customControl {
     }
     
     focus(*) {
+        if this.onFocusFunction != ""
+        %this.onFocusFunction%(this)
+        return 1
+    }
+    
+}
+
+class customTab extends accessibilityOverlay {
+    
+    controlType := "tab"
+    controlTypeLabel := "tab"
+    onFocusFunction := ""
+    unlabelledString := "unlabelled"
+    
+    __new(label, onFocusFunction := "") {
+        accessibilityOverlay.totalNumberOfControls++
+        this.controlID := accessibilityOverlay.totalNumberOfControls
+        this.label := label
+        this.onFocusFunction := onFocusFunction
+        accessibilityOverlay.allControls.push(this)
+    }
+    
+    focus(controlID := 0) {
+        if this.controlID != controlID {
+            if this.label == ""
+            accessibilityOverlay.speak(this.unlabelledString . " " . this.controlTypeLabel)
+            else
+            accessibilityOverlay.speak(this.label . " " . this.controlTypeLabel)
+        }
         if this.onFocusFunction != ""
         %this.onFocusFunction%(this)
         return 1

@@ -1,12 +1,12 @@
-# accessibilityOverlay
+# What It Is
 This set of classes written in AutoHotkey 2 makes it possible to simulate accessible user interface elements by combining AutoHotkey functionality with screen reader output. It was specifically written to address the needs of blind users who often require a large number of keyboard shortcuts when creating AHK-based accessibility solutions for otherwise inaccessible applications.
-## What You'll Need
+## Requirements
 1. AutoHotkey version 2
 2. The NVDA screen reader or Microsoft SAPI voices installed on your system
 3. In case you want to use NVDA for speech output, you'll need a copy of the nvdaControllerClient DLL depending on the build of AutoHotkey you want to use.
    * nvdaControllerClient32.dll for the 32-bit version of AutoHotkey
    * nvdaControllerClient64.dll  for the 64-bit version of AutoHotkey
-   * Both files can be downloaded at the following location: http://www.nvda-project.org/nvdaControllerClient/nvdaControllerClient_20100219.7z
+   Both files can be downloaded at the following location: http://www.nvda-project.org/nvdaControllerClient/nvdaControllerClient_20100219.7z
 ## How It Works
 You define elements using the classes in the "accessibilityOverlay.ahk" file. These elements then get automatically voiced either by NVDA or Microsoft SAPI.
 * If NVDA is running and if the appropriate copy of the nvdaControllerClient DLL is located in your script directory, the elements are automatically voiced using NVDA.
@@ -100,12 +100,13 @@ overlay.addHotspotButton("Button 2", 180, 180) ; Add a second button
 overlay.reset() ; Reset the overlay object to its initial state
 ```
 ## Defined Classes
-Here is a list of all classes currently defined in the "accessibilityOverlay.ahk" file:
+Here is a list of all currently defined classes:
 * accessibilityOverlay - Creates an overlay object that can serve as a container for other controls.
-* customControl - Creates a completely custom control that does absolutely nothing on its own (instead it relies on the 2 custom functions specified).
-* customButton - Creates a button that only uses a label and 2 custom actions when it gets focused or activated.
+* customControl - Creates a completely custom control that does absolutely nothing on its own (instead it relies on the 2 extra functions specified).
+* customButton - Creates a button that only requires a label and the names of functions to be executed up on focus or activation.
 * hotspotButton - Creates a button that clicks the mouse coordinates specified up on activation and optionally triggers extra functions up on focus and/or activation.
-* graphicButton - Creates a button that looks for images, reports an error if the specified graphics are not found and optionally triggers extra functions up on focus and/or activation.
+* graphicButton - Creates a button that looks for images, reports an error if the specified graphics can not be found and optionally triggers extra functions up on focus and/or activation.
 * tabControl - Creates an element for attaching tabs on to.
+* customTab - Creates a tab that only requires a label and the name of the function to be triggered up on focus.
 * hotspotTab - Creates a tab that clicks the mouse coordinates specified and optionally triggers an extra function up on focus.
-* graphicTab - Creates a tab that looks for images, reports an error if the specified graphics are not found and optionally triggers an extra function up on focus.
+* graphicTab - Creates a tab that looks for images, reports an error if the specified graphics can not be found and optionally triggers an extra function up on focus.
