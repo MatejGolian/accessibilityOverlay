@@ -1,4 +1,4 @@
-﻿#requires autoHotkey v2.0
+﻿#requires AutoHotkey v2.0
 
 class accessibilityOverlay {
     
@@ -430,9 +430,9 @@ class accessibilityOverlay {
     }
     
     static speak(message) {
-        if fileExist("nvdaControllerClient" a_PtrSize*8 ".dll") and !DllCall("nvdaControllerClient" a_PtrSize*8 ".dll\nvdaController_testIfRunning") {
-            dllCall("nvdaControllerClient" . a_PtrSize * 8 . ".dll\nvdaController_cancelSpeech")
-            dllCall("nvdaControllerClient" . a_PtrSize * 8 . ".dll\nvdaController_speakText", "wstr", message)
+        if fileExist("nvdaControllerClient" . A_PtrSize * 8 . ".dll") and !DllCall("nvdaControllerClient" . A_PtrSize * 8 . ".dll\nvdaController_testIfRunning") {
+            dllCall("nvdaControllerClient" . A_PtrSize * 8 . ".dll\nvdaController_cancelSpeech")
+            dllCall("nvdaControllerClient" . A_PtrSize * 8 . ".dll\nvdaController_speakText", "wstr", message)
         }
         else {
             accessibilityOverlay.SAPI.speak("", 0x1|0x2)
@@ -441,7 +441,7 @@ class accessibilityOverlay {
     }
     
     static stopSpeech() {
-        if !FileExist("nvdaControllerClient" a_PtrSize*8 ".dll") or dllCall("nvdaControllerClient" . a_PtrSize * 8 . ".dll\nvdaController_testIfRunning")
+        if !FileExist("nvdaControllerClient" . A_PtrSize * 8 . ".dll") or dllCall("nvdaControllerClient" . A_PtrSize * 8 . ".dll\nvdaController_testIfRunning")
         accessibilityOverlay.SAPI.speak("", 0x1|0x2)
     }
     
