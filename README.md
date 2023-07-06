@@ -19,9 +19,9 @@ appName := "My App"
 accessibilityOverlay.speak(appName . " ready") ; Make NVDA or SAPI report that your script has been launched
 
 overlay := accessibilityOverlay() ; Create a new overlay object
-overlay.addHotspotButton("Main button 1", 120, 180) ; Add a button that will get clicked at the coordinates specified once the button is activated
+overlay.addHotspotButton("Main button 1", 120, 180) ; Add a button that will get clicked at the coordinates specified once it's activated
 overlay.addHotspotButton("Main button 2", 180, 180) ; Add a second button
-mainTabControl := overlay.addTabControl("Pages") ; Add a tab control to the overlay object labelled "Pages"
+mainTabControl := overlay.addTabControl("Pages") ; Add a tab control to the overlay object and label it "Pages"
 basicTab := hotspotTab("Basic", 900, 292) ; Create a new tab object that will get clicked at the coordinates specified once it's selected
 basicTab.addHotspotButton("Basic button 1", 640, 404) ; Add a button to this tab
 basicTab.addHotspotButton("Basic button 2", 716, 404) ; Add a second button
@@ -53,7 +53,7 @@ appName := "My App"
 accessibilityOverlay.speak(appName . " ready") ; Make NVDA or SAPI report that your script has been launched
 
 overlay := accessibilityOverlay() ; Create a new overlay object
-overlay.addHotspotButton("Button 1", 120, 180, "focusButton", "activateButton") ; Add a button that will get clicked at the coordinates specified once the button is activated and make it trigger the "focusButton" and "activateButton" functions
+overlay.addHotspotButton("Button 1", 120, 180, "focusButton", "activateButton") ; Add a button that will get clicked at the coordinates specified once it's activated and make it trigger the "focusButton" and "activateButton" functions
 overlay.addHotspotButton("Button 2", 180, 180, "focusButton", "activateButton") ; Add a second button
 
 #hotIf winActive("ahk_exe notepad.exe") ; Restrict the script to Notepad
@@ -102,7 +102,7 @@ overlay.reset() ; Reset the overlay object to its initial state
 Here is a list of all currently defined classes:
 * accessibilityOverlay - Creates an overlay object that can serve as a container for other controls.
 * customControl - Creates a completely custom control that does absolutely nothing on its own (instead it relies on the 2 extra functions specified).
-* customButton - Creates a button that only requires a label and the names of functions to be executed up on focus or activation.
+* customButton - Creates a button that only requires a label and the names of functions to be executed up on focus and/or activation.
 * hotspotButton - Creates a button that clicks the mouse coordinates specified up on activation and optionally triggers extra functions up on focus and/or activation.
 * graphicButton - Creates a button that looks for images, reports an error if the specified graphics can not be found and optionally triggers extra functions up on focus and/or activation.
 * tabControl - Creates an element for attaching tabs on to.
