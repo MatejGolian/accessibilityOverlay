@@ -1,5 +1,5 @@
 # What It Is
-This set of classes written in AutoHotkey 2 makes it possible to simulate accessible user interface elements by combining AutoHotkey functionality with screen reader output. It was specifically written to address the needs of blind users who often require a large number of keyboard shortcuts when creating AHK-based accessibility solutions for otherwise inaccessible applications.
+This is a set of classes written in AutoHotkey 2 that makes it possible to simulate accessible user interface elements by combining AutoHotkey functionality with screen reader output. It was specifically written to address the needs of blind users who often require a large number of keyboard shortcuts when creating AHK-based accessibility solutions for otherwise inaccessible applications.
 ## Requirements
 1. AutoHotkey version 2
 2. The NVDA screen reader or Microsoft SAPI voices installed on your system
