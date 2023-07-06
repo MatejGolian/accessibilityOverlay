@@ -7,7 +7,7 @@ This is a set of classes written in AutoHotkey 2 that makes it possible to simul
    * Use nvdaControllerClient32.dll with the 32-bit version of AutoHotkey.
    * Use nvdaControllerClient64.dll with the 64-bit version of AutoHotkey.
 ## How It Works
-You define elements using the classes in the "accessibilityOverlay.ahk" file. These elements then get automatically voiced either by NVDA or Microsoft SAPI.
+You define elements using the classes found in the "accessibilityOverlay.ahk" file. These elements then get automatically voiced either by NVDA or Microsoft SAPI.
 * If NVDA is running and if the appropriate copy of the nvdaControllerClient DLL is located in your script directory, the elements are automatically voiced using NVDA.
 * If NVDA is not running or if the appropriate copy of the nvdaControllerClient DLL can not be found in your script directory, the elements are automatically voiced using Microsoft SAPI.
 ### Basic Usage Example
