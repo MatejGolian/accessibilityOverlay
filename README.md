@@ -78,8 +78,6 @@ Ctrl::accessibilityOverlay.stopSpeech() ; Stops SAPI (does not do anything in ca
     accessibilityOverlay.speak(appName . " reset")
 }
 
-return ; End auto-execute section
-
 focusButton(button) { ; Define function
     global appName
     ; Do something when a given button receives focus, like
