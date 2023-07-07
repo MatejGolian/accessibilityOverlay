@@ -81,13 +81,15 @@ Ctrl::accessibilityOverlay.stopSpeech() ; Stops SAPI (does not do anything in ca
 return ; End auto-execute section
 
 focusButton(button) { ; Define function
+    global appName
     ; Do something when a given button receives focus, like
-    msgBox(button.label) ; Dysplay a standard AHK message box with the label of the currently focused button
+    msgBox button.label, appName ; Dysplay a standard AHK message box with the label of the currently focused button
 }
 
 activateButton(button) { ; Define function
+    global appName
     ; Do something when a given button is activated, like
-    msgBox(button.label) ; Dysplay a standard AHK message box with the label of the button
+    msgBox button.label, appName ; Dysplay a standard AHK message box with the label of the button
 }
 ```
 ### Translating Overlays
