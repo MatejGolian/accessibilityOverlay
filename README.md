@@ -1,4 +1,4 @@
-# What It Is
+# What Is This?
 This is a set of classes written in AutoHotkey 2 that makes it possible to simulate accessible user interface elements by combining AutoHotkey functionality with screen reader output. It was specifically written to address the needs of blind users who often require a large number of keyboard shortcuts when creating AHK-based accessibility solutions for otherwise inaccessible applications.
 ## Requirements
 1. AutoHotkey version 2
@@ -12,6 +12,8 @@ You define elements using the classes found in the "accessibilityOverlay.ahk" fi
 * If NVDA is not running or if the appropriate copy of the nvdaControllerClient DLL can not be found in your script directory, the elements are automatically voiced using Microsoft SAPI.
 ### Basic Usage Example
 ```
+#requires AutoHotkey v2.0
+
 #include accessibilityOverlay.ahk ; Include the overlay classes in the script
 
 appName := "My App"
@@ -52,6 +54,8 @@ Ctrl::accessibilityOverlay.stopSpeech() ; Stops SAPI (does not do anything in ca
 When creating elements such as buttons and tabs, you can optionally supply the names of functions that will be executed either after the given control receives focus or once its activated. These functions are always the last parameters expected by the constructors and the calling object is automatically passed on to them as a parameter. Tab objects only support firing functions on focus, while buttons support firing functions on activation as well.
 For instance, here is how to create an overlay with buttons that fire user defined functions:
 ```
+#requires AutoHotkey v2.0
+
 #include accessibilityOverlay.ahk ; Include the overlay classes in the script
 
 appName := "My App"

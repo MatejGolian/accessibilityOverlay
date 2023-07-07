@@ -1,4 +1,4 @@
-#requires autoHotkey v2.0
+#requires AutoHotkey v2.0
 
 #include accessibilityOverlay.ahk
 
