@@ -53,19 +53,19 @@ mainTabControl.addTabs(GeneralTab, advancedTab)
 
 #hotIf winActive("ahk_exe notepad.exe")
 
-tab::notepadOverlay.focusNextControl()
-+tab::notepadOverlay.focusPreviousControl()
-right::
-^tab::notepadOverlay.focusNextTab()
-left::
-^+tab::notepadOverlay.focusPreviousTab()
-^a::notepadOverlay.activateControl(NestedTab1Button1.controlID)
-^f::notepadOverlay.focusControl(NestedTab1Button1.controlID)
-space::
-enter::notepadOverlay.activateCurrentControl()
-cTRL::accessibilityOverlay.stopSpeech()
+Tab::notepadOverlay.focusNextControl()
++Tab::notepadOverlay.focusPreviousControl()
+Right::
+^Tab::notepadOverlay.focusNextTab()
+Left::
+^+Tab::notepadOverlay.focusPreviousTab()
+^A::notepadOverlay.activateControl(NestedTab1Button1.controlID)
+^F::notepadOverlay.focusControl(NestedTab1Button1.controlID)
+Space::
+Enter::notepadOverlay.activateCurrentControl()
+Ctrl::accessibilityOverlay.stopSpeech()
 
-^r:: {
+^R:: {
     global appName, notepadOverlay
     notepadOverlay.reset()
     accessibilityOverlay.speak(appName . " reset")

@@ -35,12 +35,18 @@ mainTabControl.addTabs(basicTab, advancedTab) ; Add the 2 previously created tab
 #hotIf winActive("ahk_exe notepad.exe") ; Restrict the script to Notepad
 
 ; Set up keyboard shortcuts and navigation (items wrap automatically)
-tab::Overlay.focusNextControl() ; Move focus to the next control
-+tab::Overlay.focusPreviousControl() ; Move focus to the previous control
-right::Overlay.focusNextTab() ; If the current control is a tab control use the right arrow to focus the next tab
-left::Overlay.focusPreviousTab() ; If the current control is a tab control use the left arrow to focus the previous tab
-enter::Overlay.activateCurrentControl() ; Activate the currently focused control
-ctrl::accessibilityOverlay.stopSpeech() ; Stops SAPI (does not do anything in case of NVDA, since that's not needed)
+Tab::Overlay.focusNextControl() ; Move focus to the next control
++Tab::Overlay.focusPreviousControl() ; Move focus to the previous control
+Right::Overlay.focusNextTab() ; If the current control is a tab control use the right arrow to focus the next tab
+Left::Overlay.focusPreviousTab() ; If the current control is a tab control use the left arrow to focus the previous tab
+Enter::Overlay.activateCurrentControl() ; Activate the currently focused control
+Ctrl::accessibilityOverlay.stopSpeech() ; Stops SAPI (does not do anything in case of NVDA, since that's not needed)
+
+^R:: { ; Resets the overlay
+    global appName, overlay
+    overlay.reset()
+    accessibilityOverlay.speak(appName . " reset")
+}
 ```
 ### Firing Extra/Custom Functions
 When creating elements such as buttons and tabs, you can optionally supply the names of functions that will be executed either after the given control receives focus or once its activated. These functions are always the last parameters expected by the constructors and the calling object is automatically passed on to them as a parameter. Tab objects only support firing functions on focus, while buttons support firing functions on activation as well.
@@ -59,12 +65,18 @@ overlay.addHotspotButton("Button 2", 180, 180, "focusButton", "activateButton") 
 #hotIf winActive("ahk_exe notepad.exe") ; Restrict the script to Notepad
 
 ; Set up keyboard shortcuts and navigation (items wrap automatically)
-tab::Overlay.focusNextControl() ; Move focus to the next control
-+tab::Overlay.focusPreviousControl() ; Move focus to the previous control
-right::Overlay.focusNextTab() ; If the current control is a tab control use the right arrow to focus the next tab
-left::Overlay.focusPreviousTab() ; If the current control is a tab control use the left arrow to focus the previous tab
-enter::Overlay.activateCurrentControl() ; Activate the currently focused control
-ctrl::accessibilityOverlay.stopSpeech() ; Stops SAPI (does not do anything in case of NVDA, since that's not needed)
+Tab::Overlay.focusNextControl() ; Move focus to the next control
++Tab::Overlay.focusPreviousControl() ; Move focus to the previous control
+Right::Overlay.focusNextTab() ; If the current control is a tab control use the right arrow to focus the next tab
+Left::Overlay.focusPreviousTab() ; If the current control is a tab control use the left arrow to focus the previous tab
+Enter::Overlay.activateCurrentControl() ; Activate the currently focused control
+Ctrl::accessibilityOverlay.stopSpeech() ; Stops SAPI (does not do anything in case of NVDA, since that's not needed)
+
+^R:: { ; Resets the overlay
+    global appName, overlay
+    overlay.reset()
+    accessibilityOverlay.speak(appName . " reset")
+}
 
 return ; End auto-execute section
 
