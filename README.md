@@ -7,14 +7,14 @@ This is a set of classes written in AutoHotkey 2 that makes it possible to simul
    * Use nvdaControllerClient32.Dll with the 32-bit version of AutoHotkey.
    * Use nvdaControllerClient64.Dll with the 64-bit version of AutoHotkey.
 ## How It Works
-You define elements using the classes found in the "AccessibilityOverlay.Ahk" file. These elements then get automatically voiced either by NVDA or Microsoft SAPI.
+You define elements using the classes found in the "AccessibilityOverlay.Class.ahk" file. These elements then get automatically voiced either by NVDA or Microsoft SAPI.
 * If NVDA is running and if the appropriate copy of the nvdaControllerClient DLL is located in your script directory, the elements are automatically voiced using NVDA.
 * If NVDA is not running or if the appropriate copy of the nvdaControllerClient DLL can not be found in your script directory, the elements are automatically voiced using Microsoft SAPI.
 ### Basic Usage Example
 ```
 #Requires AutoHotkey v2.0
 
-#Include AccessibilityOverlay.Class.Ahk ; Include the overlay classes in the script
+#Include AccessibilityOverlay.Class.ahk ; Include the overlay classes in the script
 
 AppName := "My App"
 
@@ -56,7 +56,7 @@ For instance, here is how to create an overlay with buttons that fire user defin
 ```
 #Requires AutoHotkey v2.0
 
-#Include AccessibilityOverlay.Class.Ahk ; Include the overlay classes in the script
+#Include AccessibilityOverlay.Class.ahk ; Include the overlay classes in the script
 
 AppName := "My App"
 
