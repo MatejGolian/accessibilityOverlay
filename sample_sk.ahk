@@ -1,73 +1,73 @@
-#requires AutoHotkey v2.0
+#Requires AutoHotkey v2.0
 
-#include accessibilityOverlay.ahk
+#Include AccessibilityOverlay.Class.Ahk
 
-#maxThreadsPerHotkey 1
-#singleInstance force
-#warn
-sendMode "input"
-setWorkingDir a_initialWorkingDir
-coordMode "mouse", "window"
-coordMode "pixel", "Window"
+#MaxThreadsPerHotkey 1
+#SingleInstance Force
+#Warn
+SendMode "Input"
+SetWorkingDir A_InitialWorkingDir
+CoordMode "Mouse", "Window"
+CoordMode "Pixel", "Window"
 
-appName := "Skript pre Poznámkový blok"
+AppName := "Skript pre Poznámkový blok"
 
-accessibilityOverlay.speak(appName . " pripravený")
+AccessibilityOverlay.Speak(AppName . " pripravený")
 
-notepadOverlay := accessibilityOverlay()
-notepadOverlay.addHotspotButton("Hlavné tlačidlo 1", 120, 180)
-notepadOverlay.addHotspotButton("Hlavné tlačidlo 2", 180, 180)
-mainTabControl := notepadOverlay.addTabControl()
-generalTab := hotspotTab("Všeobecné", 360, 240)
-nestedOverlay := generalTab.addAccessibilityOverlay()
-nestedOverlay.addHotspotButton("Vnorené tlačidlo 1", 60, 320)
-nestedOverlay.addHotspotButton("Vnorené tlačidlo 2", 120, 320)
-nestedTabControl := nestedOverlay.addTabControl()
-nestedTab1 := hotspotTab("Vnorená záložka 1", 60, 400)
-nestedTab1Button1 := nestedTab1.addHotspotButton("Tlačidlo 1", 60, 460)
-nestedTab1.addHotspotButton("Tlačidlo 2", 240, 460)
-nestedTab1.addHotspotButton("Tlačidlo 3", 300, 460)
-nestedTab2 := hotspotTab("Vnorená záložka 2", 60, 400)
-nestedTab2.addHotspotButton("Voľba 1", 60, 460)
-nestedTab2.addHotspotButton("Voľba 2", 240, 460)
-nestedTab2.addHotspotButton("Voľba 3", 300, 460)
-nestedTabControl.addTabs(NestedTab1, nestedTab2)
-generalTab.addHotspotButton("Všeobecné tlačidlo 1", 60, 320)
-generalTab.addHotspotButton("Všeobecné tlačidlo 2", 120, 320)
-generalTab.addHotspotButton("Všeobecné tlačidlo 3", 180, 320)
-generalTab.addHotspotButton("Všeobecné tlačidlo 4", 240, 320)
-advancedTab := hotspotTab("Pokročilé", 420, 240)
-advancedTab.addHotspotButton("Pokročilé tlačidlo 1", 60, 320)
-advancedTabControl := advancedTab.addTabControl()
-optionsTab := hotspotTab("Nastavenia", 60, 400)
-optionsTab.addHotspotButton("Nastavenie 1", 60, 460)
-optionsTab.addHotspotButton("Nastavenie 2", 240, 460)
-optionsTab.addHotspotButton("Nastavenie 3", 300, 460)
-appearanceTab := hotspotTab("Vzhľad", 60, 400)
-appearanceTab.addHotspotButton("Možnosť 1", 60, 460)
-appearanceTab.addHotspotButton("Možnosť 2", 240, 460)
-appearanceTab.addHotspotButton("Možnosť 3", 300, 460)
-advancedTabControl.addTabs(OptionsTab, appearanceTab)
-advancedTab.addHotspotButton("Pokročilé tlačidlo 2", 120, 320)
-mainTabControl.addTabs(GeneralTab, advancedTab)
-notepadOverlay.translate("Slovak")
+NotepadOverlay := AccessibilityOverlay()
+NotepadOverlay.AddHotspotButton("Hlavné tlačidlo 1", 120, 180)
+NotepadOverlay.AddHotspotButton("Hlavné tlačidlo 2", 180, 180)
+MainTabControl := NotepadOverlay.AddTabControl()
+GeneralTab := HotspotTab("Všeobecné", 360, 240)
+NestedOverlay := GeneralTab.AddAccessibilityOverlay()
+NestedOverlay.AddHotspotButton("Vnorené tlačidlo 1", 60, 320)
+NestedOverlay.AddHotspotButton("Vnorené tlačidlo 2", 120, 320)
+NestedTabControl := NestedOverlay.AddTabControl()
+NestedTab1 := HotspotTab("Vnorená záložka 1", 60, 400)
+NestedTab1Button1 := NestedTab1.AddHotspotButton("Tlačidlo 1", 60, 460)
+NestedTab1.AddHotspotButton("Tlačidlo 2", 240, 460)
+NestedTab1.AddHotspotButton("Tlačidlo 3", 300, 460)
+NestedTab2 := HotspotTab("Vnorená záložka 2", 60, 400)
+NestedTab2.AddHotspotButton("Voľba 1", 60, 460)
+NestedTab2.AddHotspotButton("Voľba 2", 240, 460)
+NestedTab2.AddHotspotButton("Voľba 3", 300, 460)
+NestedTabControl.AddTabs(NestedTab1, NestedTab2)
+GeneralTab.AddHotspotButton("Všeobecné tlačidlo 1", 60, 320)
+GeneralTab.AddHotspotButton("Všeobecné tlačidlo 2", 120, 320)
+GeneralTab.AddHotspotButton("Všeobecné tlačidlo 3", 180, 320)
+GeneralTab.AddHotspotButton("Všeobecné tlačidlo 4", 240, 320)
+AdvancedTab := HotspotTab("Pokročilé", 420, 240)
+AdvancedTab.AddHotspotButton("Pokročilé tlačidlo 1", 60, 320)
+AdvancedTabControl := AdvancedTab.AddTabControl()
+OptionsTab := HotspotTab("Nastavenia", 60, 400)
+OptionsTab.AddHotspotButton("Nastavenie 1", 60, 460)
+OptionsTab.AddHotspotButton("Nastavenie 2", 240, 460)
+OptionsTab.AddHotspotButton("Nastavenie 3", 300, 460)
+AppearanceTab := HotspotTab("Vzhľad", 60, 400)
+AppearanceTab.AddHotspotButton("Možnosť 1", 60, 460)
+AppearanceTab.AddHotspotButton("Možnosť 2", 240, 460)
+AppearanceTab.AddHotspotButton("Možnosť 3", 300, 460)
+AdvancedTabControl.AddTabs(OptionsTab, AppearanceTab)
+AdvancedTab.AddHotspotButton("Pokročilé tlačidlo 2", 120, 320)
+MainTabControl.AddTabs(GeneralTab, AdvancedTab)
+NotepadOverlay.Translate("Slovak")
 
-#hotIf winActive("ahk_exe notepad.exe")
+#HotIf WinActive("ahk_exe notepad.Exe")
 
-Tab::notepadOverlay.focusNextControl()
-+Tab::notepadOverlay.focusPreviousControl()
+Tab::NotepadOverlay.FocusNextControl()
++Tab::NotepadOverlay.FocusPreviousControl()
 Right::
-^Tab::notepadOverlay.focusNextTab()
+^Tab::NotepadOverlay.FocusNextTab()
 Left::
-^+Tab::notepadOverlay.focusPreviousTab()
-^A::notepadOverlay.activateControl(NestedTab1Button1.controlID)
-^F::notepadOverlay.focusControl(NestedTab1Button1.controlID)
+^+Tab::NotepadOverlay.FocusPreviousTab()
+^A::NotepadOverlay.ActivateControl(NestedTab1Button1.ControlID)
+^F::NotepadOverlay.FocusControl(NestedTab1Button1.ControlID)
 Space::
-Enter::notepadOverlay.activateCurrentControl()
-Ctrl::accessibilityOverlay.stopSpeech()
+Enter::NotepadOverlay.ActivateCurrentControl()
+Ctrl::AccessibilityOverlay.StopSpeech()
 
 ^R:: {
-    global appName, notepadOverlay
-    notepadOverlay.reset()
-    accessibilityOverlay.speak(appName . " zresetovaný")
+    Global AppName, NotepadOverlay
+    NotepadOverlay.Reset()
+    AccessibilityOverlay.Speak(AppName . " zresetovaný")
 }
