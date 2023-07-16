@@ -1204,7 +1204,8 @@ Class TabControl {
         Return This.Tabs.Get(TabNumber, 0)
     }
     
-    ResetTabs() {
+    Reset() {
+        This.CurrentTab := 1
         For Tab In This.Tabs
         Tab.Reset()
     }
