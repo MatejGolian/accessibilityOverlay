@@ -121,6 +121,7 @@ Here is a list of all currently defined classes:
 * CustomButton - Creates a button that only requires a label and the names of functions to be executed up on focus and/or activation.
 * HotspotButton - Creates a button that clicks the mouse coordinates specified up on activation and optionally triggers extra functions up on focus and/or activation.
 * GraphicButton - Creates a button that looks for images, reports an error if the specified graphics can not be found and optionally triggers extra functions up on focus and/or activation.
+* GraphicCheckbox - Creates a checkbox that looks for images, reports an error if the specified graphics can not be found and optionally triggers extra functions up on focus and/or activation.
 * TabControl - Creates an element for attaching tabs on to.
 * CustomTab - Creates a tab that only requires a label and the name of the function to be triggered up on focus.
 * HotspotTab - Creates a tab that clicks the mouse coordinates specified and optionally triggers an extra function up on focus.
