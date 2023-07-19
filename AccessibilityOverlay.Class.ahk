@@ -87,12 +87,16 @@ Class AccessibilityOverlay {
             Clone.AddCustomButton(CurrentControl.Label, CurrentControl.OnFocusFunction, CurrentControl.OnActivateFunction)
             Case "CustomControl":
             Clone.AddCustomControl(CurrentControl.OnFocusFunction, CurrentControl.OnActivateFunction)
+            Case "CustomEdit":
+            Clone.AddCustomEdit(CurrentControl.Label, CurrentControl.OnFocusFunction)
             Case "GraphicButton":
             Clone.AddGraphicButton(CurrentControl.Label, CurrentControl.RegionX1Coordinate, CurrentControl.RegionY1Coordinate, CurrentControl.RegionX2Coordinate, CurrentControl.RegionY2Coordinate, CurrentControl.OnImage, CurrentControl.OffImage, CurrentControl.OnHoverImage, CurrentControl.OffHoverImage, CurrentControl.OnFocusFunction, CurrentControl.OnActivateFunction)
             Case "GraphicCheckbox":
             Clone.AddGraphicCheckbox(CurrentControl.Label, CurrentControl.RegionX1Coordinate, CurrentControl.RegionY1Coordinate, CurrentControl.RegionX2Coordinate, CurrentControl.RegionY2Coordinate, CurrentControl.CheckedImage, CurrentControl.UncheckedImage, CurrentControl.CheckedHoverImage, CurrentControl.UncheckedHoverImage, CurrentControl.OnFocusFunction, CurrentControl.OnActivateFunction)
             Case "HotspotButton":
             Clone.AddHotspotButton(CurrentControl.Label, CurrentControl.XCoordinate, CurrentControl.YCoordinate, CurrentControl.OnFocusFunction, CurrentControl.OnActivateFunction)
+            Case "HotspotEdit":
+            Clone.AddHotspotEdit(CurrentControl.Label, CurrentControl.XCoordinate, CurrentControl.YCoordinate, CurrentControl.OnFocusFunction)
             Case "TabControl":
             If CurrentControl.Tabs.Length == 0 {
                 Clone.AddTabControl(CurrentControl.Label)
@@ -376,6 +380,9 @@ Class AccessibilityOverlay {
         "CustomButton", Map(
         "ControlTypeLabel", "button",
         "UnlabelledString", "unlabelled"),
+        "CustomEdit", Map(
+        "ControlTypeLabel", "edit",
+        "UnlabelledString", "unlabelled"),
         "CustomTab", Map(
         "ControlTypeLabel", "tab",
         "UnlabelledString", "unlabelled"),
@@ -397,6 +404,9 @@ Class AccessibilityOverlay {
         "HotspotButton", Map(
         "ControlTypeLabel", "button",
         "UnlabelledString", "unlabelled"),
+        "HotspotEdit", Map(
+        "ControlTypeLabel", "edit",
+        "UnlabelledString", "unlabelled"),
         "HotspotTab", Map(
         "ControlTypeLabel", "tab",
         "UnlabelledString", "unlabelled"),
@@ -412,6 +422,9 @@ Class AccessibilityOverlay {
         "UnlabelledString", ""),
         "CustomButton", Map(
         "ControlTypeLabel", "tlačidlo",
+        "UnlabelledString", "bez názvu"),
+        "CustomEdit", Map(
+        "ControlTypeLabel", "editačné",
         "UnlabelledString", "bez názvu"),
         "CustomTab", Map(
         "ControlTypeLabel", "záložka",
@@ -434,6 +447,9 @@ Class AccessibilityOverlay {
         "HotspotButton", Map(
         "ControlTypeLabel", "tlačidlo",
         "UnlabelledString", "bez názvu"),
+        "HotspotEdit", Map(
+        "ControlTypeLabel", "editačné",
+        "UnlabelledString", "bez názvu"),
         "HotspotTab", Map(
         "ControlTypeLabel", "záložka",
         "UnlabelledString", "bez názvu"),
@@ -449,6 +465,9 @@ Class AccessibilityOverlay {
         "UnlabelledString", ""),
         "CustomButton", Map(
         "ControlTypeLabel", "knapp",
+        "UnlabelledString", "namnlös"),
+        "CustomEdit", Map(
+        "ControlTypeLabel", "redigera",
         "UnlabelledString", "namnlös"),
         "CustomTab", Map(
         "ControlTypeLabel", "flik",
@@ -470,6 +489,9 @@ Class AccessibilityOverlay {
         "UnlabelledString", "namnlös"),
         "HotspotButton", Map(
         "ControlTypeLabel", "knapp",
+        "UnlabelledString", "namnlös"),
+        "HotspotEdit", Map(
+        "ControlTypeLabel", "redigera",
         "UnlabelledString", "namnlös"),
         "HotspotTab", Map(
         "ControlTypeLabel", "flik",
@@ -519,6 +541,11 @@ Class AccessibilityOverlay {
         Return This.AddControl(Control)
     }
     
+    AddCustomEdit(Label, OnFocusFunction := "") {
+        Control := CustomEdit(Label, OnFocusFunction)
+        Return This.AddControl(Control)
+    }
+    
     AddGraphicButton(Label, RegionX1Coordinate, RegionY1Coordinate, RegionX2Coordinate, RegionY2Coordinate, OnImage, OffImage := "", OnHoverImage := "", OffHoverImage := "", OnFocusFunction := "", OnActivateFunction := "") {
         Control := GraphicButton(Label, RegionX1Coordinate, RegionY1Coordinate, RegionX2Coordinate, RegionY2Coordinate, OnImage, OffImage, OnHoverImage, OffHoverImage, OnFocusFunction, OnActivateFunction)
         Return This.AddControl(Control)
@@ -531,6 +558,11 @@ Class AccessibilityOverlay {
     
     AddHotspotButton(Label, XCoordinate, YCoordinate, OnFocusFunction := "", OnActivateFunction := "") {
         Control := HotspotButton(Label, XCoordinate, YCoordinate, OnFocusFunction, OnActivateFunction)
+        Return This.AddControl(Control)
+    }
+    
+    AddHotspotEdit(Label, XCoordinate, YCoordinate, OnFocusFunction := "") {
+        Control := HotspotEdit(Label, XCoordinate, YCoordinate, OnFocusFunction)
         Return This.AddControl(Control)
     }
     
@@ -617,6 +649,47 @@ Class CustomControl {
         If This.OnFocusFunction != ""
         %this.OnFocusFunction%(This)
         Return 1
+    }
+    
+}
+
+Class CustomEdit {
+    
+    ControlID := 0
+    ControlType := "Edit"
+    ControlTypeLabel := "edit"
+    OnFocusFunction := ""
+    Label := ""
+    SuperordinateControlID := 0
+    Value := ""
+    UnlabelledString := "unlabelled"
+    
+    __New(Label, OnFocusFunction := "") {
+        AccessibilityOverlay.TotalNumberOfControls++
+        This.ControlID := AccessibilityOverlay.TotalNumberOfControls
+        This.Label := Label
+        This.OnFocusFunction := OnFocusFunction
+        AccessibilityOverlay.AllControls.Push(This)
+    }
+    
+    Focus(CurrentControlID := 0) {
+        If This.OnFocusFunction != ""
+        %this.OnFocusFunction%(This)
+        If This.ControlID != CurrentControlID {
+            If This.Label == ""
+            AccessibilityOverlay.Speak(This.UnlabelledString . " " . This.ControlTypeLabel . " " . This.Value)
+            Else
+            AccessibilityOverlay.Speak(This.Label . " " . This.ControlTypeLabel . " " . This.Value)
+        }
+        Return 1
+    }
+    
+    GetValue() {
+        Return This.Value
+    }
+    
+    SetValue(Value) {
+        This.Value := Value
     }
     
 }
@@ -1324,11 +1397,15 @@ Class HotspotButton {
     
 }
 
-Class HotspotTab Extends AccessibilityOverlay {
+Class HotspotEdit {
     
-    ControlType := "Tab"
-    ControlTypeLabel := "tab"
+    ControlID := 0
+    ControlType := "Edit"
+    ControlTypeLabel := "edit"
     OnFocusFunction := ""
+    Label := ""
+    SuperordinateControlID := 0
+    Value := ""
     XCoordinate := 0
     YCoordinate := 0
     UnlabelledString := "unlabelled"
@@ -1343,120 +1420,162 @@ Class HotspotTab Extends AccessibilityOverlay {
         AccessibilityOverlay.AllControls.Push(This)
     }
     
-    Focus(ControlID := 0) {
+    Focus(CurrentControlID := 0) {
         Click This.XCoordinate, This.YCoordinate
         If This.OnFocusFunction != ""
         %this.OnFocusFunction%(This)
-        If This.ControlID != ControlID {
+        If This.ControlID != CurrentControlID {
             If This.Label == ""
-            AccessibilityOverlay.Speak(This.UnlabelledString . " " . This.ControlTypeLabel)
+            AccessibilityOverlay.Speak(This.UnlabelledString . " " . This.ControlTypeLabel . " " . This.Value)
             Else
-            AccessibilityOverlay.Speak(This.Label . " " . This.ControlTypeLabel)
+            AccessibilityOverlay.Speak(This.Label . " " . This.ControlTypeLabel . " " . This.Value)
         }
         Return 1
+    }
+    
+    GetValue() {
+        Return This.Value
+    }
+    
+    SetValue(Value) {
+        This.Value := Value
     }
     
 }
 
+Class HotspotTab Extends AccessibilityOverlay {
+    
+    ControlType := "Tab"
+    ControlTypeLabel := "tab"
+    OnFocusFunction := ""
+    XCoordinate := 0
+YCoordinate := 0
+UnlabelledString := "unlabelled"
+
+__New(Label, XCoordinate, YCoordinate, OnFocusFunction := "") {
+AccessibilityOverlay.TotalNumberOfControls++
+This.ControlID := AccessibilityOverlay.TotalNumberOfControls
+This.Label := Label
+This.XCoordinate := XCoordinate
+This.YCoordinate := YCoordinate
+This.OnFocusFunction := OnFocusFunction
+AccessibilityOverlay.AllControls.Push(This)
+}
+
+Focus(ControlID := 0) {
+Click This.XCoordinate, This.YCoordinate
+If This.OnFocusFunction != ""
+%this.OnFocusFunction%(This)
+If This.ControlID != ControlID {
+If This.Label == ""
+AccessibilityOverlay.Speak(This.UnlabelledString . " " . This.ControlTypeLabel)
+Else
+AccessibilityOverlay.Speak(This.Label . " " . This.ControlTypeLabel)
+}
+Return 1
+}
+
+}
+
 Class TabControl {
-    
-    ControlID := 0
-    ControlType := "TabControl"
-    ControlTypeLabel := "tab control"
-    Label := ""
-    SuperordinateControlID := 0
-    CurrentTab := 1
-    Tabs := Array()
-    SelectedString := "selected"
-    NotFoundString := "not found"
-    UnlabelledString := ""
-    
-    __New(Label := "", Tabs*) {
-        AccessibilityOverlay.TotalNumberOfControls++
-        This.ControlID := AccessibilityOverlay.TotalNumberOfControls
-        This.Label := Label
-        If Tabs.Length > 0
-        For Tab In Tabs
-        This.AddTabs(Tab)
-        AccessibilityOverlay.AllControls.Push(This)
-    }
-    
-    AddTabs(Tabs*) {
-        If Tabs.Length > 0
-        For Tab In Tabs {
-            Tab.SuperordinateControlID := This.ControlID
-            This.Tabs.Push(Tab)
-        }
-    }
-    
-    Focus(CurrentControlID := 0) {
-        If This.Tabs.Length > 0 {
-            If This.Tabs[This.CurrentTab].Focus(This.Tabs[This.CurrentTab].ControlID) == 1 {
-                If This.ControlID == CurrentControlID {
-                    If This.Tabs[This.CurrentTab].Label == ""
-                    AccessibilityOverlay.Speak(This.Tabs[This.CurrentTab].UnlabelledString . " " . This.Tabs[This.CurrentTab].ControlTypeLabel . " " . This.SelectedString)
-                    Else
-                    AccessibilityOverlay.Speak(This.Tabs[This.CurrentTab].Label . " " . This.Tabs[This.CurrentTab].ControlTypeLabel . " " . This.SelectedString)
-                }
-                Else {
-                    If This.Label == "" {
-                        If This.Tabs[This.CurrentTab].Label == ""
-                        AccessibilityOverlay.Speak(This.UnlabelledString . " " . This.Tabs[This.CurrentTab].UnlabelledString . " " . This.Tabs[This.CurrentTab].ControlTypeLabel . " " . This.SelectedString)
-                        Else
-                        AccessibilityOverlay.Speak(This.UnlabelledString . " " . This.ControlTypeLabel . " " . This.Tabs[This.CurrentTab].Label . " " . This.Tabs[This.CurrentTab].ControlTypeLabel . " " . This.SelectedString)
-                    }
-                    Else {
-                        If This.Tabs[This.CurrentTab].Label == ""
-                        AccessibilityOverlay.Speak(This.Label . " " . This.ControlTypeLabel . " " . This.Tabs[This.CurrentTab].UnlabelledString . " " . This.Tabs[This.CurrentTab].ControlTypeLabel . " " . This.SelectedString)
-                        Else
-                        AccessibilityOverlay.Speak(This.Label . " " . This.ControlTypeLabel . " " . This.Tabs[This.CurrentTab].Label . " " . This.Tabs[This.CurrentTab].ControlTypeLabel . " " . This.SelectedString)
-                    }
-                }
-            }
-            Else {
-                If This.ControlID == CurrentControlID {
-                    If This.Tabs[This.CurrentTab].Label == ""
-                    AccessibilityOverlay.Speak(This.Tabs[This.CurrentTab].UnlabelledString . " " . This.Tabs[This.CurrentTab].ControlTypeLabel . " " . This.NotFoundString)
-                    Else
-                    AccessibilityOverlay.Speak(This.Tabs[This.CurrentTab].Label . " " . This.Tabs[This.CurrentTab].ControlTypeLabel . " " . This.NotFoundString)
-                }
-                Else {
-                    If This.Label == "" {
-                        If This.Tabs[This.CurrentTab].Label == ""
-                        AccessibilityOverlay.Speak(This.UnlabelledString . " " . This.ControlTypeLabel . " " . This.Tabs[This.CurrentTab].UnlabelledString . " " . This.Tabs[This.CurrentTab].ControlTypeLabel . " " . This.NotFoundString)
-                        Else
-                        AccessibilityOverlay.Speak(This.UnlabelledString . " " . This.ControlTypeLabel . " " . This.Tabs[This.CurrentTab].Label . " " . This.Tabs[This.CurrentTab].ControlTypeLabel . " " . This.NotFoundString)
-                    }
-                    Else {
-                        If This.Tabs[This.CurrentTab].Label == ""
-                        AccessibilityOverlay.Speak(This.Label . " " . This.ControlTypeLabel . " " . This.Tabs[This.CurrentTab].UnlabelledString . " " . This.Tabs[This.CurrentTab].ControlTypeLabel . " " . This.NotFoundString)
-                        Else
-                        AccessibilityOverlay.Speak(This.Label . " " . This.ControlTypeLabel . " " . This.Tabs[This.CurrentTab].Label . " " . This.Tabs[This.CurrentTab].ControlTypeLabel . " " . This.NotFoundString)
-                    }
-                }
-            }
-        }
-        Else {
-            If This.Label == ""
-            AccessibilityOverlay.Speak(This.UnlabelledString . " " . This.ControlTypeLabel)
-            Else
-            AccessibilityOverlay.Speak(This.Label . " " . This.ControlTypeLabel)
-        }
-        Return 1
-    }
-    
-    GetCurrentTab() {
-        Return This.Tabs.Get(This.CurrentTab, 0)
-    }
-    
-    GetTab(TabNumber) {
-        Return This.Tabs.Get(TabNumber, 0)
-    }
-    
-    Reset() {
-        This.CurrentTab := 1
-        For Tab In This.Tabs
-        Tab.Reset()
-    }
-    
+
+ControlID := 0
+ControlType := "TabControl"
+ControlTypeLabel := "tab control"
+Label := ""
+SuperordinateControlID := 0
+CurrentTab := 1
+Tabs := Array()
+SelectedString := "selected"
+NotFoundString := "not found"
+UnlabelledString := ""
+
+__New(Label := "", Tabs*) {
+AccessibilityOverlay.TotalNumberOfControls++
+This.ControlID := AccessibilityOverlay.TotalNumberOfControls
+This.Label := Label
+If Tabs.Length > 0
+For Tab In Tabs
+This.AddTabs(Tab)
+AccessibilityOverlay.AllControls.Push(This)
+}
+
+AddTabs(Tabs*) {
+If Tabs.Length > 0
+For Tab In Tabs {
+Tab.SuperordinateControlID := This.ControlID
+This.Tabs.Push(Tab)
+}
+}
+
+Focus(CurrentControlID := 0) {
+If This.Tabs.Length > 0 {
+If This.Tabs[This.CurrentTab].Focus(This.Tabs[This.CurrentTab].ControlID) == 1 {
+If This.ControlID == CurrentControlID {
+If This.Tabs[This.CurrentTab].Label == ""
+AccessibilityOverlay.Speak(This.Tabs[This.CurrentTab].UnlabelledString . " " . This.Tabs[This.CurrentTab].ControlTypeLabel . " " . This.SelectedString)
+Else
+AccessibilityOverlay.Speak(This.Tabs[This.CurrentTab].Label . " " . This.Tabs[This.CurrentTab].ControlTypeLabel . " " . This.SelectedString)
+}
+Else {
+If This.Label == "" {
+If This.Tabs[This.CurrentTab].Label == ""
+AccessibilityOverlay.Speak(This.UnlabelledString . " " . This.Tabs[This.CurrentTab].UnlabelledString . " " . This.Tabs[This.CurrentTab].ControlTypeLabel . " " . This.SelectedString)
+Else
+AccessibilityOverlay.Speak(This.UnlabelledString . " " . This.ControlTypeLabel . " " . This.Tabs[This.CurrentTab].Label . " " . This.Tabs[This.CurrentTab].ControlTypeLabel . " " . This.SelectedString)
+}
+Else {
+If This.Tabs[This.CurrentTab].Label == ""
+AccessibilityOverlay.Speak(This.Label . " " . This.ControlTypeLabel . " " . This.Tabs[This.CurrentTab].UnlabelledString . " " . This.Tabs[This.CurrentTab].ControlTypeLabel . " " . This.SelectedString)
+Else
+AccessibilityOverlay.Speak(This.Label . " " . This.ControlTypeLabel . " " . This.Tabs[This.CurrentTab].Label . " " . This.Tabs[This.CurrentTab].ControlTypeLabel . " " . This.SelectedString)
+}
+}
+}
+Else {
+If This.ControlID == CurrentControlID {
+If This.Tabs[This.CurrentTab].Label == ""
+AccessibilityOverlay.Speak(This.Tabs[This.CurrentTab].UnlabelledString . " " . This.Tabs[This.CurrentTab].ControlTypeLabel . " " . This.NotFoundString)
+Else
+AccessibilityOverlay.Speak(This.Tabs[This.CurrentTab].Label . " " . This.Tabs[This.CurrentTab].ControlTypeLabel . " " . This.NotFoundString)
+}
+Else {
+If This.Label == "" {
+If This.Tabs[This.CurrentTab].Label == ""
+AccessibilityOverlay.Speak(This.UnlabelledString . " " . This.ControlTypeLabel . " " . This.Tabs[This.CurrentTab].UnlabelledString . " " . This.Tabs[This.CurrentTab].ControlTypeLabel . " " . This.NotFoundString)
+Else
+AccessibilityOverlay.Speak(This.UnlabelledString . " " . This.ControlTypeLabel . " " . This.Tabs[This.CurrentTab].Label . " " . This.Tabs[This.CurrentTab].ControlTypeLabel . " " . This.NotFoundString)
+}
+Else {
+If This.Tabs[This.CurrentTab].Label == ""
+AccessibilityOverlay.Speak(This.Label . " " . This.ControlTypeLabel . " " . This.Tabs[This.CurrentTab].UnlabelledString . " " . This.Tabs[This.CurrentTab].ControlTypeLabel . " " . This.NotFoundString)
+Else
+AccessibilityOverlay.Speak(This.Label . " " . This.ControlTypeLabel . " " . This.Tabs[This.CurrentTab].Label . " " . This.Tabs[This.CurrentTab].ControlTypeLabel . " " . This.NotFoundString)
+}
+}
+}
+}
+Else {
+If This.Label == ""
+AccessibilityOverlay.Speak(This.UnlabelledString . " " . This.ControlTypeLabel)
+Else
+AccessibilityOverlay.Speak(This.Label . " " . This.ControlTypeLabel)
+}
+Return 1
+}
+
+GetCurrentTab() {
+Return This.Tabs.Get(This.CurrentTab, 0)
+}
+
+GetTab(TabNumber) {
+Return This.Tabs.Get(TabNumber, 0)
+}
+
+Reset() {
+This.CurrentTab := 1
+For Tab In This.Tabs
+Tab.Reset()
+}
+
 }
