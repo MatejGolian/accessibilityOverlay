@@ -51,7 +51,7 @@ Ctrl::AccessibilityOverlay.StopSpeech() ; Stops SAPI (does not do anything in ca
 }
 ```
 ### Firing Extra/Custom Functions
-When creating elements such as buttons and tabs, you can optionally supply the names of functions that will be executed either after the given control receives focus or once its activated. These functions are always the last parameters expected by the constructors and the calling object is automatically passed on to them as a parameter. Tab objects only support firing functions on focus, while buttons support firing functions on activation as well.
+When creating elements such as buttons and tabs, you can optionally supply functions that will be executed either after the given control receives focus or once its activated. These functions are always the last parameters expected by the constructors and the calling object is automatically passed on to them as a parameter. Tab objects only support firing functions on focus, while buttons support firing functions on activation as well.
 For instance, here is how to create an overlay with buttons that fire user defined functions:
 ```
 #Requires AutoHotkey v2.0
@@ -63,8 +63,8 @@ AppName := "My App"
 AccessibilityOverlay.Speak(AppName . " ready") ; Make NVDA or SAPI report that your script has been launched
 
 Overlay := AccessibilityOverlay() ; Create a new overlay object
-Overlay.AddHotspotButton("Button 1", 120, 180, "FocusButton", "ActivateButton") ; Add a button that will get clicked at the coordinates specified once it's activated and make it trigger the "focusButton" and "activateButton" functions
-Overlay.AddHotspotButton("Button 2", 180, 180, "FocusButton", "ActivateButton") ; Add a second button
+Overlay.AddHotspotButton("Button 1", 120, 180, FocusButton, ActivateButton) ; Add a button that will get clicked at the coordinates specified once it's activated and make it trigger the "focusButton" and "activateButton" functions
+Overlay.AddHotspotButton("Button 2", 180, 180, FocusButton, ActivateButton) ; Add a second button
 
 #HotIf WinActive("ahk_exe notepad.Exe") ; Restrict the script to Notepad
 
@@ -118,13 +118,13 @@ Overlay.Reset() ; Reset the overlay object to its initial state
 Here is a list of all currently defined classes:
 * AccessibilityOverlay - Creates an overlay object that can serve as a container for other controls.
 * CustomControl - Creates a completely custom control that does absolutely nothing on its own (instead it relies on the 2 extra functions specified).
-* CustomButton - Creates a button that only requires a label and the names of functions to be executed up on focus and/or activation.
+* CustomButton - Creates a button that only requires a label and the functions to be executed up on focus and/or activation.
 * HotspotButton - Creates a button that clicks the mouse coordinates specified up on activation and optionally triggers extra functions up on focus and/or activation.
 * GraphicButton - Creates a button that looks for images, reports an error if the specified graphics can not be found and optionally triggers extra functions up on focus and/or activation.
 * GraphicCheckbox - Creates a checkbox that looks for images, reports an error if the specified graphics can not be found and optionally triggers extra functions up on focus and/or activation.
 * CustomEdit - Creates a edit field announcement and optionally executes a function up on focus.
 * HotspotEdit - Creates a edit field announcement, clicks the mouse coordinates specified up on focus and optionally triggers an extra function up on focus
 * TabControl - Creates an element for attaching tabs on to.
-* CustomTab - Creates a tab that only requires a label and the name of the function to be triggered up on focus.
+* CustomTab - Creates a tab that only requires a label and an optional function to be triggered up on focus.
 * HotspotTab - Creates a tab that clicks the mouse coordinates specified and optionally triggers an extra function up on focus.
 * GraphicTab - Creates a tab that looks for images, reports an error if the specified graphics can not be found and optionally triggers an extra function up on focus.
