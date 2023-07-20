@@ -52,7 +52,7 @@ AdvancedTab.AddHotspotButton("Pokročilé tlačidlo 2", 120, 320)
 MainTabControl.AddTabs(GeneralTab, AdvancedTab)
 NotepadOverlay.Translate("Slovak")
 
-#HotIf WinActive("ahk_exe notepad.Exe")
+#HotIf WinActive("ahk_exe notepad.exe")
 
 Tab::NotepadOverlay.FocusNextControl()
 +Tab::NotepadOverlay.FocusPreviousControl()
