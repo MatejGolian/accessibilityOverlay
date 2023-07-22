@@ -288,6 +288,8 @@ Class AccessibilityOverlay {
             This.ChildControls.Pop()
             This.FocusableControlIDs := This.GetFocusableControlIDs()
             NewList := This.FocusableControlIDs
+            Found := This.FindFocusableControlID(This.CurrentControlID)
+            If Found == 0 Or OldList[Found] != NewList[Found]
             If NewList.Length == 0 {
                 This.CurrentControlID := 0
             }
@@ -311,11 +313,13 @@ Class AccessibilityOverlay {
     }
     
     RemoveControlAt(Index) {
-        If This.ChildControls.Get(Index) {
+        If Index > 0 And Index <= This.ChildControls.Length {
             OldList := This.GetFocusableControlIDs()
             This.ChildControls.RemoveAt(Index)
             This.FocusableControlIDs := This.GetFocusableControlIDs()
             NewList := This.FocusableControlIDs
+            Found := This.FindFocusableControlID(This.CurrentControlID)
+            If Found == 0 Or OldList[Found] != NewList[Found]
             If NewList.Length == 0 {
                 This.CurrentControlID := 0
             }
