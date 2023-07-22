@@ -284,11 +284,26 @@ Class AccessibilityOverlay {
     
     RemoveControl() {
         If This.ChildControls.Length > 0 {
+            OldList := This.GetFocusableControlIDs()
             This.ChildControls.Pop()
             This.FocusableControlIDs := This.GetFocusableControlIDs()
-            Found := This.FindFocusableControlID(This.CurrentControlID)
-            If Found == 0
-            This.CurrentControlID := 0
+            NewList := This.FocusableControlIDs
+            If NewList.Length == 0 {
+                This.CurrentControlID := 0
+            }
+            Else If NewList.Length == 1 {
+                This.CurrentControlID := NewList[1]
+            }
+            Else {
+                I := NewList.Length
+                Loop NewList.Length {
+                    If OldList[I] == NewList[I] {
+                        This.CurrentControlID := NewList[I]
+                        Break
+                    }
+                    I--
+                }
+            }
             This.SetCurrentControlID(This.CurrentControlID)
             Return 1
         }
@@ -297,13 +312,26 @@ Class AccessibilityOverlay {
     
     RemoveControlAt(Index) {
         If This.ChildControls.Get(Index) {
+            OldList := This.GetFocusableControlIDs()
             This.ChildControls.RemoveAt(Index)
             This.FocusableControlIDs := This.GetFocusableControlIDs()
-            Found := This.FindFocusableControlID(This.CurrentControlID)
-            If Found <= 1
-            This.CurrentControlID := This.FocusableControlIDs[This.FocusableControlIDs.Length]
-            Else
-            This.CurrentControlID := This.FocusableControlIDs[Found - 1]
+            NewList := This.FocusableControlIDs
+            If NewList.Length == 0 {
+                This.CurrentControlID := 0
+            }
+            Else If NewList.Length == 1 {
+                This.CurrentControlID := NewList[1]
+            }
+            Else {
+                I := NewList.Length
+                Loop NewList.Length {
+                    If OldList[I] == NewList[I] {
+                        This.CurrentControlID := NewList[I]
+                        Break
+                    }
+                    I--
+                }
+            }
             This.SetCurrentControlID(This.CurrentControlID)
             Return 1
         }
