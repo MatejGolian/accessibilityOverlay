@@ -2,14 +2,15 @@
 This is a set of classes written in AutoHotkey 2 that makes it possible to simulate accessible user interface elements by combining AutoHotkey functionality with screen reader output. It was specifically written to address the needs of blind users who often require a large number of keyboard shortcuts when creating AHK-based accessibility solutions for otherwise inaccessible applications.
 ## Requirements
 1. AutoHotkey version 2
-2. The NVDA screen reader or Microsoft SAPI voices installed on your system
+2. JAWS, NVDA or Microsoft SAPI voices installed on your system
 3. In case you want to use NVDA for speech output, you'll need a copy of the nvdaControllerClient DLL depending on your build of AutoHotkey. The nvdaControllerClient DLL is available both in 32 and 64-bit and both versions can be downloaded at the following location: http://www.Nvda-project.Org/nvdaControllerClient/nvdaControllerClient_20100219.7z
    * Use nvdaControllerClient32.Dll with the 32-bit version of AutoHotkey.
    * Use nvdaControllerClient64.Dll with the 64-bit version of AutoHotkey.
 ## How It Works
-You define elements using the classes found in the "AccessibilityOverlay.Class.ahk" file. These elements then get automatically voiced either by NVDA or Microsoft SAPI.
+You define elements using the classes found in the "AccessibilityOverlay.Class.ahk" file. These elements then get automatically voiced either by JAWS, NVDA or Microsoft SAPI.
+* If JAWS is running, the elements are automatically voiced using JAWS.
 * If NVDA is running and if the appropriate copy of the nvdaControllerClient DLL is located in your script directory, the elements are automatically voiced using NVDA.
-* If NVDA is not running or if the appropriate copy of the nvdaControllerClient DLL can not be found in your script directory, the elements are automatically voiced using Microsoft SAPI.
+* If nor JAWS or NVDA is running or if the appropriate copy of the nvdaControllerClient DLL can not be found in your script directory, the elements are automatically voiced using Microsoft SAPI. Note that when both JAWS and NVDA are available, they will both be used for output.
 ### Basic Usage Example
 ```
 #Requires AutoHotkey v2.0
