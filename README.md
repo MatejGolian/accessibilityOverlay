@@ -53,7 +53,8 @@ Ctrl::AccessibilityOverlay.StopSpeech() ; Stops SAPI (does not do anything in ca
 ```
 ### Firing Extra/Custom Functions
 When creating elements such as buttons and tabs, you can optionally supply functions that will be executed either after the given control receives focus or once its activated. These functions are always the last parameters expected by the constructors and the calling object is automatically passed on to them as a parameter. Tab objects only support firing functions on focus, while buttons support firing functions on activation as well.
-For instance, here is how to create an overlay with buttons that fire user defined functions:
+If so desired, a single object can trigger more than one function on focus or activation. For it to do so, pass an array of functions on to it during instantiation.
+Here is how to create an overlay with buttons that fire user defined functions:
 ```
 #Requires AutoHotkey v2.0
 
@@ -65,7 +66,7 @@ AccessibilityOverlay.Speak(AppName . " ready") ; Make NVDA or SAPI report that y
 
 Overlay := AccessibilityOverlay() ; Create a new overlay object
 Overlay.AddHotspotButton("Button 1", 120, 180, FocusButton, ActivateButton) ; Add a button that will get clicked at the coordinates specified once it's activated and make it trigger the "focusButton" and "activateButton" functions
-Overlay.AddHotspotButton("Button 2", 180, 180, FocusButton, ActivateButton) ; Add a second button
+Overlay.AddHotspotButton("Button 2", 180, 180, [FocusButton, FocusButton2], [ActivateButton, ActivateButton2]) ; Add a second button that triggers 2 focus functions and 2 activate functions
 
 #HotIf WinActive("ahk_exe notepad.Exe") ; Restrict the script to Notepad
 
@@ -89,11 +90,42 @@ FocusButton(Button) { ; Define function
     MsgBox Button.Label, AppName ; Dysplay a standard AHK message box with the label of the currently focused button
 }
 
+FocusButton2(Button) { ; Define function
+    Global AppName
+    ; Do something when a given button receives focus, like
+    MsgBox Button.Label, AppName ; Dysplay a standard AHK message box with the label of the currently focused button
+}
+
 ActivateButton(Button) { ; Define function
     Global AppName
     ; Do something when a given button is activated, like
     MsgBox Button.Label, AppName ; Dysplay a standard AHK message box with the label of the button
 }
+
+ActivateButton2(Button) { ; Define function
+    Global AppName
+    ; Do something when a given button is activated, like
+    MsgBox Button.Label, AppName ; Dysplay a standard AHK message box with the label of the button
+}
+```
+### Advanced Control Adding
+You can use the methods "AddControl" and "AddControlAt" to add child controls to AccessibilityOverlays. The "AddControl" method adds a control as the last control, while "AddControlAt" inserts the control at the specified index pushing all later controls.
+```
+Overlay := AccessibilityOverlay() ; Create a new overlay object
+Overlay.AddHotspotButton("Button 1", 120, 180) ; Add a button that will get clicked at the coordinates specified once the button is activated
+Overlay.AddHotspotButton("Button 3", 180, 180) ; Add a button that will become the third button once all controls have been added
+Overlay.AddControl(HotspotButton("Button 4", 210, 180))  ; Add a button that will become the fourth button once all controls have been added
+Overlay.AddControlAt(2, HotspotButton("Button 2", 150, 180)) ; Add this as the second button
+```
+### Removing Controls From An Overlay
+The methods "Remove" and "RemoveAt" can be used to remove child controls from AccessibilityOverlay objects. The "Remove" method always removes the last control, while "RemoveAt" removes the control at the specified index.
+```
+Overlay := AccessibilityOverlay() ; Create a new overlay object
+Overlay.AddHotspotButton("Button 1", 120, 180) ; Add a button that will get clicked at the coordinates specified once the button is activated
+Overlay.AddHotspotButton("Button 2", 180, 180) ; Add a second button
+Overlay.AddHotspotButton("Button 3", 180, 180) ; Add a third button
+Overlay.Remove() ; Remove the third button
+Overlay.RemoveAt(1) ; Remove the first button
 ```
 ### Translating Overlays
 By calling the "Translate" metod of an AccessibilityOverlay object it's possible to translate that object to different languages. The currently supported languages are English, Slovak and Swedish. Note that this method does not translate the user labels of the added elements - just predefined information mostly related to control type and state announcement.
@@ -118,15 +150,15 @@ Overlay.Reset() ; Reset the overlay object to its initial state
 ## Defined Classes
 Here is a list of all currently defined classes:
 * AccessibilityOverlay - Creates an overlay object that can serve as a container for other controls.
-* CustomControl - Creates a completely custom control that does absolutely nothing on its own (instead it relies on the 2 extra functions specified).
+* CustomControl - Creates a completely custom control that does absolutely nothing on its own (instead it relies on the custom functions specified).
 * CustomButton - Creates a button that only requires a label and the functions to be executed up on focus and/or activation.
 * HotspotButton - Creates a button that clicks the mouse coordinates specified up on activation and optionally triggers extra functions up on focus and/or activation.
 * GraphicButton - Creates a button that looks for images, reports an error if the specified graphics can not be found and optionally triggers extra functions up on focus and/or activation.
 * GraphicCheckbox - Creates a checkbox that looks for images, reports an error if the specified graphics can not be found and optionally triggers extra functions up on focus and/or activation.
 * CustomEdit - Creates a edit field announcement and optionally executes a function up on focus.
-* HotspotEdit - Creates a edit field announcement, clicks the mouse coordinates specified up on focus and optionally triggers an extra function up on focus.
+* HotspotEdit - Creates a edit field announcement, clicks the mouse coordinates specified up on focus and optionally triggers extra functions up on focus.
 * SpeechOutput - Creates an element which sole purpose is to make the screen reader say a message.
 * TabControl - Creates an element for attaching tabs on to.
 * CustomTab - Creates a tab that only requires a label and an optional function to be triggered up on focus.
-* HotspotTab - Creates a tab that clicks the mouse coordinates specified and optionally triggers an extra function up on focus.
-* GraphicTab - Creates a tab that looks for images, reports an error if the specified graphics can not be found and optionally triggers an extra function up on focus.
+* HotspotTab - Creates a tab that clicks the mouse coordinates specified and optionally triggers extra functions up on focus.
+* GraphicTab - Creates a tab that looks for images, reports an error if the specified graphics can not be found and optionally triggers extra functions up on focus.
