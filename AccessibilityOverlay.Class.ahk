@@ -95,6 +95,8 @@ Class AccessibilityOverlay {
                 Clone.AddControl(CurrentControl.Clone())
                 Case "CustomButton":
                 Clone.AddCustomButton(CurrentControl.Label, CurrentControl.OnFocusFunction, CurrentControl.OnActivateFunction)
+                Case "CustomComboBox":
+                Clone.AddCustomComboBox(CurrentControl.Label, CurrentControl.OnFocusFunction)
                 Case "CustomControl":
                 Clone.AddCustomControl(CurrentControl.OnFocusFunction, CurrentControl.OnActivateFunction)
                 Case "CustomEdit":
@@ -502,6 +504,9 @@ Class AccessibilityOverlay {
         "CustomButton", Map(
         "ControlTypeLabel", "button",
         "UnlabelledString", "unlabelled"),
+        "CustomComboBox", Map(
+        "ControlTypeLabel", "combo box",
+        "UnlabelledString", "unlabelled"),
         "CustomEdit", Map(
         "ControlTypeLabel", "edit",
         "UnlabelledString", "unlabelled"),
@@ -554,6 +559,9 @@ Class AccessibilityOverlay {
         "CustomButton", Map(
         "ControlTypeLabel", "tlačidlo",
         "UnlabelledString", "bez názvu"),
+        "CustomComboBox", Map(
+        "ControlTypeLabel", "kombinovaný rámik",
+        "UnlabelledString", "bez názvu"),
         "CustomEdit", Map(
         "ControlTypeLabel", "editačné",
         "UnlabelledString", "bez názvu"),
@@ -605,6 +613,9 @@ Class AccessibilityOverlay {
         "UnlabelledString", ""),
         "CustomButton", Map(
         "ControlTypeLabel", "knapp",
+        "UnlabelledString", "namnlös"),
+        "CustomComboBox", Map(
+        "ControlTypeLabel", "kombinationsruta",
         "UnlabelledString", "namnlös"),
         "CustomEdit", Map(
         "ControlTypeLabel", "redigera",
@@ -690,6 +701,11 @@ Class AccessibilityOverlay {
     
     AddCustomButton(Label, OnFocusFunction := "", OnActivateFunction := "") {
         Control := CustomButton(Label, OnFocusFunction, OnActivateFunction)
+        Return This.AddControl(Control)
+    }
+    
+    AddCustomComboBox(Label, OnFocusFunction := "") {
+        Control := CustomComboBox(Label, OnFocusFunction)
         Return This.AddControl(Control)
     }
     
@@ -801,6 +817,56 @@ Class CustomButton {
             AccessibilityOverlay.Speak(This.Label . " " . This.ControlTypeLabel)
         }
         Return 1
+    }
+    
+}
+
+Class CustomComboBox {
+    
+    ControlID := 0
+    ControlType := "ComboBox"
+    ControlTypeLabel := "combo box"
+    OnFocusFunction := Array()
+    Label := ""
+    SuperordinateControlID := 0
+    Value := ""
+    UnlabelledString := "unlabelled"
+    
+    __New(Label, OnFocusFunction := "") {
+        AccessibilityOverlay.TotalNumberOfControls++
+        This.ControlID := AccessibilityOverlay.TotalNumberOfControls
+        This.Label := Label
+        If OnFocusFunction != "" {
+            If OnFocusFunction Is Array
+            This.OnFocusFunction := OnFocusFunction
+            Else
+            This.OnFocusFunction := Array(OnFocusFunction)
+        }
+        AccessibilityOverlay.AllControls.Push(This)
+    }
+    
+    Focus(CurrentControlID := 0, SpeakValueOnTrue := 0) {
+        For OnFocusFunction In This.OnFocusFunction
+        %OnFocusFunction.Name%(This)
+        If This.ControlID != CurrentControlID {
+            If This.Label == ""
+            AccessibilityOverlay.Speak(This.UnlabelledString . " " . This.ControlTypeLabel . " " . This.Value)
+            Else
+            AccessibilityOverlay.Speak(This.Label . " " . This.ControlTypeLabel . " " . This.Value)
+        }
+        Else {
+            If SpeakValueOnTrue == 1
+            AccessibilityOverlay.Speak(This.Value)
+        }
+        Return 1
+    }
+    
+    GetValue() {
+        Return This.Value
+    }
+    
+    SetValue(Value) {
+        This.Value := Value
     }
     
 }
