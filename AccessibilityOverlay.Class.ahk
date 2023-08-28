@@ -111,6 +111,8 @@ Class AccessibilityOverlay {
                 Clone.AddHotspotComboBox(CurrentControl.Label, CurrentControl.XCoordinate, CurrentControl.YCoordinate, CurrentControl.OnFocusFunction)
                 Case "HotspotEdit":
                 Clone.AddHotspotEdit(CurrentControl.Label, CurrentControl.XCoordinate, CurrentControl.YCoordinate, CurrentControl.OnFocusFunction)
+                Case "OCRButton":
+                Clone.AddOCRButton(CurrentControl.RegionX1Coordinate, CurrentControl.RegionY1Coordinate, CurrentControl.RegionX2Coordinate, CurrentControl.RegionY2Coordinate, CurrentControl.Language, CurrentControl.Scale, CurrentControl.OnFocusFunction)
                 Case "OCRComboBox":
                 Clone.AddOCRComboBox(CurrentControl.Label, CurrentControl.RegionX1Coordinate, CurrentControl.RegionY1Coordinate, CurrentControl.RegionX2Coordinate, CurrentControl.RegionY2Coordinate, CurrentControl.Language, CurrentControl.Scale, CurrentControl.OnFocusFunction)
                 Case "OCREdit":
@@ -540,6 +542,9 @@ Class AccessibilityOverlay {
         "HotspotTab", Map(
         "ControlTypeLabel", "tab",
         "UnlabelledString", "unlabelled"),
+        "OCRButton", Map(
+        "ControlTypeLabel", "button",
+        "UnlabelledString", "unlabelled"),
         "OCRComboBox", Map(
         "ControlTypeLabel", "combo box",
         "UnlabelledString", "unlabelled"),
@@ -595,6 +600,9 @@ Class AccessibilityOverlay {
         "HotspotTab", Map(
         "ControlTypeLabel", "záložka",
         "UnlabelledString", "bez názvu"),
+        "OCRButton", Map(
+        "ControlTypeLabel", "tlačidlo",
+        "UnlabelledString", "bez názvu"),
         "OCRComboBox", Map(
         "ControlTypeLabel", "kombinovaný rámik",
         "UnlabelledString", "bez názvu"),
@@ -649,6 +657,9 @@ Class AccessibilityOverlay {
         "UnlabelledString", "namnlös"),
         "HotspotTab", Map(
         "ControlTypeLabel", "flik",
+        "UnlabelledString", "namnlös"),
+        "OCRButton", Map(
+        "ControlTypeLabel", "knapp",
         "UnlabelledString", "namnlös"),
         "OCRComboBox", Map(
         "ControlTypeLabel", "kombinationsruta",
@@ -741,6 +752,11 @@ Class AccessibilityOverlay {
     
     AddHotspotEdit(Label, XCoordinate, YCoordinate, OnFocusFunction := "") {
         Control := HotspotEdit(Label, XCoordinate, YCoordinate, OnFocusFunction)
+        Return This.AddControl(Control)
+    }
+    
+    AddOCRButton(RegionX1Coordinate, RegionY1Coordinate, RegionX2Coordinate, RegionY2Coordinate, Language := "", Scale := 1, OnFocusFunction := "") {
+        Control := OCRButton(RegionX1Coordinate, RegionY1Coordinate, RegionX2Coordinate, RegionY2Coordinate, Language, Scale, OnFocusFunction)
         Return This.AddControl(Control)
     }
     
@@ -1943,6 +1959,94 @@ Class OCRComboBox {
     
     SetValue(Value) {
         This.Value := Value
+    }
+    
+}
+
+Class OCRButton {
+    
+    ControlID := 0
+    ControlType := "Button"
+    ControlTypeLabel := "button"
+    Label := ""
+    OnFocusFunction := Array()
+    OnActivateFunction := Array()
+    SuperordinateControlID := 0
+    RegionX1Coordinate := 0
+    RegionY1Coordinate := 0
+    RegionX2Coordinate := 0
+    RegionY2Coordinate := 0
+    Language := ""
+    Scale := 1
+    UnlabelledString := "unlabelled"
+    
+    __New(RegionX1Coordinate, RegionY1Coordinate, RegionX2Coordinate, RegionY2Coordinate, Language := "", Scale := 1, OnFocusFunction := "", OnActivateFunction := "") {
+        AccessibilityOverlay.TotalNumberOfControls++
+        This.ControlID := AccessibilityOverlay.TotalNumberOfControls
+        This.RegionX1Coordinate := RegionX1Coordinate
+        This.RegionY1Coordinate := RegionY1Coordinate
+        This.RegionX2Coordinate := RegionX2Coordinate
+        This.RegionY2Coordinate := RegionY2Coordinate
+        This.Language := Language
+        This.Scale := Scale
+        If OnFocusFunction != "" {
+            If OnFocusFunction Is Array
+            This.OnFocusFunction := OnFocusFunction
+            Else
+            This.OnFocusFunction := Array(OnFocusFunction)
+        }
+        If OnActivateFunction != "" {
+            If OnActivateFunction Is Array
+            This.OnActivateFunction := OnActivateFunction
+            Else
+            This.OnActivateFunction := Array(OnActivateFunction)
+        }
+        AccessibilityOverlay.AllControls.Push(This)
+    }
+    
+    Activate(CurrentControlID := 0) {
+        If HasMethod(This, "Focus") And CurrentControlID != This.ControlID
+        This.Focus()
+        For OnActivateFunction In This.OnActivateFunction
+        %OnActivateFunction.Name%(This)
+        XCoordinate := Floor((This.RegionX2Coordinate - This.RegionX1Coordinate)/2)
+        YCoordinate := Floor((This.RegionY2Coordinate - This.RegionY1Coordinate)/2)
+        Click XCoordinate, YCoordinate
+        Return 1
+    }
+    
+    Focus(CurrentControlID := 0) {
+        For OnFocusFunction In This.OnFocusFunction
+        %OnFocusFunction.Name%(This)
+        AvailableLanguages := OCR.GetAvailableLanguages()
+        FirstAvailableLanguage := False
+        PreferredLanguage := False
+        Loop Parse, AvailableLanguages, "`n" {
+            If A_Index == 1 And A_LoopField != ""
+            FirstAvailableLanguage := A_LoopField
+            If A_LoopField == This.Language And This.Language != "" {
+                PreferredLanguage := True
+                Break
+            }
+        }
+        If PreferredLanguage == False And FirstAvailableLanguage != False {
+            Result := OCR.FromRect(This.RegionX1Coordinate, This.RegionY1Coordinate, This.RegionX2Coordinate - This.RegionX1Coordinate, This.RegionY2Coordinate - This.RegionY1Coordinate, FirstAvailableLanguage, This.Scale)
+            This.Label := Result.Text
+        }
+        Else If PreferredLanguage == True {
+            Result := OCR.FromRect(This.RegionX1Coordinate, This.RegionY1Coordinate, This.RegionX2Coordinate - This.RegionX1Coordinate, This.RegionY2Coordinate - This.RegionY1Coordinate, This.Language, This.Scale)
+            This.Label := Result.Text
+        }
+        Else {
+            This.Label := This.UnlabelledString
+        }
+        XCoordinate := Floor((This.RegionX2Coordinate - This.RegionX1Coordinate)/2)
+        YCoordinate := Floor((This.RegionY2Coordinate - This.RegionY1Coordinate)/2)
+        MouseMove XCoordinate, YCoordinate
+        If This.ControlID != CurrentControlID {
+            AccessibilityOverlay.Speak(This.Label . " " . This.ControlTypeLabel)
+        }
+        Return 1
     }
     
 }
