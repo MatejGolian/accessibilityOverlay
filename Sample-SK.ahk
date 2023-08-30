@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 
-#Include AccessibilityOverlay.Class.ahk
+#Include AccessibilityOverlay.ahk
 
 #MaxThreadsPerHotkey 1
 #SingleInstance Force
