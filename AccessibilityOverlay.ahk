@@ -487,22 +487,25 @@ Class AccessibilityOverlay {
     }
     
     Static OCR(RegionX1Coordinate, RegionY1Coordinate, RegionX2Coordinate, RegionY2Coordinate, OCRLanguage := "", OCRScale := 1) {
-        AvailableLanguages := OCR.GetAvailableLanguages()
-        FirstAvailableLanguage := False
-        PreferredLanguage := False
-        Loop Parse, AvailableLanguages, "`n" {
-            If A_Index == 1 And A_LoopField != ""
-            FirstAvailableLanguage := A_LoopField
-            If A_LoopField == OCRLanguage And OCRLanguage != "" {
-                PreferredLanguage := True
-                Break
+        If IsSet(OCR) {
+            AvailableLanguages := OCR.GetAvailableLanguages()
+            FirstAvailableLanguage := False
+            PreferredLanguage := False
+            Loop Parse, AvailableLanguages, "`n" {
+                If A_Index == 1 And A_LoopField != ""
+                FirstAvailableLanguage := A_LoopField
+                If A_LoopField == OCRLanguage And OCRLanguage != "" {
+                    PreferredLanguage := True
+                    Break
+                }
             }
+            If PreferredLanguage == False And FirstAvailableLanguage != False
+            Return OCR.FromRect(RegionX1Coordinate, RegionY1Coordinate, RegionX2Coordinate - RegionX1Coordinate, RegionY2Coordinate - RegionY1Coordinate, FirstAvailableLanguage, OCRScale).Text
+            Else If PreferredLanguage == True
+            Return OCR.FromRect(RegionX1Coordinate, RegionY1Coordinate, RegionX2Coordinate - RegionX1Coordinate, RegionY2Coordinate - RegionY1Coordinate, OCRLanguage, OCRScale).Text
+            Else
+            Return ""
         }
-        If PreferredLanguage == False And FirstAvailableLanguage != False
-        Return OCR.FromRect(RegionX1Coordinate, RegionY1Coordinate, RegionX2Coordinate - RegionX1Coordinate, RegionY2Coordinate - RegionY1Coordinate, FirstAvailableLanguage, OCRScale).Text
-        Else If PreferredLanguage == True
-        Return OCR.FromRect(RegionX1Coordinate, RegionY1Coordinate, RegionX2Coordinate - RegionX1Coordinate, RegionY2Coordinate - RegionY1Coordinate, OCRLanguage, OCRScale).Text
-        Else
         Return ""
     }
     
