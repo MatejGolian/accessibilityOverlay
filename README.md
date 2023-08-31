@@ -3,7 +3,7 @@ This is a set of classes written in AutoHotkey 2 that makes it possible to simul
 ## Requirements
 1. AutoHotkey version 2
 2. JAWS, NVDA or Microsoft SAPI voices installed on your system
-3. The OCR library found [here](https://github.com/Descolada/OCR).
+3. If you want to create controls based on OCR results, you will need the OCR library found [here](https://github.com/Descolada/OCR).
 4. In case you want to use NVDA for speech output, you'll need a copy of the nvdaControllerClient DLL depending on your build of AutoHotkey. The nvdaControllerClient DLL is available both in 32 and 64-bit and both versions can be downloaded at the following location: http://www.Nvda-project.Org/nvdaControllerClient/nvdaControllerClient_20100219.7z
    * Use nvdaControllerClient32.Dll with the 32-bit version of AutoHotkey.
    * Use nvdaControllerClient64.Dll with the 64-bit version of AutoHotkey.
