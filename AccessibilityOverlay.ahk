@@ -1338,6 +1338,7 @@ Class GraphicCheckbox {
     OnFocusFunction := Array()
     OnActivateFunction := Array()
     SuperordinateControlID := 0
+    Checked := 0
     CheckedImage := ""
     UncheckedImage := ""
     CheckedHoverImage := ""
@@ -1348,7 +1349,6 @@ Class GraphicCheckbox {
     RegionY2Coordinate := 0
     FoundXCoordinate := 0
     FoundYCoordinate := 0
-    ToggleState := 0
     NotFoundString := "not found"
     CheckedString := "checked"
     UncheckedString := "unchecked"
@@ -1390,9 +1390,9 @@ Class GraphicCheckbox {
     }
     
     Activate(CurrentControlID := 0) {
-        If This.ToggleState == 0 {
+        If This.Checked == 0 {
             If This.CheckIfInactive() == 1 {
-                This.ToggleState := 1
+                This.Checked := 1
                 If This.ControlID != CurrentControlID {
                     If HasMethod(This, "Focus")
                     This.Focus(This.ControlID)
@@ -1407,7 +1407,7 @@ Class GraphicCheckbox {
                 Return 1
             }
             If This.CheckIfActive() == 1 {
-                This.ToggleState := 0
+                This.Checked := 0
                 If This.ControlID != CurrentControlID {
                     If HasMethod(This, "Focus")
                     This.Focus(This.ControlID)
@@ -1424,7 +1424,7 @@ Class GraphicCheckbox {
         }
         Else {
             If This.CheckIfActive() == 1 {
-                This.ToggleState := 0
+                This.Checked := 0
                 If This.ControlID != CurrentControlID {
                     If HasMethod(This, "Focus")
                     This.Focus(This.ControlID)
@@ -1439,7 +1439,7 @@ Class GraphicCheckbox {
                 Return 1
             }
             If This.CheckIfInactive() == 1 {
-                This.ToggleState := 1
+                This.Checked := 1
                 If This.ControlID != CurrentControlID {
                     If HasMethod(This, "Focus")
                     This.Focus(This.ControlID)
@@ -1500,9 +1500,9 @@ Class GraphicCheckbox {
     }
     
     Focus(CurrentControlID := 0) {
-        If This.ToggleState == 0 {
+        If This.Checked == 0 {
             If This.CheckIfInactive() == 1 {
-                This.ToggleState := 0
+                This.Checked := 0
                 For OnFocusFunction In This.OnFocusFunction
                 %OnFocusFunction.Name%(This)
                 MouseMove This.FoundXCoordinate, This.FoundYCoordinate
@@ -1515,7 +1515,7 @@ Class GraphicCheckbox {
                 Return 1
             }
             If This.CheckIfActive() == 1 {
-                This.ToggleState := 1
+                This.Checked := 1
                 For OnFocusFunction In This.OnFocusFunction
                 %OnFocusFunction.Name%(This)
                 MouseMove This.FoundXCoordinate, This.FoundYCoordinate
@@ -1530,7 +1530,7 @@ Class GraphicCheckbox {
         }
         Else {
             If This.CheckIfActive() == 1 {
-                This.ToggleState := 1
+                This.Checked := 1
                 For OnFocusFunction In This.OnFocusFunction
                 %OnFocusFunction.Name%(This)
                 MouseMove This.FoundXCoordinate, This.FoundYCoordinate
@@ -1543,7 +1543,7 @@ Class GraphicCheckbox {
                 Return 1
             }
             If This.CheckIfInactive() == 1 {
-                This.ToggleState := 0
+                This.Checked := 0
                 For OnFocusFunction In This.OnFocusFunction
                 %OnFocusFunction.Name%(This)
                 MouseMove This.FoundXCoordinate, This.FoundYCoordinate
