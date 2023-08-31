@@ -1818,6 +1818,7 @@ Class HotspotComboBox {
     Focus(CurrentControlID := 0, SpeakValueOnTrue := 0) {
         For OnFocusFunction In This.OnFocusFunction
         %OnFocusFunction.Name%(This)
+        Click This.XCoordinate, This.YCoordinate
         If This.ControlID != CurrentControlID {
             If This.Label == ""
             AccessibilityOverlay.Speak(This.UnlabelledString . " " . This.ControlTypeLabel . " " . This.Value)
@@ -1828,7 +1829,6 @@ Class HotspotComboBox {
             If SpeakValueOnTrue == 1
             AccessibilityOverlay.Speak(This.Value)
         }
-        Click This.XCoordinate, This.YCoordinate
         Return 1
     }
     
@@ -1874,13 +1874,13 @@ Class HotspotEdit {
     Focus(CurrentControlID := 0) {
         For OnFocusFunction In This.OnFocusFunction
         %OnFocusFunction.Name%(This)
+        Click This.XCoordinate, This.YCoordinate
         If This.ControlID != CurrentControlID {
             If This.Label == ""
             AccessibilityOverlay.Speak(This.UnlabelledString . " " . This.ControlTypeLabel . " " . This.Value)
             Else
             AccessibilityOverlay.Speak(This.Label . " " . This.ControlTypeLabel . " " . This.Value)
         }
-        Click This.XCoordinate, This.YCoordinate
         Return 1
     }
     
@@ -1921,13 +1921,13 @@ Class HotspotTab Extends AccessibilityOverlay {
     Focus(ControlID := 0) {
         For OnFocusFunction In This.OnFocusFunction
         %OnFocusFunction.Name%(This)
+        Click This.XCoordinate, This.YCoordinate
         If This.ControlID != ControlID {
             If This.Label == ""
             AccessibilityOverlay.Speak(This.UnlabelledString . " " . This.ControlTypeLabel)
             Else
             AccessibilityOverlay.Speak(This.Label . " " . This.ControlTypeLabel)
         }
-        Click This.XCoordinate, This.YCoordinate
         Return 1
     }
     
@@ -2043,6 +2043,9 @@ Class OCRComboBox {
         For OnFocusFunction In This.OnFocusFunction
         %OnFocusFunction.Name%(This)
         This.Value := AccessibilityOverlay.OCR(This.RegionX1Coordinate, This.RegionY1Coordinate, This.RegionX2Coordinate, This.RegionY2Coordinate, This.OCRLanguage, This.OCRScale)
+        XCoordinate := This.RegionX1Coordinate + Floor((This.RegionX2Coordinate - This.RegionX1Coordinate)/2)
+        YCoordinate := This.RegionY1Coordinate + Floor((This.RegionY2Coordinate - This.RegionY1Coordinate)/2)
+        Click XCoordinate, YCoordinate
         If This.ControlID != CurrentControlID {
             If This.Label == ""
             AccessibilityOverlay.Speak(This.UnlabelledString . " " . This.ControlTypeLabel . " " . This.Value)
@@ -2053,9 +2056,6 @@ Class OCRComboBox {
             If SpeakValueOnTrue == 1
             AccessibilityOverlay.Speak(This.Value)
         }
-        XCoordinate := This.RegionX1Coordinate + Floor((This.RegionX2Coordinate - This.RegionX1Coordinate)/2)
-        YCoordinate := This.RegionY1Coordinate + Floor((This.RegionY2Coordinate - This.RegionY1Coordinate)/2)
-        Click XCoordinate, YCoordinate
         Return 1
     }
     
@@ -2114,15 +2114,15 @@ Class OCREdit {
         Value := This.BlankString
         Else
         Value := This.Value
+        XCoordinate := This.RegionX1Coordinate + Floor((This.RegionX2Coordinate - This.RegionX1Coordinate)/2)
+        YCoordinate := This.RegionY1Coordinate + Floor((This.RegionY2Coordinate - This.RegionY1Coordinate)/2)
+        Click XCoordinate, YCoordinate
         If This.ControlID != CurrentControlID {
             If This.Label == ""
             AccessibilityOverlay.Speak(This.UnlabelledString . " " . This.ControlTypeLabel . " " . Value)
             Else
             AccessibilityOverlay.Speak(This.Label . " " . This.ControlTypeLabel . " " . Value)
         }
-        XCoordinate := This.RegionX1Coordinate + Floor((This.RegionX2Coordinate - This.RegionX1Coordinate)/2)
-        YCoordinate := This.RegionY1Coordinate + Floor((This.RegionY2Coordinate - This.RegionY1Coordinate)/2)
-        Click XCoordinate, YCoordinate
         Return 1
     }
     
@@ -2171,15 +2171,15 @@ Class OCRTab Extends AccessibilityOverlay {
         For OnFocusFunction In This.OnFocusFunction
         %OnFocusFunction.Name%(This)
         This.Label := AccessibilityOverlay.OCR(This.RegionX1Coordinate, This.RegionY1Coordinate, This.RegionX2Coordinate, This.RegionY2Coordinate, This.OCRLanguage, This.OCRScale)
+        XCoordinate := This.RegionX1Coordinate + Floor((This.RegionX2Coordinate - This.RegionX1Coordinate)/2)
+        YCoordinate := This.RegionY1Coordinate + Floor((This.RegionY2Coordinate - This.RegionY1Coordinate)/2)
+        Click XCoordinate, YCoordinate
         If This.ControlID != ControlID {
             If This.Label == ""
             AccessibilityOverlay.Speak(This.UnlabelledString . " " . This.ControlTypeLabel)
             Else
             AccessibilityOverlay.Speak(This.Label . " " . This.ControlTypeLabel)
         }
-        XCoordinate := This.RegionX1Coordinate + Floor((This.RegionX2Coordinate - This.RegionX1Coordinate)/2)
-        YCoordinate := This.RegionY1Coordinate + Floor((This.RegionY2Coordinate - This.RegionY1Coordinate)/2)
-        Click XCoordinate, YCoordinate
         Return 1
     }
     
