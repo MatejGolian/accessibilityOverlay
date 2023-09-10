@@ -815,11 +815,6 @@ Class AccessibilityOverlay {
         Return This.AddControl(Control)
     }
     
-    AddOCRTab(RegionX1Coordinate, RegionY1Coordinate, RegionX2Coordinate, RegionY2Coordinate, OCRLanguage := "", OCRScale := 1, OnFocusFunction := "") {
-        Control := OCRTab(RegionX1Coordinate, RegionY1Coordinate, RegionX2Coordinate, RegionY2Coordinate, OCRLanguage, OCRScale, OnFocusFunction)
-        Return This.AddControl(Control)
-    }
-    
     AddOCRText(RegionX1Coordinate, RegionY1Coordinate, RegionX2Coordinate, RegionY2Coordinate, OCRLanguage := "", OCRScale := 1) {
         Control := OCRText(RegionX1Coordinate, RegionY1Coordinate, RegionX2Coordinate, RegionY2Coordinate, OCRLanguage, OCRScale)
         Return This.AddControl(Control)
