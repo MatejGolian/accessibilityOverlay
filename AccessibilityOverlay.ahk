@@ -84,6 +84,8 @@ Class AccessibilityOverlay {
             Clone := GraphicTab(This.Label, This.RegionX1Coordinate, This.RegionY1Coordinate, This.RegionX2Coordinate, This.RegionY2Coordinate, This.OnImage, This.OffImage, This.OnHoverImage, This.OffHoverImage, This.ClickXOffset, This.ClickYOffset, This.OnFocusFunction)
             Case "HotspotTab":
             Clone := HotspotTab(This.Label, This.XCoordinate, This.YCoordinate, This.OnFocusFunction)
+            Case "OCRTab":
+            Clone := OCRTab(This.RegionX1Coordinate, This.RegionY1Coordinate, This.RegionX2Coordinate, This.RegionY2Coordinate, This.OCRLanguage, This.OCRScale, This.OnFocusFunction)
         }
         If This.ChildControls.Length > 0
         For CurrentControl In This.ChildControls {
@@ -117,8 +119,6 @@ Class AccessibilityOverlay {
                 Clone.AddOCRComboBox(CurrentControl.Label, CurrentControl.RegionX1Coordinate, CurrentControl.RegionY1Coordinate, CurrentControl.RegionX2Coordinate, CurrentControl.RegionY2Coordinate, CurrentControl.OCRLanguage, CurrentControl.OCRScale, CurrentControl.OnFocusFunction)
                 Case "OCREdit":
                 Clone.AddOCREdit(CurrentControl.Label, CurrentControl.RegionX1Coordinate, CurrentControl.RegionY1Coordinate, CurrentControl.RegionX2Coordinate, CurrentControl.RegionY2Coordinate, CurrentControl.OCRLanguage, CurrentControl.OCRScale, CurrentControl.OnFocusFunction)
-                Case "OCRTab":
-                Clone.AddOCRTab(CurrentControl.RegionX1Coordinate, CurrentControl.RegionY1Coordinate, CurrentControl.RegionX2Coordinate, CurrentControl.RegionY2Coordinate, CurrentControl.OCRLanguage, CurrentControl.OCRScale, CurrentControl.OnFocusFunction)
                 Case "OCRText":
                 Clone.AddOCRText(CurrentControl.RegionX1Coordinate, CurrentControl.RegionY1Coordinate, CurrentControl.RegionX2Coordinate, CurrentControl.RegionY2Coordinate, CurrentControl.OCRLanguage, CurrentControl.OCRScale)
                 Case "StaticText":
