@@ -1224,16 +1224,13 @@ Class CustomTab Extends AccessibilityOverlay {
     UnlabelledString := "unlabelled"
     
     __New(Label, OnFocusFunction := "") {
-        AccessibilityOverlay.TotalNumberOfControls++
-        This.ControlID := AccessibilityOverlay.TotalNumberOfControls
-        This.Label := Label
+        Super.__New(Label)
         If OnFocusFunction != "" {
             If OnFocusFunction Is Array
             This.OnFocusFunction := OnFocusFunction
             Else
             This.OnFocusFunction := Array(OnFocusFunction)
         }
-        AccessibilityOverlay.AllControls.Push(This)
     }
     
     Focus(ControlID := 0) {
@@ -1250,15 +1247,18 @@ Class CustomTab Extends AccessibilityOverlay {
     
 }
 
-Class GraphicButton {
+Class GraphicButton Extends AccessibilityOverlayControl {
     
-    ControlID := 0
     ControlType := "Button"
     ControlTypeLabel := "button"
+    FoundXCoordinate := 0
+    FoundYCoordinate := 0
+    IsToggle := 0
     Label := ""
-    OnFocusFunction := Array()
+    MouseXOffset := 0
+    MouseYOffset := 0
     OnActivateFunction := Array()
-    SuperordinateControlID := 0
+    OnFocusFunction := Array()
     OnImage := ""
     OffImage := ""
     OnHoverImage := ""
@@ -1267,11 +1267,6 @@ Class GraphicButton {
     RegionY1Coordinate := 0
     RegionX2Coordinate := 0
     RegionY2Coordinate := 0
-    FoundXCoordinate := 0
-    FoundYCoordinate := 0
-    MouseXOffset := 0
-    MouseYOffset := 0
-    IsToggle := 0
     ToggleState := 0
     NotFoundString := "not found"
     OffString := "off"
@@ -1515,22 +1510,20 @@ Class GraphicButton {
         Return 0
     }
     
-    GetSuperordinateControl() {
-        Return AccessibilityOverlay.GetControl(This.SuperordinateControlID)
-    }
-    
 }
 
-Class GraphicCheckbox {
+Class GraphicCheckbox Extends AccessibilityOverlayControl {
     
-    ControlID := 0
+    Checked := 0
     ControlType := "Checkbox"
     ControlTypeLabel := "checkbox"
+    FoundXCoordinate := 0
+    FoundYCoordinate := 0
     Label := ""
-    OnFocusFunction := Array()
+    MouseXOffset := 0
+    MouseYOffset := 0
     OnActivateFunction := Array()
-    SuperordinateControlID := 0
-    Checked := 0
+    OnFocusFunction := Array()
     CheckedImage := ""
     UncheckedImage := ""
     CheckedHoverImage := ""
@@ -1539,10 +1532,6 @@ Class GraphicCheckbox {
     RegionY1Coordinate := 0
     RegionX2Coordinate := 0
     RegionY2Coordinate := 0
-    FoundXCoordinate := 0
-    FoundYCoordinate := 0
-    MouseXOffset := 0
-    MouseYOffset := 0
     NotFoundString := "not found"
     CheckedString := "checked"
     UncheckedString := "unchecked"
@@ -1761,16 +1750,17 @@ Class GraphicCheckbox {
         Return 0
     }
     
-    GetSuperordinateControl() {
-        Return AccessibilityOverlay.GetControl(This.SuperordinateControlID)
-    }
-    
 }
 
 Class GraphicTab Extends AccessibilityOverlay {
     
     ControlType := "Tab"
     ControlTypeLabel := "tab"
+    FoundXCoordinate := 0
+    FoundYCoordinate := 0
+    IsToggle := 0
+    MouseXOffset := 0
+    MouseYOffset := 0
     OnFocusFunction := Array()
     OnImage := ""
     OffImage := ""
@@ -1780,18 +1770,11 @@ Class GraphicTab Extends AccessibilityOverlay {
     RegionY1Coordinate := 0
     RegionX2Coordinate := 0
     RegionY2Coordinate := 0
-    FoundXCoordinate := 0
-    FoundYCoordinate := 0
-    MouseXOffset := 0
-    MouseYOffset := 0
-    IsToggle := 0
     ToggleState := 0
     UnlabelledString := "unlabelled"
     
     __New(Label, RegionX1Coordinate, RegionY1Coordinate, RegionX2Coordinate, RegionY2Coordinate, OnImage, OffImage := "", OnHoverImage := "", OffHoverImage := "", MouseXOffset := 0, MouseYOffset := 0, OnFocusFunction := "") {
-        AccessibilityOverlay.TotalNumberOfControls++
-        This.ControlID := AccessibilityOverlay.TotalNumberOfControls
-        This.Label := Label
+        Super.__New(Label)
         This.RegionX1Coordinate := RegionX1Coordinate
         This.RegionY1Coordinate := RegionY1Coordinate
         This.RegionX2Coordinate := RegionX2Coordinate
@@ -1818,7 +1801,6 @@ Class GraphicTab Extends AccessibilityOverlay {
             Else
             This.OnFocusFunction := Array(OnFocusFunction)
         }
-        AccessibilityOverlay.AllControls.Push(This)
     }
     
     CheckIfActive() {
@@ -2064,9 +2046,7 @@ Class HotspotTab Extends AccessibilityOverlay {
     UnlabelledString := "unlabelled"
     
     __New(Label, XCoordinate, YCoordinate, OnFocusFunction := "") {
-        AccessibilityOverlay.TotalNumberOfControls++
-        This.ControlID := AccessibilityOverlay.TotalNumberOfControls
-        This.Label := Label
+        Super.__New(Label)
         This.XCoordinate := XCoordinate
         This.YCoordinate := YCoordinate
         If OnFocusFunction != "" {
@@ -2075,7 +2055,6 @@ Class HotspotTab Extends AccessibilityOverlay {
             Else
             This.OnFocusFunction := Array(OnFocusFunction)
         }
-        AccessibilityOverlay.AllControls.Push(This)
     }
     
     Focus(ControlID := 0) {
@@ -2235,8 +2214,7 @@ Class OCRTab Extends AccessibilityOverlay {
     UnlabelledString := ""
     
     __New(RegionX1Coordinate, RegionY1Coordinate, RegionX2Coordinate, RegionY2Coordinate, OCRLanguage := "", OCRScale := 1, OnFocusFunction := "") {
-        AccessibilityOverlay.TotalNumberOfControls++
-        This.ControlID := AccessibilityOverlay.TotalNumberOfControls
+        Super.__New()
         This.RegionX1Coordinate := RegionX1Coordinate
         This.RegionY1Coordinate := RegionY1Coordinate
         This.RegionX2Coordinate := RegionX2Coordinate
@@ -2249,7 +2227,6 @@ Class OCRTab Extends AccessibilityOverlay {
             Else
             This.OnFocusFunction := Array(OnFocusFunction)
         }
-        AccessibilityOverlay.AllControls.Push(This)
     }
     
     Focus(ControlID := 0) {
@@ -2336,13 +2313,11 @@ Class StaticText {
     
 }
 
-Class TabControl {
+Class TabControl Extends AccessibilityOverlayControl {
     
-    ControlID := 0
     ControlType := "TabControl"
     ControlTypeLabel := "tab control"
     Label := ""
-    SuperordinateControlID := 0
     CurrentTab := 1
     Tabs := Array()
     SelectedString := "selected"
