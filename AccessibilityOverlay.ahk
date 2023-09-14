@@ -268,7 +268,7 @@ Class ToggleableGraphic Extends ActivatableGraphic {
     
 }
 
-Class Hotspot Extends AccessibilityOverlayControl {
+Class HotspotControl Extends AccessibilityOverlayControl {
     
     ControlType := "Hotspot"
     XCoordinate := 0
@@ -282,7 +282,7 @@ Class Hotspot Extends AccessibilityOverlayControl {
     
 }
 
-Class FocusableHotspot Extends Hotspot {
+Class FocusableHotspot Extends HotspotControl {
     
     OnFocusFunction := Array()
     
@@ -306,7 +306,7 @@ Class FocusableHotspot Extends Hotspot {
     
 }
 
-Class ActivatableHotspot Extends Hotspot {
+Class ActivatableHotspot Extends HotspotControl {
     
     OnActivateFunction := Array()
     OnFocusFunction := Array()
