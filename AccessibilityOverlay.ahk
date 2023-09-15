@@ -12,17 +12,6 @@ Class AccessibilityControl {
         AccessibilityOverlay.AllControls.Push(This)
     }
     
-    Clone() {
-        Clone := AccessibilityControl()
-        For PropertyName, PropertyValue In This.OwnProps()
-        If !HasProp(Clone, PropertyName)
-        Clone.%PropertyName% := PropertyValue
-        Else
-        If PropertyName != "ControlID"
-        Clone.%PropertyName% := PropertyValue
-        Return Clone
-    }
-    
     GetSuperordinateControl() {
         Return AccessibilityOverlay.GetControl(This.SuperordinateControlID)
     }
@@ -544,27 +533,33 @@ Class AccessibilityOverlay Extends AccessibilityControl {
             Case "OCRTab":
             Clone := OCRTab(This.RegionX1Coordinate, This.RegionY1Coordinate, This.RegionX2Coordinate, This.RegionY2Coordinate, This.OCRLanguage, This.OCRScale, This.OnFocusFunction)
         }
-        If This.ChildControls.Length > 0
-        For CurrentControl In This.ChildControls {
-            Switch(CurrentControl.__Class) {
-                Case "TabControl":
-                If CurrentControl.Tabs.Length = 0 {
-                    Clone.AddTabControl(CurrentControl.Label)
-                }
-                Else {
-                    ClonedTabControl := Clone.AddTabControl(CurrentControl.Label)
-                    For CurrentTab In CurrentControl.Tabs
-                    ClonedTabControl.AddTabs(CurrentTab.Clone())
-                }
-                Default:
-                Clone.AddControl(CurrentControl.Clone())
-            }
+        For CurrentControl In This.ChildControls
+        Switch(CurrentControl.__Class) {
+            Case "TabControl":
+            ClonedControl := Clone.AddTabControl(CurrentControl.Label)
+            For CurrentTab In CurrentControl.Tabs
+            ClonedControl.AddTabs(CurrentTab.Clone())
+            For PropertyName, PropertyValue In CurrentControl.OwnProps()
+            If !HasProp(ClonedControl, PropertyName)
+            ClonedControl.%PropertyName% := PropertyValue
+            Else
+            If PropertyName != "ControlID"And PropertyName != "CurrentTab" And PropertyName != "SuperordinateControlID" And PropertyName != "Tabs"
+            If ClonedControl.%PropertyName% != PropertyValue
+            ClonedControl.%PropertyName% := PropertyValue
+            Default:
+            ClonedControl := AccessibilityControl()
+            For PropertyName, PropertyValue In CurrentControl.OwnProps()
+            If PropertyName != "ControlID" And PropertyName != "SuperordinateControlID"
+            ClonedControl.%PropertyName% := PropertyValue
+            ClonedControl.Base := CurrentControl.Base
+            Clone.AddControl(ClonedControl)
         }
         For PropertyName, PropertyValue In This.OwnProps()
         If !HasProp(Clone, PropertyName)
         Clone.%PropertyName% := PropertyValue
         Else
-        If PropertyName != "ControlID"
+        If PropertyName != "ChildControls" And PropertyName != "ControlID" And PropertyName != "CurrentControlID" And PropertyName != "SuperordinateControlID"
+        If Clone.%PropertyName% != PropertyValue
         Clone.%PropertyName% := PropertyValue
         Return Clone
     }
