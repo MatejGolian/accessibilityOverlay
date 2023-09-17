@@ -156,9 +156,9 @@ Here is a list of all currently defined classes:
 * CustomControl - Creates a completely custom control that does absolutely nothing on its own (instead it relies on the custom functions specified).
 * CustomButton - Creates a button that only requires a label and the functions to be executed up on focus and/or activation.
 * HotspotButton - Creates a button that clicks the mouse coordinates specified up on activation and optionally triggers extra functions up on focus and/or activation.
-* GraphicButton - Creates a button that looks for images, reports an error if the specified graphics can not be found and optionally triggers extra functions up on focus and/or activation.
+* GraphicalButton - Creates a button that looks for images, reports an error if the specified graphics can not be found and optionally triggers extra functions up on focus and/or activation.
 * OCRButton - Creates a button that OCRs a portion of the screen up on focus and automatically updates its label with the result.
-* GraphicCheckbox - Creates a checkbox that looks for images, reports an error if the specified graphics can not be found and optionally triggers extra functions up on focus and/or activation.
+* GraphicalCheckbox - Creates a checkbox that looks for images, reports an error if the specified graphics can not be found and optionally triggers extra functions up on focus and/or activation.
 * CustomComboBox - Creates a combo box announcement and executes functions up on focus.
 * HotspotComboBox - Creates a combo box announcement, clicks the mouse coordinates specified up on focus and optionally triggers extra functions up on focus.
 * OCRComboBox - Creates a combo box announcement, OCRs a portion of the screen up on focus and treats the result as its value.
@@ -170,5 +170,5 @@ Here is a list of all currently defined classes:
 * TabControl - Creates an element for attaching tabs on to.
 * CustomTab - Creates a tab that only requires a label and an optional function to be triggered up on focus.
 * HotspotTab - Creates a tab that clicks the mouse coordinates specified and optionally triggers extra functions up on focus.
-* GraphicTab - Creates a tab that looks for images, reports an error if the specified graphics can not be found and optionally triggers extra functions up on focus.
+* GraphicalTab - Creates a tab that looks for images, reports an error if the specified graphics can not be found and optionally triggers extra functions up on focus.
 * OCRTab - Creates a tab announcement, OCRs a portion of the screen up on focus and automatically updates its label with the result.
