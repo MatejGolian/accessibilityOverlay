@@ -1,7 +1,7 @@
 #Requires AutoHotkey v2.0
 
 #Include AccessibilityOverlay.ahk
-#Include OCR.ahk
+#Include *i OCR.ahk
 
 #MaxThreadsPerHotkey 1
 #SingleInstance Force
