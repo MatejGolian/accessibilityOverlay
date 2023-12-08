@@ -1187,6 +1187,12 @@ Class AccessibilityOverlay Extends AccessibilityControl {
         "HotspotButton", Map(
         "ControlTypeLabel", "button",
         "UnlabelledString", "unlabelled"),
+        "HotspotCheckbox", Map(
+        "ControlTypeLabel", "checkbox",
+        "CheckedString", "checked",
+        "UncheckedString", "unchecked",
+        "UnknownStateString", "unknown state",
+        "UnlabelledString", "unlabelled"),
         "HotspotComboBox", Map(
         "ControlTypeLabel", "combo box",
         "UnlabelledString", "unlabelled"),
@@ -1250,6 +1256,12 @@ Class AccessibilityOverlay Extends AccessibilityControl {
         "UnlabelledString", "bez názvu"),
         "HotspotButton", Map(
         "ControlTypeLabel", "tlačidlo",
+        "UnlabelledString", "bez názvu"),
+        "HotspotCheckbox", Map(
+        "ControlTypeLabel", "začiarkavacie políčko",
+        "CheckedString", "začiarknuté",
+        "UncheckedString", "nezačiarknuté",
+        "UnknownStateString", "neznámy stav",
         "UnlabelledString", "bez názvu"),
         "HotspotComboBox", Map(
         "ControlTypeLabel", "kombinovaný rámik",
@@ -1317,6 +1329,12 @@ Class AccessibilityOverlay Extends AccessibilityControl {
         "UnlabelledString", "namnlös"),
         "HotspotComboBox", Map(
         "ControlTypeLabel", "kombinationsruta",
+        "UnlabelledString", "namnlös"),
+        "HotspotCheckbox", Map(
+        "ControlTypeLabel", "kryssruta",
+        "CheckedString", "kryssad",
+        "UncheckedString", "inte kryssad",
+        "UnknownStateString", "okänd status",
         "UnlabelledString", "namnlös"),
         "HotspotEdit", Map(
         "ControlTypeLabel", "redigera",
@@ -1413,6 +1431,11 @@ Class AccessibilityOverlay Extends AccessibilityControl {
     
     AddHotspotButton(Label, XCoordinate, YCoordinate, OnFocusFunction := "", OnActivateFunction := "") {
         Control := HotspotButton(Label, XCoordinate, YCoordinate, OnFocusFunction, OnActivateFunction)
+        Return This.AddControl(Control)
+    }
+    
+    AddHotspotCheckbox(Label, CheckedColor, UncheckedColor, XCoordinate, YCoordinate, OnFocusFunction := "", OnActivateFunction := "") {
+        Control := HotspotCheckbox(Label, CheckedColor, UncheckedColor, XCoordinate, YCoordinate, OnFocusFunction, OnActivateFunction)
         Return This.AddControl(Control)
     }
     
@@ -2042,6 +2065,74 @@ Class HotspotButton Extends ActivatableHotspot {
             AccessibilityOverlay.Speak(This.UnlabelledString . " " . This.ControlTypeLabel . " " . This.HotkeyLabel)
             Else
             AccessibilityOverlay.Speak(This.Label . " " . This.ControlTypeLabel . " " . This.HotkeyLabel)
+        }
+    }
+    
+    SetHotkey(HotkeyCommand, HotkeyLabel := "", HotkeyFunction := "") {
+        Super.SetHotkey(HotkeyCommand, HotkeyFunction)
+        This.HotkeyLabel := HotkeyLabel
+    }
+    
+}
+
+Class HotspotCheckbox Extends ActivatableHotspot {
+    
+    Checked := 0
+    ControlType := "Checkbox"
+    ControlTypeLabel := "checkbox"
+    HotkeyLabel := ""
+    Label := ""
+    CheckedColor := ""
+    UncheckedColor := ""
+    CheckedString := "checked"
+    UncheckedString := "unchecked"
+    UnknownStateString := "unknown state"
+    UnlabelledString := "unlabelled"
+    
+    __New(Label, XCoordinate, YCoordinate, CheckedColor, UncheckedColor, OnFocusFunction := "", OnActivateFunction := "") {
+        Super.__New(XCoordinate, YCoordinate, OnFocusFunction, OnActivateFunction)
+        This.Label := Label
+        This.CheckedColor := CheckedColor
+        This.UncheckedColor := UncheckedColor
+    }
+    
+    CheckState() {
+        Sleep 100
+        CurrentColor := PixelGetColor(This.XCoordinate, This.YCoordinate)
+        If CurrentColor = This.CheckedColor
+        This.Checked := 1
+        Else If CurrentColor = This.UncheckedColor
+        This.Checked := 0
+        Else
+        This.Checked := -1
+    }
+    
+    Activate(CurrentControlID := 0) {
+        Super.Activate(CurrentControlID)
+        This.CheckState()
+            If This.Checked = 1
+            StateString := This.CheckedString
+            Else If This.Checked = 0
+            StateString := This.UncheckedString
+            Else
+            StateString := This.UnknownStateString
+            AccessibilityOverlay.Speak(StateString)
+    }
+    
+    Focus(CurrentControlID := 0) {
+        Super.Focus(CurrentControlID)
+        This.CheckState()
+        If This.ControlID != CurrentControlID {
+            If This.Checked = 1
+            StateString := This.CheckedString
+            Else If This.Checked = 0
+            StateString := This.UncheckedString
+            Else
+            StateString := This.UnknownStateString
+            If This.Label = ""
+            AccessibilityOverlay.Speak(This.UnlabelledString . " " . This.ControlTypeLabel . " " . StateString . " " . This.HotkeyLabel)
+            Else
+            AccessibilityOverlay.Speak(This.Label . " " . This.ControlTypeLabel . " " . StateString . " " . This.HotkeyLabel)
         }
     }
     

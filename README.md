@@ -155,10 +155,11 @@ Here is a list of all currently defined classes:
 * AccessibilityOverlay - Creates an overlay object that can serve as a container for other controls.
 * CustomControl - Creates a completely custom control that does absolutely nothing on its own (instead it relies on the custom functions specified).
 * CustomButton - Creates a button that only requires a label and the functions to be executed up on focus and/or activation.
-* HotspotButton - Creates a button that clicks the mouse coordinates specified up on activation and optionally triggers extra functions up on focus and/or activation.
 * GraphicalButton - Creates a button that looks for images, reports an error if the specified graphics can not be found and optionally triggers extra functions up on focus and/or activation.
+* HotspotButton - Creates a button that clicks the mouse coordinates specified up on activation and optionally triggers extra functions up on focus and/or activation.
 * OCRButton - Creates a button that OCRs a portion of the screen up on focus and automatically updates its label with the result.
 * GraphicalCheckbox - Creates a checkbox that looks for images, reports an error if the specified graphics can not be found and optionally triggers extra functions up on focus and/or activation.
+* HotspotCheckbox - Creates a checkbox that clicks the mouse coordinates specified up on activation, determines the state of the checkbox based on the color under the mouse and optionally triggers extra functions up on focus and/or activation.
 * CustomComboBox - Creates a combo box announcement and executes functions up on focus.
 * HotspotComboBox - Creates a combo box announcement, clicks the mouse coordinates specified up on focus and optionally triggers extra functions up on focus.
 * OCRComboBox - Creates a combo box announcement, OCRs a portion of the screen up on focus and treats the result as its value.
@@ -169,6 +170,6 @@ Here is a list of all currently defined classes:
 * StaticText - Announces a simple message.
 * TabControl - Creates an element for attaching tabs on to.
 * CustomTab - Creates a tab that only requires a label and an optional function to be triggered up on focus.
-* HotspotTab - Creates a tab that clicks the mouse coordinates specified and optionally triggers extra functions up on focus.
 * GraphicalTab - Creates a tab that looks for images, reports an error if the specified graphics can not be found and optionally triggers extra functions up on focus.
+* HotspotTab - Creates a tab that clicks the mouse coordinates specified and optionally triggers extra functions up on focus.
 * OCRTab - Creates a tab announcement, OCRs a portion of the screen up on focus and automatically updates its label with the result.
