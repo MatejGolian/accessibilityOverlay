@@ -1177,9 +1177,9 @@ Class AccessibilityOverlay Extends AccessibilityControl {
         "UnlabelledString", "unlabelled"),
         "GraphicalCheckbox", Map(
         "ControlTypeLabel", "checkbox",
+        "CheckedString", "checked",
+        "UncheckedString", "unchecked",
         "NotFoundString", "not found",
-        "OnString", "checked",
-        "OffString", "unchecked",
         "UnlabelledString", "unlabelled"),
         "GraphicalTab", Map(
         "ControlTypeLabel", "tab",
@@ -1247,9 +1247,9 @@ Class AccessibilityOverlay Extends AccessibilityControl {
         "UnlabelledString", "bez názvu"),
         "GraphicalCheckbox", Map(
         "ControlTypeLabel", "začiarkavacie políčko",
+        "CheckedString", "začiarknuté",
+        "UncheckedString", "nezačiarknuté",
         "NotFoundString", "nenájdené",
-        "OnString", "začiarknuté",
-        "OffString", "nezačiarknuté",
         "UnlabelledString", "bez názvu"),
         "GraphicalTab", Map(
         "ControlTypeLabel", "záložka",
@@ -1317,9 +1317,9 @@ Class AccessibilityOverlay Extends AccessibilityControl {
         "UnlabelledString", "namnlös"),
         "GraphicalCheckbox", Map(
         "ControlTypeLabel", "kryssruta",
+        "CheckedString", "kryssad",
+        "UncheckedString", "inte kryssad",
         "NotFoundString", "hittades ej",
-        "OnString", "kryssad",
-        "OffString", "inte kryssad",
         "UnlabelledString", "namnlös"),
         "GraphicalTab", Map(
         "ControlTypeLabel", "flik",
@@ -1821,14 +1821,14 @@ Class GraphicalButton Extends ToggleableGraphic {
 
 Class GraphicalCheckbox Extends ToggleableGraphic {
     
+    Checked := 0
     ControlType := "Checkbox"
     ControlTypeLabel := "checkbox"
     HotkeyLabel := ""
-    IsToggle := 1
     Label := ""
+    CheckedString := "checked"
+    UncheckedString := "unchecked"
     NotFoundString := "not found"
-    OnString := "checked"
-    OffString := "unchecked"
     UnlabelledString := "unlabelled"
     
     __New(Label, RegionX1Coordinate, RegionY1Coordinate, RegionX2Coordinate, RegionY2Coordinate, OnImage, OnHoverImage := "", OffImage := "", OffHoverImage := "", MouseXOffset := 0, MouseYOffset := 0, OnFocusFunction := "", OnActivateFunction := "") {
@@ -1838,26 +1838,27 @@ Class GraphicalCheckbox Extends ToggleableGraphic {
     
     Activate(CurrentControlID := 0) {
         Super.Activate(CurrentControlID)
+        This.Checked := This.State
         If This.State = 1 {
             If This.ControlID != CurrentControlID {
                 If This.Label = ""
-                AccessibilityOverlay.Speak(This.UnlabelledString . " " . This.ControlTypeLabel . " " . This.OnString . " " . This.HotkeyLabel)
+                AccessibilityOverlay.Speak(This.UnlabelledString . " " . This.ControlTypeLabel . " " . This.CheckedString . " " . This.HotkeyLabel)
                 Else
-                AccessibilityOverlay.Speak(This.Label . " " . This.ControlTypeLabel . " " . This.OnString . " " . This.HotkeyLabel)
+                AccessibilityOverlay.Speak(This.Label . " " . This.ControlTypeLabel . " " . This.CheckedString . " " . This.HotkeyLabel)
             }
             Else {
-                AccessibilityOverlay.Speak(This.OnString)
+                AccessibilityOverlay.Speak(This.CheckedString)
             }
         }
         Else If This.State = 0 {
             If This.ControlID != CurrentControlID {
                 If This.Label = ""
-                AccessibilityOverlay.Speak(This.UnlabelledString . " " . This.ControlTypeLabel . " " . This.OffString . " " . This.HotkeyLabel)
+                AccessibilityOverlay.Speak(This.UnlabelledString . " " . This.ControlTypeLabel . " " . This.UncheckedString . " " . This.HotkeyLabel)
                 Else
-                AccessibilityOverlay.Speak(This.Label . " " . This.ControlTypeLabel . " " . This.OffString . " " . This.HotkeyLabel)
+                AccessibilityOverlay.Speak(This.Label . " " . This.ControlTypeLabel . " " . This.UncheckedString . " " . This.HotkeyLabel)
             }
             Else {
-                AccessibilityOverlay.Speak(This.OffString)
+                AccessibilityOverlay.Speak(This.UncheckedString)
             }
         }
         Else {
@@ -1872,20 +1873,21 @@ Class GraphicalCheckbox Extends ToggleableGraphic {
     
     Focus(CurrentControlID := 0) {
         Super.Focus(CurrentControlID)
+        This.Checked := This.State
         If This.State = 1 {
             If This.ControlID != CurrentControlID {
                 If This.Label = ""
-                AccessibilityOverlay.Speak(This.UnlabelledString . " " . This.ControlTypeLabel . " " . This.OnString . " " . This.HotkeyLabel)
+                AccessibilityOverlay.Speak(This.UnlabelledString . " " . This.ControlTypeLabel . " " . This.CheckedString . " " . This.HotkeyLabel)
                 Else
-                AccessibilityOverlay.Speak(This.Label . " " . This.ControlTypeLabel . " " . This.OnString . " " . This.HotkeyLabel)
+                AccessibilityOverlay.Speak(This.Label . " " . This.ControlTypeLabel . " " . This.CheckedString . " " . This.HotkeyLabel)
             }
         }
         Else If This.State = 0 {
             If This.ControlID != CurrentControlID {
                 If This.Label = ""
-                AccessibilityOverlay.Speak(This.UnlabelledString . " " . This.ControlTypeLabel . " " . This.OffString . " " . This.HotkeyLabel)
+                AccessibilityOverlay.Speak(This.UnlabelledString . " " . This.ControlTypeLabel . " " . This.UncheckedString . " " . This.HotkeyLabel)
                 Else
-                AccessibilityOverlay.Speak(This.Label . " " . This.ControlTypeLabel . " " . This.OffString . " " . This.HotkeyLabel)
+                AccessibilityOverlay.Speak(This.Label . " " . This.ControlTypeLabel . " " . This.UncheckedString . " " . This.HotkeyLabel)
             }
         }
         Else {
@@ -2110,13 +2112,21 @@ Class HotspotCheckbox Extends ActivatableHotspot {
     Activate(CurrentControlID := 0) {
         Super.Activate(CurrentControlID)
         This.CheckState()
-            If This.Checked = 1
-            StateString := This.CheckedString
-            Else If This.Checked = 0
-            StateString := This.UncheckedString
+        If This.Checked = 1
+        StateString := This.CheckedString
+        Else If This.Checked = 0
+        StateString := This.UncheckedString
+        Else
+        StateString := This.UnknownStateString
+        If This.ControlID != CurrentControlID {
+            If This.Label = ""
+            AccessibilityOverlay.Speak(This.UnlabelledString . " " . This.ControlTypeLabel . " " . StateString . " " . This.HotkeyLabel)
             Else
-            StateString := This.UnknownStateString
+            AccessibilityOverlay.Speak(This.Label . " " . This.ControlTypeLabel . " " . StateString . " " . This.HotkeyLabel)
+        }
+        Else {
             AccessibilityOverlay.Speak(StateString)
+        }
     }
     
     Focus(CurrentControlID := 0) {
