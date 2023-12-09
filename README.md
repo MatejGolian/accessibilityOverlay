@@ -158,6 +158,7 @@ Here is a list of all currently defined classes:
 * GraphicalButton - Creates a button that looks for images, reports an error if the specified graphics can not be found and optionally triggers extra functions up on focus and/or activation.
 * HotspotButton - Creates a button that clicks the mouse coordinates specified up on activation and optionally triggers extra functions up on focus and/or activation.
 * OCRButton - Creates a button that OCRs a portion of the screen up on focus and automatically updates its label with the result.
+* CustomCheckbox - Creates a checkbox that determines the state of the checkbox based on the custom function specified and optionally triggers extra functions up on focus and/or activation.
 * GraphicalCheckbox - Creates a checkbox that looks for images, reports an error if the specified graphics can not be found and optionally triggers extra functions up on focus and/or activation.
 * HotspotCheckbox - Creates a checkbox that clicks the mouse coordinates specified up on activation, determines the state of the checkbox based on the color under the mouse and optionally triggers extra functions up on focus and/or activation.
 * CustomComboBox - Creates a combo box announcement and executes functions up on focus.
