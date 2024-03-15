@@ -499,6 +499,7 @@ Class NativeControl Extends AccessibilityControl {
             AccessibilityOverlay.Speak(This.NotFoundString)
         }
         else {
+            If ControlGetFocus("A") And ControlGetClassNN(ControlGetFocus("A")) != This.NativeControlID
             ControlFocus This.NativeControlID, "A"
             If CurrentControlID != This.ControlID {
                 For OnFocusFunction In This.OnFocusFunction
