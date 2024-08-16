@@ -522,6 +522,24 @@ Return This.state
 
 }
 
+Class GraphicalButton Extends Button {
+}
+
+Class GraphicalCheckbox Extends CheckBox {
+}
+
+Class GraphicalSlider Extends FocusableControl {
+}
+
+Class GraphicalHorizontalSlider Extends GraphicalSlider {
+}
+
+Class GraphicalVerticalSlider Extends GraphicalSlider {
+}
+
+Class GraphicalTab Extends Tab {
+}
+
 Class HotspotButton Extends Button {
 
 XCoordinate := 0
@@ -1059,7 +1077,7 @@ element.Click("Left")
 }
 }
 
-ExecuteOnFocusPostSpeech() {
+ExecuteOnFocusPreSpeech() {
 Try {
 element := This.GetElement()
 element.SetFocus()
