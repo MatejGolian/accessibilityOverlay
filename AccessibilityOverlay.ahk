@@ -21,7 +21,6 @@ Static SAPI := False
 Static TotalNumberOfControls := 0
 
 __New(Label := "") {
-Super.__New()
 This.Label := Label
 }
 
@@ -367,8 +366,8 @@ GetReachableControls() {
 ReachableControls := Array()
 For Value In This.GetFocusableControls()
 If Value Is TabControl {
-For Tab In Value.Tabs
-ReachableControls.Push(Tab)
+For TabObject In Value.Tabs
+ReachableControls.Push(TabObject)
 }
 Else {
 ReachableControls.Push(Value)
@@ -1003,15 +1002,15 @@ Tabs := Array()
 __New(Label := "", Tabs*) {
 Super.__New(Label)
 If Tabs.Length > 0
-For Tab In Tabs
-This.AddTabs(Tab)
+For TabObject In Tabs
+This.AddTabs(TabObject)
 }
 
 AddTabs(Tabs*) {
 If Tabs.Length > 0
-For Tab In Tabs {
-Tab.SuperordinateControlID := This.ControlID
-This.Tabs.Push(Tab)
+For TabObject In Tabs {
+TabObject.SuperordinateControlID := This.ControlID
+This.Tabs.Push(TabObject)
 }
 }
 
