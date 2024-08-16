@@ -22,6 +22,9 @@ Static TotalNumberOfControls := 0
 
 __New(Label := "") {
 This.Label := Label
+AccessibilityOverlay.TotalNumberOfControls++
+This.ControlID := AccessibilityOverlay.TotalNumberOfControls
+AccessibilityOverlay.AllControls.Push(This)
 }
 
 __Call(Value, Properties) {
