@@ -39,12 +39,12 @@ This.FocusableControlIDs := This.GetFocusableControlIDs()
 Found := This.FindFocusableControlID(ControlID)
 If Found > 0 {
 CurrentControl := AccessibilityOverlay.GetControl(ControlID)
-If HasMethod(CurrentControl, "Focus") And ControlID != This.CurrentControlID {
+If CurrentControl.HasMethod("Focus") And ControlID != This.CurrentControlID {
 CurrentControl.Focus()
 This.SetCurrentControlID(ControlID)
 }
-If HasMethod(CurrentControl, "Activate") {
-CurrentControl.Activate(ControlID)
+If CurrentControl.HasMethod("Activate") {
+CurrentControl.Activate()
 This.SetCurrentControlID(ControlID)
 Return 1
 }
@@ -59,8 +59,8 @@ This.FocusableControlIDs := This.GetFocusableControlIDs()
 Found := This.FindFocusableControlID(This.CurrentControlID)
 If Found > 0 {
 CurrentControl := AccessibilityOverlay.GetControl(This.CurrentControlID)
-If HasMethod(CurrentControl, "Activate")
-CurrentControl.Activate(CurrentControl.ControlID)
+If CurrentControl.HasMethod("Activate")
+CurrentControl.Activate()
 Return 1
 }
 }
@@ -100,7 +100,7 @@ ClonedControl := TabControl()
 For CurrentTab In CurrentControl.Tabs
 ClonedControl.AddTabs(CurrentTab.Clone())
 For PropertyName, PropertyValue In CurrentControl.OwnProps()
-If !HasProp(ClonedControl, PropertyName)
+If !ClonedControl.HasProp(PropertyName)
 ClonedControl.%PropertyName% := PropertyValue
 Else
 If PropertyName != "ControlID"And PropertyName != "CurrentTab" And PropertyName != "SuperordinateControlID" And PropertyName != "Tabs"
@@ -150,11 +150,8 @@ If Found = 0
 This.CurrentControlID := This.FocusableControlIDs[1]
 This.SetCurrentControlID(This.CurrentControlID)
 CurrentControl := AccessibilityOverlay.GetControl(This.CurrentControlID)
-If HasMethod(CurrentControl, "Focus") {
-If This.ControlID != ControlID
+If CurrentControl.HasMethod("Focus") {
 CurrentControl.Focus()
-Else
-CurrentControl.Focus(CurrentControl.ControlID)
 Return 1
 }
 }
@@ -167,7 +164,7 @@ This.FocusableControlIDs := This.GetFocusableControlIDs()
 Found := This.FindFocusableControlID(ControlID)
 If Found > 0 {
 CurrentControl := AccessibilityOverlay.GetControl(ControlID)
-If HasMethod(CurrentControl, "Focus")
+If CurrentControl.HasMethod("Focus")
 If ControlID != This.CurrentControlID {
 CurrentControl.Focus()
 This.SetCurrentControlID(ControlID)
@@ -187,7 +184,7 @@ This.FocusableControlIDs := This.GetFocusableControlIDs()
 Found := This.FindFocusableControlID(This.CurrentControlID)
 If Found > 0 {
 CurrentControl := AccessibilityOverlay.GetControl(This.CurrentControlID)
-If HasMethod(CurrentControl, "Focus")
+If CurrentControl.HasMethod("Focus")
 CurrentControl.Focus()
 Return 1
 }
@@ -205,7 +202,7 @@ Else
 This.CurrentControlID := This.FocusableControlIDs[Found + 1]
 This.SetCurrentControlID(This.CurrentControlID)
 CurrentControl := AccessibilityOverlay.GetControl(This.CurrentControlID)
-If HasMethod(CurrentControl, "Focus") {
+If CurrentControl.HasMethod("Focus") {
 CurrentControl.Focus()
 Return 1
 }
@@ -223,7 +220,7 @@ Else
 This.CurrentControlID := This.FocusableControlIDs[Found - 1]
 This.SetCurrentControlID(This.CurrentControlID)
 CurrentControl := AccessibilityOverlay.GetControl(This.CurrentControlID)
-If HasMethod(CurrentControl, "Focus") {
+If CurrentControl.HasMethod("Focus") {
 CurrentControl.Focus()
 Return 1
 }
@@ -239,11 +236,11 @@ If Found > 0 {
 CurrentControl := AccessibilityOverlay.GetControl(This.FocusableControlIDs[Found])
 If CurrentControl Is TabControl {
 If CurrentControl.CurrentTab < CurrentControl.Tabs.Length
-Tab := CurrentControl.CurrentTab + 1
+TabNumber := CurrentControl.CurrentTab + 1
 Else
-Tab := 1
-CurrentControl.CurrentTab := Tab
-CurrentControl.Focus(CurrentControl.ControlID)
+TabNumber := 1
+CurrentControl.CurrentTab := TabNumber
+CurrentControl.Focus()
 Return 1
 }
 }
@@ -259,11 +256,11 @@ If Found > 0 {
 CurrentControl := AccessibilityOverlay.GetControl(This.FocusableControlIDs[Found])
 If CurrentControl Is TabControl {
 If CurrentControl.CurrentTab <= 1
-Tab := CurrentControl.Tabs.Length
+TabNumber := CurrentControl.Tabs.Length
 Else
-Tab := CurrentControl.CurrentTab - 1
-CurrentControl.CurrentTab := Tab
-CurrentControl.Focus(CurrentControl.ControlID)
+TabNumber := CurrentControl.CurrentTab - 1
+CurrentControl.CurrentTab := TabNumber
+CurrentControl.Focus()
 Return 1
 }
 }
@@ -551,39 +548,6 @@ This.CurrentControlID := 0
 }
 }
 
-Translate(Translation := "") {
-If Translation != "" {
-If !(Translation Is Map)
-Translation := AccessibilityOverlay.Translations[Translation]
-If Translation Is Map {
-If Translation[This.__Class] Is Map
-For Key, Value In Translation[This.__Class]
-This.%Key% := Value
-If This.ChildControls.Length > 0
-For CurrentControl In This.ChildControls {
-If Translation[CurrentControl.__Class] Is Map
-For Key, Value In Translation[CurrentControl.__Class]
-CurrentControl.%Key% := Value
-Switch(CurrentControl.__Class) {
-Case "AccessibilityOverlay":
-If CurrentControl.ChildControls.Length > 0 {
-CurrentControl.Translate(Translation)
-}
-Case "TabControl":
-If CurrentControl.Tabs.Length > 0
-For CurrentTab In CurrentControl.Tabs {
-If Translation[CurrentTab.__Class] Is Map
-For Key, Value In Translation[CurrentTab.__Class]
-CurrentTab.%Key% := Value
-If CurrentTab.ChildControls.Length > 0
-CurrentTab.Translate(Translation)
-}
-}
-}
-}
-}
-}
-
 TriggerHotkey(HotkeyCommand) {
 For ReachableControl In This.GetReachableControls()
 If ReachableControl.HasOwnProp("HotkeyCommand") And ReachableControl.HotkeyCommand = HotkeyCommand
@@ -609,7 +573,7 @@ Break 2
 }
 }
 Else {
-If HasMethod(ReachableControl, "Activate")
+If ReachableControl.HasMethod("Activate")
 This.ActivateControl(ReachableControl.ControlID)
 Else
 This.FocusControl(ReachableControl.ControlID)
@@ -617,16 +581,6 @@ For HotkeyFunction In ReachableControl.HotkeyFunction
 HotkeyFunction.Call(ReachableControl)
 Break
 }
-}
-
-Static GetAllControls() {
-Return AccessibilityOverlay.AllControls
-}
-
-Static GetControl(ControlID) {
-If ControlID > 0 And AccessibilityOverlay.AllControls.Length > 0 And AccessibilityOverlay.AllControls.Length >= ControlID
-Return AccessibilityOverlay.AllControls[ControlID]
-Return 0
 }
 
 Static __New() {
@@ -640,6 +594,16 @@ SAPI := ComObject("SAPI.SpVoice")
 Catch
 SAPI := False
 AccessibilityOverlay.SAPI := SAPI
+}
+
+Static GetAllControls() {
+Return AccessibilityOverlay.AllControls
+}
+
+Static GetControl(ControlID) {
+If ControlID > 0 And AccessibilityOverlay.AllControls.Length > 0 And AccessibilityOverlay.AllControls.Length >= ControlID
+Return AccessibilityOverlay.AllControls[ControlID]
+Return 0
 }
 
 Static OCR(X1Coordinate, Y1Coordinate, X2Coordinate, Y2Coordinate, OCRLanguage := "", OCRScale := 1) {
