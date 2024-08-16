@@ -64,6 +64,7 @@ Return ""
 }
 
 Static Speak(Message) {
+If Message != "" {
 AccessibilityOverlay.LastMessage := Message
 If (AccessibilityOverlay.JAWS != False And ProcessExist("jfw.exe")) Or (FileExist("NvdaControllerClient" . A_PtrSize * 8 . ".dll") And !DllCall("NvdaControllerClient" . A_PtrSize * 8 . ".dll\nvdaController_testIfRunning")) {
 If AccessibilityOverlay.JAWS != False And ProcessExist("jfw.exe") {
@@ -78,6 +79,7 @@ Else {
 If AccessibilityOverlay.SAPI != False {
 AccessibilityOverlay.SAPI.Speak("", 0x1|0x2)
 AccessibilityOverlay.SAPI.Speak(Message, 0x1)
+}
 }
 }
 }
@@ -135,9 +137,11 @@ If This.ControlID != AccessibilityOverlay.CurrentControlID
 For FocusFunction In This.FocusFunctions
 FocusFunction.Call(This)
 If This.CheckFocus() {
+If This.HasMethod("ExecuteOnFocusPreSpeech")
+This.ExecuteOnFocusPreSpeech()
 This.SpeakOnFocus(Speak)
-If This.HasMethod("ExecuteOnFocus")
-This.ExecuteOnFocus()
+If This.HasMethod("ExecuteOnFocusPostSpeech")
+This.ExecuteOnFocusPostSpeech()
 }
 }
 
@@ -166,7 +170,8 @@ This.Value := Value
 }
 
 SpeakOnFocus(Speak := True) {
-CheckResult := This.CheckState()
+Message := ""
+CheckResult := This.State
 LabelString := This.Label
 If LabelString = ""
 LabelString := This.DefaultLabel
@@ -178,7 +183,6 @@ If This.States.Has(CheckResult)
 StateString := This.States[CheckResult]
 If This.ControlID != AccessibilityOverlay.CurrentControlID {
 Message := LabelString . " " . This.ControlTypeLabel . " " . ValueString . " " . StateString . " " . This.HotkeyLabel
-AccessibilityOverlay.LastMessage := Message
 If Speak
 AccessibilityOverlay.Speak(Message)
 }
@@ -208,16 +212,18 @@ If This.Focused {
 For ActivationFunction In This.ActivationFunctions
 ActivationFunction.Call(This)
 If This.CheckFocus() {
+If This.HasMethod("ExecuteOnActivationPreSpeech")
+This.ExecuteOnActivationPreSpeech()
 This.SpeakOnActivation(Speak)
-If This.HasMethod("ExecuteOnActivation")
-This.ExecuteOnActivation()
+If This.HasMethod("ExecuteOnActivationPostSpeech")
+This.ExecuteOnActivationPostSpeech()
 }
 }
 }
 
 SpeakOnActivation(Speak := True) {
 Message := ""
-CheckResult := This.CheckState()
+CheckResult := This.State
 LabelString := This.Label
 If LabelString = ""
 LabelString := This.DefaultLabel
@@ -232,11 +238,8 @@ Message := LabelString . " " . This.ControlTypeLabel . " " . ValueString . " " .
 Else
 If This.ControlID = AccessibilityOverlay.CurrentControlID And This.ControlID = AccessibilityOverlay.PreviousControlID And This.states.Length > 1
 Message := StateString
-If Message != "" {
-AccessibilityOverlay.LastMessage := Message
 If Speak
 AccessibilityOverlay.Speak(Message)
-}
 }
 
 }
@@ -378,9 +381,11 @@ If This.ControlID != AccessibilityOverlay.CurrentControlID
 For FocusFunction In This.FocusFunctions
 FocusFunction.Call(This)
 If This.CheckFocus() {
+If This.HasMethod("ExecuteOnFocusPreSpeech")
+This.ExecuteOnFocusPreSpeech()
 This.SpeakOnFocus(Speak)
-If This.HasMethod("ExecuteOnFocus")
-This.ExecuteOnFocus()
+If This.HasMethod("ExecuteOnFocusPostSpeech")
+This.ExecuteOnFocusPostSpeech()
 }
 }
 
@@ -397,7 +402,8 @@ This.HotkeyFunctions.Push(HotkeyFunction)
 }
 
 SpeakOnFocus(Speak := True) {
-CheckResult := This.CheckState()
+Message := ""
+CheckResult := This.State
 LabelString := This.Label
 If LabelString = ""
 LabelString := This.DefaultLabel
@@ -527,11 +533,11 @@ This.XCoordinate := XCoordinate
 This.YCoordinate := YCoordinate
 }
 
-ExecuteOnActivation() {
+ExecuteOnActivationPostSpeech() {
 Click This.XCoordinate, This.YCoordinate
 }
 
-ExecuteOnFocus() {
+ExecuteOnFocusPostSpeech() {
 MouseMove This.XCoordinate, This.YCoordinate
 }
 
@@ -581,11 +587,11 @@ This.state := -1
 Return -1
 }
 
-ExecuteOnActivation() {
+ExecuteOnActivationPostSpeech() {
 Click This.XCoordinate, This.YCoordinate
 }
 
-ExecuteOnFocus() {
+ExecuteOnFocusPostSpeech() {
 MouseMove This.XCoordinate, This.YCoordinate
 }
 
@@ -602,7 +608,7 @@ This.XCoordinate := XCoordinate
 This.YCoordinate := YCoordinate
 }
 
-ExecuteOnFocus() {
+ExecuteOnFocusPostSpeech() {
 Click This.XCoordinate, This.YCoordinate
 }
 
@@ -619,7 +625,7 @@ This.XCoordinate := XCoordinate
 This.YCoordinate := YCoordinate
 }
 
-ExecuteOnFocus() {
+ExecuteOnFocusPostSpeech() {
 Click This.XCoordinate, This.YCoordinate
 }
 
@@ -636,7 +642,7 @@ This.XCoordinate := XCoordinate
 This.YCoordinate := YCoordinate
 }
 
-ExecuteOnFocus() {
+ExecuteOnFocusPostSpeech() {
 Click This.XCoordinate, This.YCoordinate
 }
 
@@ -686,12 +692,62 @@ This.state := -1
 Return -1
 }
 
-ExecuteOnActivation() {
+ExecuteOnActivationPostSpeech() {
 Click This.XCoordinate, This.YCoordinate
 }
 
-ExecuteOnFocus() {
+ExecuteOnFocusPostSpeech() {
 MouseMove This.XCoordinate, This.YCoordinate
+}
+
+}
+
+Class NativeControl Extends ActivatableControl {
+
+ControlType := "Native"
+NativeControlID := ""
+States := Map("-1", "Can not focus control", "0", "not found", "1", "")
+
+__New(NativeControlID, Label := "", FocusFunctions := "", ActivationFunctions := "") {
+Super.__New(Label, FocusFunctions, ActivationFunctions)
+This.NativeControlID := NativeControlID
+}
+
+CheckFocus() {
+Found := This.CheckState()
+If Not Found {
+This.Focused := 0
+AccessibilityOverlay.Speak(This.States["0"])
+}
+Else {
+Try {
+This.Focused := 1
+ControlFocus This.NativeControlID, "A"
+}
+Catch {
+This.Focused := 0
+This.State := -1
+AccessibilityOverlay.Speak(This.States["-1"])
+}
+If This.Focused
+Return True
+}
+Return False
+}
+
+CheckState() {
+Try
+Found := ControlGetHwnd(This.NativeControlID, "A")
+Catch
+Found := False
+If Found {
+This.State := 1
+Return True
+}
+Else {
+This.State := 0
+Return False
+}
 }
 
 }
@@ -716,13 +772,13 @@ This.X2Coordinate := X2Coordinate
 This.Y2Coordinate := Y2Coordinate
 }
 
-ExecuteOnActivation() {
+ExecuteOnActivationPostSpeech() {
 XCoordinate := This.X1Coordinate + Floor((This.X2Coordinate - This.X1Coordinate)/2)
 YCoordinate := This.Y1Coordinate + Floor((This.Y2Coordinate - This.Y1Coordinate)/2)
 Click XCoordinate, YCoordinate
 }
 
-ExecuteOnFocus() {
+ExecuteOnFocusPostSpeech() {
 XCoordinate := This.X1Coordinate + Floor((This.X2Coordinate - This.X1Coordinate)/2)
 YCoordinate := This.Y1Coordinate + Floor((This.Y2Coordinate - This.Y1Coordinate)/2)
 MouseMove XCoordinate, YCoordinate
@@ -730,7 +786,7 @@ MouseMove XCoordinate, YCoordinate
 
 SpeakOnActivation(Speak := True) {
 Message := ""
-CheckResult := This.CheckState()
+CheckResult := This.State
 LabelString := AccessibilityOverlay.OCR(This.X1Coordinate, This.Y1Coordinate, This.X2Coordinate, This.Y2Coordinate, This.OCRLanguage, This.OCRScale)
 This.Label := LabelString
 If LabelString = ""
@@ -743,15 +799,13 @@ Message := LabelString . " " . This.ControlTypeLabel . " " . StateString
 Else
 If This.ControlID = AccessibilityOverlay.CurrentControlID And This.ControlID = AccessibilityOverlay.PreviousControlID And This.states.Length > 1
 Message := StateString
-If Message != "" {
-AccessibilityOverlay.LastMessage := Message
 If Speak
 AccessibilityOverlay.Speak(Message)
 }
-}
 
 SpeakOnFocus(Speak := True) {
-CheckResult := This.CheckState()
+Message := ""
+CheckResult := This.State
 LabelString := AccessibilityOverlay.OCR(This.X1Coordinate, This.Y1Coordinate, This.X2Coordinate, This.Y2Coordinate, This.OCRLanguage, This.OCRScale)
 If LabelString = ""
 LabelString := This.DefaultLabel
@@ -760,7 +814,6 @@ If This.States.Has(CheckResult)
 StateString := This.States[CheckResult]
 If This.ControlID != AccessibilityOverlay.CurrentControlID {
 Message := LabelString . " " . This.ControlTypeLabel . " " . StateString . " " . This.HotkeyLabel
-AccessibilityOverlay.LastMessage := Message
 If Speak
 AccessibilityOverlay.Speak(Message)
 }
@@ -787,7 +840,7 @@ This.X2Coordinate := X2Coordinate
 This.Y2Coordinate := Y2Coordinate
 }
 
-ExecuteOnFocus() {
+ExecuteOnFocusPostSpeech() {
 XCoordinate := This.X1Coordinate + Floor((This.X2Coordinate - This.X1Coordinate)/2)
 YCoordinate := This.Y1Coordinate + Floor((This.Y2Coordinate - This.Y1Coordinate)/2)
 Click XCoordinate, YCoordinate
@@ -799,7 +852,8 @@ Return This.Value
 }
 
 SpeakOnFocus(Speak := True) {
-CheckResult := This.CheckState()
+Message := ""
+CheckResult := This.State
 LabelString := This.Label
 If LabelString = ""
 LabelString := This.DefaultLabel
@@ -811,7 +865,6 @@ If This.States.Has(CheckResult)
 StateString := This.States[CheckResult]
 If This.ControlID != AccessibilityOverlay.CurrentControlID {
 Message := LabelString . " " . This.ControlTypeLabel . " " . ValueString . " " . StateString . " " . This.HotkeyLabel
-AccessibilityOverlay.LastMessage := Message
 If Speak
 AccessibilityOverlay.Speak(Message)
 }
@@ -838,7 +891,7 @@ This.X2Coordinate := X2Coordinate
 This.Y2Coordinate := Y2Coordinate
 }
 
-ExecuteOnFocus() {
+ExecuteOnFocusPostSpeech() {
 XCoordinate := This.X1Coordinate + Floor((This.X2Coordinate - This.X1Coordinate)/2)
 YCoordinate := This.Y1Coordinate + Floor((This.Y2Coordinate - This.Y1Coordinate)/2)
 Click XCoordinate, YCoordinate
@@ -850,7 +903,8 @@ Return This.Value
 }
 
 SpeakOnFocus(Speak := True) {
-CheckResult := This.CheckState()
+Message := ""
+CheckResult := This.State
 LabelString := This.Label
 If LabelString = ""
 LabelString := This.DefaultLabel
@@ -862,7 +916,6 @@ If This.States.Has(CheckResult)
 StateString := This.States[CheckResult]
 If This.ControlID != AccessibilityOverlay.CurrentControlID {
 Message := LabelString . " " . This.ControlTypeLabel . " " . ValueString . " " . StateString . " " . This.HotkeyLabel
-AccessibilityOverlay.LastMessage := Message
 If Speak
 AccessibilityOverlay.Speak(Message)
 }
@@ -890,14 +943,15 @@ This.X2Coordinate := X2Coordinate
 This.Y2Coordinate := Y2Coordinate
 }
 
-ExecuteOnFocus() {
+ExecuteOnFocusPostSpeech() {
 XCoordinate := This.X1Coordinate + Floor((This.X2Coordinate - This.X1Coordinate)/2)
 YCoordinate := This.Y1Coordinate + Floor((This.Y2Coordinate - This.Y1Coordinate)/2)
 Click XCoordinate, YCoordinate
 }
 
 SpeakOnFocus(Speak := True) {
-CheckResult := This.CheckState()
+Message := ""
+CheckResult := This.State
 LabelString := AccessibilityOverlay.OCR(This.X1Coordinate, This.Y1Coordinate, This.X2Coordinate, This.Y2Coordinate, This.OCRLanguage, This.OCRScale)
 This.Label := LabelString
 If LabelString = ""
@@ -907,7 +961,6 @@ If This.States.Has(CheckResult)
 StateString := This.States[CheckResult]
 If This.ControlID != AccessibilityOverlay.CurrentControlID {
 Message := LabelString . " " . This.ControlTypeLabel . " " . StateString . " " . This.HotkeyLabel
-AccessibilityOverlay.LastMessage := Message
 If Speak
 AccessibilityOverlay.Speak(Message)
 }
@@ -937,7 +990,8 @@ This.Y2Coordinate := Y2Coordinate
 }
 
 SpeakOnFocus(Speak := True) {
-CheckResult := This.CheckState()
+Message := ""
+CheckResult := This.State
 LabelString := AccessibilityOverlay.OCR(This.X1Coordinate, This.Y1Coordinate, This.X2Coordinate, This.Y2Coordinate, This.OCRLanguage, This.OCRScale)
 This.Label := LabelString
 If LabelString = ""
@@ -947,7 +1001,6 @@ If This.States.Has(CheckResult)
 StateString := This.States[CheckResult]
 If This.ControlID != AccessibilityOverlay.CurrentControlID {
 Message := LabelString . " " . StateString . " " . This.HotkeyLabel
-AccessibilityOverlay.LastMessage := Message
 If Speak
 AccessibilityOverlay.Speak(Message)
 }
@@ -960,7 +1013,8 @@ Class StaticText Extends FocusableControl {
 ControlType := "Text"
 
 SpeakOnFocus(Speak := True) {
-CheckResult := This.CheckState()
+Message := ""
+CheckResult := This.State
 LabelString := This.Label
 If LabelString = ""
 LabelString := This.DefaultLabel
@@ -969,7 +1023,6 @@ If This.States.Has(CheckResult)
 StateString := This.States[CheckResult]
 If This.ControlID != AccessibilityOverlay.CurrentControlID {
 Message := LabelString . " " . StateString . " " . This.HotkeyLabel
-AccessibilityOverlay.LastMessage := Message
 If Speak
 AccessibilityOverlay.Speak(Message)
 }
