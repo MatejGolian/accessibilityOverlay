@@ -95,7 +95,7 @@ AccessibilityOverlay.SAPI.Speak("", 0x1|0x2)
 Class FocusableControl {
 
 ControlID := 0
-ControlType := "FocusableControl"
+ControlType := "Focusable"
 ControlTypeLabel := ""
 DefaultLabel := ""
 DefaultValue := ""
@@ -193,7 +193,7 @@ AccessibilityOverlay.Speak(Message)
 Class ActivatableControl Extends FocusableControl {
 
 ActivationFunctions := Array()
-ControlType := "ActivatableControl"
+ControlType := "Activatable"
 
 __New(Label := "", FocusFunctions := "", ActivationFunctions := "") {
 Super.__New(Label, FocusFunctions)
@@ -714,7 +714,10 @@ This.NativeControlID := NativeControlID
 }
 
 CheckFocus() {
-Found := This.CheckState()
+Try
+Found := ControlGetHwnd(This.NativeControlID, "A")
+Catch
+Found := False
 If Not Found {
 This.Focused := 0
 AccessibilityOverlay.Speak(This.States["0"])
@@ -736,6 +739,8 @@ Return False
 }
 
 CheckState() {
+If This.Focused = 0
+Return False
 Try
 Found := ControlGetHwnd(This.NativeControlID, "A")
 Catch
@@ -1033,5 +1038,76 @@ AccessibilityOverlay.Speak(Message)
 Class ToggleButton Extends Button {
 
 States := Map("-1", "unknown state", "0", "off", "1", "on")
+
+}
+
+Class UIAControl Extends ActivatableControl {
+
+ControlType := "UIA"
+States := Map("0", "not found", "1", "")
+UIAPath := ""
+
+__New(UIAPath, Label := "", FocusFunctions := "", ActivationFunctions := "") {
+Super.__New(Label, FocusFunctions, ActivationFunctions)
+This.UIAPath := UIAPath
+}
+
+ExecuteOnActivationPostSpeech() {
+Try {
+element := This.GetElement()
+element.Click("Left")
+}
+}
+
+ExecuteOnFocusPostSpeech() {
+Try {
+element := This.GetElement()
+element.SetFocus()
+}
+}
+
+CheckFocus() {
+Try
+Found := This.GetControl()
+Catch
+Found := False
+If Not Found {
+This.Focused := 0
+AccessibilityOverlay.Speak(This.States["0"])
+}
+Else {
+This.Focused := 1
+Return True
+}
+Return False
+}
+
+CheckState() {
+Try
+Found := This.GetElement()
+Catch
+Found := False
+If Found {
+This.State := 1
+Return True
+}
+Else {
+This.State := 0
+Return False
+}
+}
+
+GetElement() {
+If !IsSet(UIA)
+Return False
+Try {
+element := UIA.ElementFromHandle("ahk_id " . WinGetID("A"))
+element := element.ElementFromPath(This.UIAPath)
+}
+Catch {
+Return False
+}
+Return Element
+}
 
 }
