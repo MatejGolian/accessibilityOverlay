@@ -15,6 +15,7 @@ SuperordinateControlID := 0
 Static AllControls := Array()
 Static CurrentControlID := 0
 Static JAWS := False
+Static LastMessage := ""
 Static PreviousControlID := 0
 Static SAPI := False
 Static TotalNumberOfControls := 0
@@ -63,6 +64,7 @@ Return ""
 }
 
 Static Speak(Message) {
+AccessibilityOverlay.LastMessage := Message
 If (AccessibilityOverlay.JAWS != False And ProcessExist("jfw.exe")) Or (FileExist("NvdaControllerClient" . A_PtrSize * 8 . ".dll") And !DllCall("NvdaControllerClient" . A_PtrSize * 8 . ".dll\nvdaController_testIfRunning")) {
 If AccessibilityOverlay.JAWS != False And ProcessExist("jfw.exe") {
 AccessibilityOverlay.JAWS.SayString(Message)
@@ -133,8 +135,7 @@ If This.ControlID != AccessibilityOverlay.CurrentControlID
 For FocusFunction In This.FocusFunctions
 FocusFunction.Call(This)
 If This.CheckFocus() {
-If Speak= True
-This.SpeakOnFocus()
+This.SpeakOnFocus(Speak)
 If This.HasMethod("ExecuteOnFocus")
 This.ExecuteOnFocus()
 }
@@ -164,7 +165,7 @@ SetValue(Value) {
 This.Value := Value
 }
 
-SpeakOnFocus() {
+SpeakOnFocus(Speak := True) {
 CheckResult := This.CheckState()
 LabelString := This.Label
 If LabelString = ""
@@ -175,8 +176,12 @@ ValueString := This.DefaultValue
 StateString := ""
 If This.States.Has(CheckResult)
 StateString := This.States[CheckResult]
-If This.ControlID != AccessibilityOverlay.CurrentControlID
-AccessibilityOverlay.Speak(LabelString . " " . This.ControlTypeLabel . " " . ValueString . " " . StateString . " " . This.HotkeyLabel)
+If This.ControlID != AccessibilityOverlay.CurrentControlID {
+Message := LabelString . " " . This.ControlTypeLabel . " " . ValueString . " " . StateString . " " . This.HotkeyLabel
+AccessibilityOverlay.LastMessage := Message
+If Speak
+AccessibilityOverlay.Speak(Message)
+}
 }
 
 }
@@ -203,15 +208,15 @@ If This.Focused {
 For ActivationFunction In This.ActivationFunctions
 ActivationFunction.Call(This)
 If This.CheckFocus() {
-If Speak
-This.SpeakOnActivation()
+This.SpeakOnActivation(Speak)
 If This.HasMethod("ExecuteOnActivation")
 This.ExecuteOnActivation()
 }
 }
 }
 
-SpeakOnActivation() {
+SpeakOnActivation(Speak := True) {
+Message := ""
 CheckResult := This.CheckState()
 LabelString := This.Label
 If LabelString = ""
@@ -223,10 +228,15 @@ StateString := ""
 If This.states.Has(CheckResult)
 StateString := This.States[CheckResult]
 If This.ControlID = AccessibilityOverlay.CurrentControlID And This.ControlID != AccessibilityOverlay.PreviousControlID
-AccessibilityOverlay.Speak(LabelString . " " . This.ControlTypeLabel . " " . ValueString . " " . StateString)
+Message := LabelString . " " . This.ControlTypeLabel . " " . ValueString . " " . StateString
 Else
 If This.ControlID = AccessibilityOverlay.CurrentControlID And This.ControlID = AccessibilityOverlay.PreviousControlID And This.states.Length > 1
-AccessibilityOverlay.Speak(StateString)
+Message := StateString
+If Message != "" {
+AccessibilityOverlay.LastMessage := Message
+If Speak
+AccessibilityOverlay.Speak(Message)
+}
 }
 
 }
@@ -368,8 +378,7 @@ If This.ControlID != AccessibilityOverlay.CurrentControlID
 For FocusFunction In This.FocusFunctions
 FocusFunction.Call(This)
 If This.CheckFocus() {
-If Speak
-This.SpeakOnFocus()
+This.SpeakOnFocus(Speak)
 If This.HasMethod("ExecuteOnFocus")
 This.ExecuteOnFocus()
 }
@@ -387,7 +396,7 @@ This.HotkeyFunctions.Push(HotkeyFunction)
 }
 }
 
-SpeakOnFocus() {
+SpeakOnFocus(Speak := True) {
 CheckResult := This.CheckState()
 LabelString := This.Label
 If LabelString = ""
@@ -395,8 +404,56 @@ LabelString := This.DefaultLabel
 StateString := ""
 If This.States.Has(CheckResult)
 StateString := This.States[CheckResult]
-If This.ControlID != AccessibilityOverlay.CurrentControlID
-AccessibilityOverlay.Speak(LabelString . " " . This.ControlTypeLabel . " " . StateString . " " . This.HotkeyLabel)
+If This.ControlID != AccessibilityOverlay.CurrentControlID {
+Message := LabelString . " " . This.ControlTypeLabel . " " . StateString . " " . This.HotkeyLabel
+AccessibilityOverlay.LastMessage := Message
+If Speak
+AccessibilityOverlay.Speak(Message)
+}
+}
+
+}
+
+Class TabControl Extends FocusableControl {
+
+ControlType := "TabControl"
+ControlTypeLabel := "tab control"
+CurrentTab := 1
+Tabs := Array()
+
+__New(Label := "", Tabs*) {
+Super.__New(Label)
+If Tabs.Length > 0
+For Tab In Tabs
+This.AddTabs(Tab)
+}
+
+AddTabs(Tabs*) {
+If Tabs.Length > 0
+For Tab In Tabs {
+Tab.SuperordinateControlID := This.ControlID
+This.Tabs.Push(Tab)
+}
+}
+
+GetCurrentTab() {
+Return This.Tabs.Get(This.CurrentTab, 0)
+}
+
+GetTab(TabNumber) {
+Return This.Tabs.Get(TabNumber, 0)
+}
+
+GetValue() {
+Value := ""
+CurrentTab := This.GetCurrentTab()
+If CurrentTab Is Object And CurrentTab.ControlType = "Tab" {
+CurrentTab.Focus(False)
+If CurrentTab.Focused = 1
+Value := AccessibilityOverlay.LastMessage
+}
+This.Value := Value
+Return This.Value
 }
 
 }
@@ -671,7 +728,8 @@ YCoordinate := This.Y1Coordinate + Floor((This.Y2Coordinate - This.Y1Coordinate)
 MouseMove XCoordinate, YCoordinate
 }
 
-SpeakOnActivation() {
+SpeakOnActivation(Speak := True) {
+Message := ""
 CheckResult := This.CheckState()
 LabelString := AccessibilityOverlay.OCR(This.X1Coordinate, This.Y1Coordinate, This.X2Coordinate, This.Y2Coordinate, This.OCRLanguage, This.OCRScale)
 This.Label := LabelString
@@ -681,13 +739,18 @@ StateString := ""
 If This.states.Has(CheckResult)
 StateString := This.States[CheckResult]
 If This.ControlID = AccessibilityOverlay.CurrentControlID And This.ControlID != AccessibilityOverlay.PreviousControlID
-AccessibilityOverlay.Speak(LabelString . " " . This.ControlTypeLabel . " " . StateString)
+Message := LabelString . " " . This.ControlTypeLabel . " " . StateString
 Else
 If This.ControlID = AccessibilityOverlay.CurrentControlID And This.ControlID = AccessibilityOverlay.PreviousControlID And This.states.Length > 1
-AccessibilityOverlay.Speak(StateString)
+Message := StateString
+If Message != "" {
+AccessibilityOverlay.LastMessage := Message
+If Speak
+AccessibilityOverlay.Speak(Message)
+}
 }
 
-SpeakOnFocus() {
+SpeakOnFocus(Speak := True) {
 CheckResult := This.CheckState()
 LabelString := AccessibilityOverlay.OCR(This.X1Coordinate, This.Y1Coordinate, This.X2Coordinate, This.Y2Coordinate, This.OCRLanguage, This.OCRScale)
 If LabelString = ""
@@ -695,8 +758,12 @@ LabelString := This.DefaultLabel
 StateString := ""
 If This.States.Has(CheckResult)
 StateString := This.States[CheckResult]
-If This.ControlID != AccessibilityOverlay.CurrentControlID
-AccessibilityOverlay.Speak(LabelString . " " . This.ControlTypeLabel . " " . StateString . " " . This.HotkeyLabel)
+If This.ControlID != AccessibilityOverlay.CurrentControlID {
+Message := LabelString . " " . This.ControlTypeLabel . " " . StateString . " " . This.HotkeyLabel
+AccessibilityOverlay.LastMessage := Message
+If Speak
+AccessibilityOverlay.Speak(Message)
+}
 }
 
 }
@@ -731,7 +798,7 @@ This.Value := AccessibilityOverlay.OCR(This.X1Coordinate, This.Y1Coordinate, Thi
 Return This.Value
 }
 
-SpeakOnFocus() {
+SpeakOnFocus(Speak := True) {
 CheckResult := This.CheckState()
 LabelString := This.Label
 If LabelString = ""
@@ -742,8 +809,12 @@ ValueString := This.DefaultValue
 StateString := ""
 If This.States.Has(CheckResult)
 StateString := This.States[CheckResult]
-If This.ControlID != AccessibilityOverlay.CurrentControlID
-AccessibilityOverlay.Speak(LabelString . " " . This.ControlTypeLabel . " " . ValueString . " " . StateString . " " . This.HotkeyLabel)
+If This.ControlID != AccessibilityOverlay.CurrentControlID {
+Message := LabelString . " " . This.ControlTypeLabel . " " . ValueString . " " . StateString . " " . This.HotkeyLabel
+AccessibilityOverlay.LastMessage := Message
+If Speak
+AccessibilityOverlay.Speak(Message)
+}
 }
 
 }
@@ -778,7 +849,7 @@ This.Value := AccessibilityOverlay.OCR(This.X1Coordinate, This.Y1Coordinate, Thi
 Return This.Value
 }
 
-SpeakOnFocus() {
+SpeakOnFocus(Speak := True) {
 CheckResult := This.CheckState()
 LabelString := This.Label
 If LabelString = ""
@@ -789,8 +860,12 @@ ValueString := This.DefaultValue
 StateString := ""
 If This.States.Has(CheckResult)
 StateString := This.States[CheckResult]
-If This.ControlID != AccessibilityOverlay.CurrentControlID
-AccessibilityOverlay.Speak(LabelString . " " . This.ControlTypeLabel . " " . ValueString . " " . StateString . " " . This.HotkeyLabel)
+If This.ControlID != AccessibilityOverlay.CurrentControlID {
+Message := LabelString . " " . This.ControlTypeLabel . " " . ValueString . " " . StateString . " " . This.HotkeyLabel
+AccessibilityOverlay.LastMessage := Message
+If Speak
+AccessibilityOverlay.Speak(Message)
+}
 }
 
 }
@@ -821,7 +896,7 @@ YCoordinate := This.Y1Coordinate + Floor((This.Y2Coordinate - This.Y1Coordinate)
 Click XCoordinate, YCoordinate
 }
 
-SpeakOnFocus() {
+SpeakOnFocus(Speak := True) {
 CheckResult := This.CheckState()
 LabelString := AccessibilityOverlay.OCR(This.X1Coordinate, This.Y1Coordinate, This.X2Coordinate, This.Y2Coordinate, This.OCRLanguage, This.OCRScale)
 This.Label := LabelString
@@ -830,8 +905,12 @@ LabelString := This.DefaultLabel
 StateString := ""
 If This.States.Has(CheckResult)
 StateString := This.States[CheckResult]
-If This.ControlID != AccessibilityOverlay.CurrentControlID
-AccessibilityOverlay.Speak(LabelString . " " . This.ControlTypeLabel . " " . StateString . " " . This.HotkeyLabel)
+If This.ControlID != AccessibilityOverlay.CurrentControlID {
+Message := LabelString . " " . This.ControlTypeLabel . " " . StateString . " " . This.HotkeyLabel
+AccessibilityOverlay.LastMessage := Message
+If Speak
+AccessibilityOverlay.Speak(Message)
+}
 }
 
 }
@@ -857,7 +936,7 @@ This.X2Coordinate := X2Coordinate
 This.Y2Coordinate := Y2Coordinate
 }
 
-SpeakOnFocus() {
+SpeakOnFocus(Speak := True) {
 CheckResult := This.CheckState()
 LabelString := AccessibilityOverlay.OCR(This.X1Coordinate, This.Y1Coordinate, This.X2Coordinate, This.Y2Coordinate, This.OCRLanguage, This.OCRScale)
 This.Label := LabelString
@@ -866,8 +945,12 @@ LabelString := This.DefaultLabel
 StateString := ""
 If This.States.Has(CheckResult)
 StateString := This.States[CheckResult]
-If This.ControlID != AccessibilityOverlay.CurrentControlID
-AccessibilityOverlay.Speak(LabelString . " " . StateString . " " . This.HotkeyLabel)
+If This.ControlID != AccessibilityOverlay.CurrentControlID {
+Message := LabelString . " " . StateString . " " . This.HotkeyLabel
+AccessibilityOverlay.LastMessage := Message
+If Speak
+AccessibilityOverlay.Speak(Message)
+}
 }
 
 }
@@ -876,7 +959,7 @@ Class StaticText Extends FocusableControl {
 
 ControlType := "Text"
 
-SpeakOnFocus() {
+SpeakOnFocus(Speak := True) {
 CheckResult := This.CheckState()
 LabelString := This.Label
 If LabelString = ""
@@ -884,8 +967,12 @@ LabelString := This.DefaultLabel
 StateString := ""
 If This.States.Has(CheckResult)
 StateString := This.States[CheckResult]
-If This.ControlID != AccessibilityOverlay.CurrentControlID
-AccessibilityOverlay.Speak(LabelString . " " . StateString . " " . This.HotkeyLabel)
+If This.ControlID != AccessibilityOverlay.CurrentControlID {
+Message := LabelString . " " . StateString . " " . This.HotkeyLabel
+AccessibilityOverlay.LastMessage := Message
+If Speak
+AccessibilityOverlay.Speak(Message)
+}
 }
 
 }
