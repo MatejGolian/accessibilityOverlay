@@ -130,17 +130,6 @@ Overlay.AddHotspotButton("Button 3", 180, 180) ; Add a third button
 Overlay.Remove() ; Remove the third button
 Overlay.RemoveAt(1) ; Remove the first button
 ```
-### Translating Overlays
-By calling the "Translate" metod of an AccessibilityOverlay object it's possible to translate that object to different languages. The currently supported languages are English, Slovak and Swedish. Note that this method does not translate the user labels of the added elements - just predefined information mostly related to control type and state announcement.
-To translate an AccessibilityOverlay object, call the “Translate” method once you have added all control elements to it and supply the desired language as a parameter like so:
-```
-Overlay := AccessibilityOverlay() ; Create a new overlay object
-Overlay.AddHotspotButton("Button 1", 120, 180) ; Add a button that will get clicked at the coordinates specified once the button is activated
-Overlay.AddHotspotButton("Button 2", 180, 180) ; Add a second button
-Overlay.Translate("Slovak") ; Translate the overlay object to Slovak
-Overlay.Translate("Swedish") ; Translate the overlay object to Swedish
-Overlay.Translate("English") ; Translate the overlay object back to English
-```
 ### Resetting Overlays
 The "Reset" method resets a given AccessibilityOverlay object to its initial state. This means that the overlay is going to behave as if you had launched a fresh instance of your script.
 To reset an AccessibilityOverlay, create an overlay object and call the "Reset" method when needed:
