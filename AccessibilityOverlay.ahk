@@ -241,12 +241,7 @@ Class AccessibilityOverlay Extends AccessibilityControl {
                 CurrentControl := AccessibilityOverlay.GetControl(This.FocusableControlIDs[Found])
                 If CurrentControl Is TabControl {
                     This.SetPreviousControlID(AccessibilityOverlay.CurrentControlID)
-                    If CurrentControl.CurrentTab < CurrentControl.Tabs.Length
-                    TabNumber := CurrentControl.CurrentTab + 1
-                    Else
-                    TabNumber := 1
-                    CurrentControl.CurrentTab := TabNumber
-                    CurrentControl.Focus()
+                    CurrentControl.FocusNextTab()
                     This.SetCurrentControlID(CurrentControl.ControlID)
                 }
             }
@@ -261,12 +256,7 @@ Class AccessibilityOverlay Extends AccessibilityControl {
                 CurrentControl := AccessibilityOverlay.GetControl(This.FocusableControlIDs[Found])
                 If CurrentControl Is TabControl {
                     This.SetPreviousControlID(AccessibilityOverlay.CurrentControlID)
-                    If CurrentControl.CurrentTab <= 1
-                    TabNumber := CurrentControl.Tabs.Length
-                    Else
-                    TabNumber := CurrentControl.CurrentTab - 1
-                    CurrentControl.CurrentTab := TabNumber
-                    CurrentControl.Focus()
+                    CurrentControl.FocusPreviousTab()
                     This.SetCurrentControlID(CurrentControl.controlID)
                 }
             }
@@ -558,35 +548,28 @@ Class AccessibilityOverlay Extends AccessibilityControl {
     
     TriggerHotkey(HotkeyCommand) {
         For ReachableControl In This.GetReachableControls()
-        If ReachableControl.HasOwnProp("HotkeyCommand") And ReachableControl.HotkeyCommand = HotkeyCommand
-        If ReachableControl.ControlType = "Tab" {
-            ParentTabControl := ReachableControl.GetSuperordinateControl()
-            SiblingTab := ParentTabControl.GetCurrentTab()
-            For Index, Value In ParentTabControl.Tabs
-            If Value = ReachableControl {
-                ParentTabControl.CurrentTab := Index
-                If Not ReachableControl.ControlID = SiblingTab.ControlID {
-                    This.FocusControl(ParentTabControl.ControlID)
+        If ReachableControl.HasOwnProp("HotkeyCommand") And ReachableControl.HotkeyCommand = HotkeyCommand {
+            ControlToTrigger := ReachableControl
+            HotkeyFunctions := ReachableControl.HotkeyFunctions
+            HotkeyTarget := ReachableControl
+            If ReachableControl.ControlType = "Tab" {
+                ControlToTrigger := ReachableControl.GetSuperordinateControl()
+                TabNumber := 1
+                For TabIndex, TabObject In ControlToTrigger.Tabs
+                If TabObject = ReachableControl {
+                    TabNumber := TabIndex
+                    Break
                 }
-                Else {
-                    If Not This.GetCurrentControlID() = ParentTabControl.ControlID
-                    This.FocusControl(ParentTabControl.ControlID)
-                    Else
-                    ReachableControl.Focus(ReachableControl.controlID)
-                    This.SetCurrentControlID(ParentTabControl.ControlID)
-                }
-                For HotkeyFunction In ReachableControl.HotkeyFunctions
-                HotkeyFunction.Call(ReachableControl)
-                Break 2
+                ControlToTrigger.CurrentTab := TabNumber
             }
-        }
-        Else {
-            If ReachableControl.HasMethod("Activate")
-            This.ActivateControl(ReachableControl.ControlID)
+            This.SetPreviousControlID(AccessibilityOverlay.CurrentControlID)
+            If ControlToTrigger.HasMethod("Activate")
+            This.ActivateControl(ControlToTrigger.ControlID)
             Else
-            This.FocusControl(ReachableControl.ControlID)
-            For HotkeyFunction In ReachableControl.HotkeyFunctions
-            HotkeyFunction.Call(ReachableControl)
+            This.FocusControl(ControlToTrigger.ControlID)
+            For HotkeyFunction In HotkeyFunctions
+            HotkeyFunction.Call(HotkeyTarget)
+            This.SetCurrentControlID(ControlToTrigger.ControlID)
             Break
         }
     }
@@ -1212,6 +1195,7 @@ Class TabControl Extends FocusableControl {
     ControlType := "TabControl"
     ControlTypeLabel := "tab control"
     CurrentTab := 1
+    PreviousTab := 0
     Tabs := Array()
     
     __New(Label := "", Tabs*) {
@@ -1227,6 +1211,29 @@ Class TabControl Extends FocusableControl {
             TabObject.SuperordinateControlID := This.ControlID
             This.Tabs.Push(TabObject)
         }
+    }
+    
+    Focus(Speak := True) {
+        Super.Focus(Speak)
+        This.PreviousTab := This.CurrentTab
+    }
+    
+    FocusNextTab(Speak := True) {
+        If This.CurrentTab < This.Tabs.Length
+        TabNumber := This.CurrentTab + 1
+        Else
+        TabNumber := 1
+        This.CurrentTab := TabNumber
+        This.Focus(Speak)
+    }
+    
+    FocusPreviousTab(Speak := True) {
+        If This.CurrentTab <= 1
+        TabNumber := This.Tabs.Length
+        Else
+        TabNumber := This.CurrentTab - 1
+        This.CurrentTab := TabNumber
+        This.Focus(Speak)
     }
     
     GetCurrentTab() {
@@ -1257,6 +1264,9 @@ Class TabControl Extends FocusableControl {
         ValueString := This.GetValue()
         If ValueString = ""
         ValueString := This.DefaultValue
+        If This.controlID = AccessibilityOverlay.PreviousControlID
+        If This.CurrentTab = This.PreviousTab And This.Tabs.Length > 1
+        ValueString := ""
         StateString := ""
         If This.States.Has(CheckResult)
         StateString := This.States[CheckResult]
