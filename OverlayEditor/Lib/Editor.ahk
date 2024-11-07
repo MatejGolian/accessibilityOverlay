@@ -16,9 +16,12 @@ Class Editor {
         This.MainWindow := Gui(, This.AppName)
         This.MainWindow.AddTreeView("vMainTree").OnEvent("ContextMenu", ObjBindMethod(This, "ShowEditMenu"))
         This.MainWindow.MainTree := This.MainWindow["MainTree"]
+        This.MainWindow.MainTree.OnEvent("Focus", ObjBindMethod(This, "TreeFocus"))
+        This.MainWindow.MainTree.OnEvent("LoseFocus", ObjBindMethod(This, "TreeLoseFocus"))
         OverlayRoot := This.MainWindow.MainTree.Add("Overlays",, "Expand")
         This.AddItem(OverlayRoot, "DummyItem", False)
         This.MainWindow.OnEvent("Close", ObjBindMethod(This, "Close"))
+        ;SetTimer ObjBindMethod(This, "CheckFocus"), 200
     }
     
     Static AddItem(Parent, Type, Select := True) {
@@ -35,6 +38,11 @@ Class Editor {
         If Select
         This.MainWindow.MainTree.Modify(Item)
     }
+    
+    ;Static CheckFocus() {
+    ;If WinActive("ahk_id " . This.MainWindow.Hwnd)
+    ;This.TreeFocus()
+;}
     
     Static CloneObj(Obj) {
         NewObj := Obj.Clone()
@@ -297,6 +305,18 @@ Class Editor {
         Return False
     }
     
+    Static ItemDeleteHK(ThisHK) {
+        Item := This.MainWindow.MainTree.GetSelection()
+        If This.Items.Has(Item) And Not This.Items[Item].Type = "DummyItem"
+        This.DeleteItem(Item)
+    }
+    
+    Static ItemEditHK(ThisHK) {
+        Item := This.MainWindow.MainTree.GetSelection()
+        If This.Items.Has(Item) And Not This.Items[Item].Type = "DummyItem"
+        This.EditItem(Item)
+    }
+    
     Static SetItemParam(Item, ParamGroup := False, ParamName := False, ParamValue := False) {
         If This.Items.Has(Item) And ParamGroup  And This.Items[Item].HasOwnProp(ParamGroup . "Params")  And ParamName
         For Index, Param In This.Items[Item].%ParamGroup%Params
@@ -354,6 +374,16 @@ Class Editor {
         CreatedMenu := This.CreateMenu("Edit")
         If CreatedMenu
         CreatedMenu.Show()
+    }
+    
+    Static TreeFocus(*) {
+        Hotkey "Delete", ObjBindMethod(This, "ItemDeleteHK")
+        Hotkey "!Enter", ObjBindMethod(This, "ItemEditHK")
+    }
+    
+    Static TreeLoseFocus(*) {
+        Hotkey "Delete", "Off"
+        Hotkey "!Enter", "Off"
     }
     
     #Include <ParamHandler>

@@ -2,12 +2,14 @@
 
 Class ParamHandler {
     
-    Static __Call(Value, Properties) {
-        If Properties.Length = 4 {
-            Name := Properties[1]
-            Value := Properties[2]
-            Expression := Properties[3]
-            Optional := Properties[4]
+    Static __Call(Value, Params) {
+        If Not SubStr(Value, -11) = "CustomLabel" And SubStr(Value, -5) = "Label"
+        Return This.HandleLabel(Params*)
+        If Params.Length = 4 {
+            Name := Params[1]
+            Value := Params[2]
+            Expression := Params[3]
+            Optional := Params[4]
             If Value = "" And Not Optional
             Return This.Error("You did not enter the " . Name . ".")
             Return Value
@@ -21,15 +23,7 @@ Class ParamHandler {
         Return Value
     }
     
-    Static HandleHotspotButtonLabel(Name, Value, Expression, Optional) {
-        If Not Expression
-        Return "`"" . Value . "`""
-        If Value = ""
-        Return "`"" . Value . "`""
-        Return Value
-    }
-    
-    Static HandleHotspotButtonHotkeyLabel(Name, Value, Expression, Optional) {
+    Static HandleLabel(Name, Value, Expression, Optional) {
         If Not Expression
         Return "`"" . Value . "`""
         If Value = ""
