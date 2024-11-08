@@ -15,3 +15,8 @@ SetTitleMatchMode "RegEx"
 #Include <Editor>
 
 Editor.Show()
+
+#HotIf WinActive("Overlay Editor ahk_class AutoHotkeyGUI")
+
+Delete::Editor.ItemDeleteHK()
+F2::Editor.ItemEditHK()
