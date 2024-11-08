@@ -24,6 +24,8 @@ Class ParamHandler {
     }
     
     Static HandleLabel(Name, Value, Expression, Optional) {
+        If Value = "" And Optional
+        Return Value
         If Not Expression
         Return "`"" . Value . "`""
         If Value = ""
