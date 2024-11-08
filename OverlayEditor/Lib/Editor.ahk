@@ -41,7 +41,7 @@ Class Editor {
         "TabControl", {Type: "TabControl", CanAdd: ["CustomTab", "GraphicalTab", "HotspotTab", "OCRTab", "Tab"], Expand: True, EditorParams: [{Expression: 2, Name: "CustomLabel", Optional: True, Value: ""}, {Expression: 2, Name: "VarName", Optional: False, Value: "TabControl"}], ConstructorParams: [{Expression: 1, Name: "Label", Optional: True, Value: ""}], HotkeyParams: []},
         "ToggleButton", {Type: "ToggleButton", CanAdd: False, Expand: False, EditorParams: [{Expression: 2, Name: "CustomLabel", Optional: True, Value: ""}, {Expression: 2, Name: "VarName", Optional: False, Value: "ToggleButton"}], ConstructorParams: [{Expression: 1, Name: "Label", Optional: False, Value: "`"`""}, {Expression: 4, Name: "PreExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PreExecActivationFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecActivationFunctions", Optional: True, Value: ""}], HotkeyParams: [{Expression: 1, Name: "HotkeyCommand", Optional: False, Value: ""}, {Expression: 1, Name: "HotkeyLabel", Optional: True, Value: ""}, {Expression: 4, Name: "HotkeyFunctions", Optional: True, Value: ""}]},
         )
-        This.MainWindow := Gui(, This.AppName)
+        This.MainWindow := Gui("+OwnDialogs", This.AppName)
         This.MainWindow.AddTreeView("vMainTree").OnEvent("ContextMenu", ObjBindMethod(This, "ShowEditMenu"))
         This.MainWindow.MainTree := This.MainWindow["MainTree"]
         OverlayRoot := This.MainWindow.MainTree.Add("Overlays",, "Expand")
@@ -148,12 +148,14 @@ Class Editor {
     }
     
     Static DeleteItem(Item, Confirmation := True) {
+        This.MainWindow.Opt("+OwnDialogs")
         If Confirmation = True {
-            This.MainWindow.Hide()
+            This.MainWindow.Opt("+Disabled")
             ConfirmationDialog := MsgBox("Delete item?", This.AppName, 4)
             If ConfirmationDialog == "Yes"
             Proceed()
-            This.MainWindow.Show()
+            This.MainWindow.Opt("-Disabled")
+            This.MainWindow.MainTree.Focus()
             Return
         }
         Proceed()
@@ -169,7 +171,7 @@ Class Editor {
     
     Static EditItem(Item) {
         ItemType := This.Items[Item].Type
-        ParamBox := GUI("+owner" This.MainWindow.Hwnd, "Item Properties")
+        ParamBox := GUI("+OwnDialogs +owner" This.MainWindow.Hwnd, ItemType . " Properties")
         EditorBoxes := Map()
         EditorExpressionBoxes := Map()
         ControlIndex := 0
@@ -251,14 +253,13 @@ Class Editor {
             ParamBox.Destroy()
         }
         Save(*) {
+            ParamBox.Opt("+OwnDialogs")
             For Param In This.Items[Item].EditorParams {
                 Result := This.ParamHandler.Handle%ItemType%%Param.Name%(Param.Name, EditorBoxes[Param.Name].Value, EditorExpressionBoxes[Param.Name].Value, Param.Optional)
                 If Result Is This.ParamHandler.Error {
-                    ParamBox.Hide()
-                    This.MainWindow.Hide()
+                    ParamBox.Opt("+Disabled")
                     MsgBox Result.Message, This.AppName
-                    This.MainWindow.Show()
-                    ParamBox.Show()
+                    ParamBox.Opt("-Disabled")
                     EditorBoxes[Param.Name].Focus()
                     Return
                 }
@@ -266,11 +267,9 @@ Class Editor {
             For Param In This.Items[Item].ConstructorParams {
                 Result := This.ParamHandler.Handle%ItemType%%Param.Name%(Param.Name, ConstructorBoxes[Param.Name].Value, ConstructorExpressionBoxes[Param.Name].Value, Param.Optional)
                 If Result Is This.ParamHandler.Error {
-                    ParamBox.Hide()
-                    This.MainWindow.Hide()
+                    ParamBox.Opt("+Disabled")
                     MsgBox Result.Message, This.AppName
-                    This.MainWindow.Show()
-                    ParamBox.Show()
+                    ParamBox.Opt("-Disabled")
                     ConstructorBoxes[Param.Name].Focus()
                     Return
                 }
@@ -278,11 +277,9 @@ Class Editor {
             For Param In This.Items[Item].HotkeyParams {
                 Result := This.ParamHandler.Handle%ItemType%%Param.Name%(Param.Name, HotkeyBoxes[Param.Name].Value, HotkeyExpressionBoxes[Param.Name].Value, Param.Optional)
                 If Result Is This.ParamHandler.Error {
-                    ParamBox.Hide()
-                    This.MainWindow.Hide()
+                    ParamBox.Opt("+Disabled")
                     MsgBox Result.Message, This.AppName
-                    This.MainWindow.Show()
-                    ParamBox.Show()
+                    ParamBox.Opt("-Disabled")
                     HotkeyBoxes[Param.Name].Focus()
                     Return
                 }
