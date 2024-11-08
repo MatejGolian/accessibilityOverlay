@@ -3,6 +3,8 @@
 Class ParamHandler {
     
     Static __Call(Value, Params) {
+        If SubStr(Value, -13) = "HotkeyCommand"
+        Return This.HandleHotkeyCommand(Params*)
         If Not SubStr(Value, -11) = "CustomLabel" And SubStr(Value, -5) = "Label"
         Return This.HandleLabel(Params*)
         If Params.Length = 4 {
@@ -17,7 +19,7 @@ Class ParamHandler {
         Return False
     }
     
-    Static HandleHotspotButtonHotkeyCommand(Name, Value, Expression, Optional) {
+    Static HandleHotkeyCommand(Name, Value, Expression, Optional) {
         If Not Value = "" And Not Expression
         Return "`"" . Value . "`""
         Return Value

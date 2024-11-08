@@ -42,7 +42,9 @@ Class Editor {
         "ToggleButton", {Type: "ToggleButton", CanAdd: False, Expand: False, EditorParams: [{Expression: 2, Name: "CustomLabel", Optional: True, Value: ""}, {Expression: 2, Name: "VarName", Optional: False, Value: "ToggleButton"}], ConstructorParams: [{Expression: 1, Name: "Label", Optional: False, Value: "`"`""}, {Expression: 4, Name: "PreExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PreExecActivationFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecActivationFunctions", Optional: True, Value: ""}], HotkeyParams: [{Expression: 1, Name: "HotkeyCommand", Optional: False, Value: ""}, {Expression: 1, Name: "HotkeyLabel", Optional: True, Value: ""}, {Expression: 4, Name: "HotkeyFunctions", Optional: True, Value: ""}]},
         )
         This.MainWindow := Gui("+OwnDialogs", This.AppName)
-        This.MainWindow.AddTreeView("vMainTree").OnEvent("ContextMenu", ObjBindMethod(This, "ShowEditMenu"))
+        This.MainWindow.AddButton("vExportButton", "Export").OnEvent("Click", ObjBindMethod(This, "Export"))
+        This.MainWindow.ExportButton := This.MainWindow["ExportButton"]
+        This.MainWindow.AddTreeView("Section XS vMainTree").OnEvent("ContextMenu", ObjBindMethod(This, "ShowEditMenu"))
         This.MainWindow.MainTree := This.MainWindow["MainTree"]
         OverlayRoot := This.MainWindow.MainTree.Add("Overlays",, "Expand")
         This.AddItem(OverlayRoot, "DummyItem", False)
@@ -315,6 +317,9 @@ Class Editor {
         }
     }
     
+    Static Export(*) {
+    }
+    
     Static GetChildItems(Item) {
         ChildItems := Array()
         ChildItem := This.MainWindow.MainTree.GetChild(Item)
@@ -406,6 +411,7 @@ Class Editor {
     
     Static Show() {
         This.MainWindow.Show()
+        This.MainWindow.MainTree.Focus()
     }
     
     Static ShowEditMenu(*) {
