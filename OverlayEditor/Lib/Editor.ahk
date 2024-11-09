@@ -10,14 +10,15 @@ Class Editor {
     Static __New() {
         #Include ../Includes/ItemDefinitions.ahk
         This.MainWindow := Gui("+OwnDialogs", This.AppName)
-        This.MainWindow.AddButton("vExportButton", "Export").OnEvent("Click", ObjBindMethod(This, "Export"))
-        This.MainWindow.ExportButton := This.MainWindow["ExportButton"]
+        This.MainWindow.AddButton("vImportButton", "Import").OnEvent("Click", ObjBindMethod(This, "Import"))
         This.MainWindow.AddText("Section XS", "Items")
         This.MainWindow.AddTreeView("XS vMainTree").OnEvent("ContextMenu", ObjBindMethod(This, "ShowEditMenu"))
         This.MainWindow.AddText("YS", "Code")
-        This.MainWindow.AddEdit("XM +ReadOnly")
+        This.MainWindow.AddEdit("W1000 R3000 XM vCodeField +Multi +ReadOnly")
+        This.MainWindow.ImportButton := This.MainWindow["ImportButton"]
         This.MainWindow.MainTree := This.MainWindow["MainTree"]
         This.MainWindow.MainTree.OverlayRoot := This.MainWindow.MainTree.Add("Overlays",, "Expand")
+        This.MainWindow.CodeField := This.MainWindow["CodeField"]
         This.AddItem(This.MainWindow.MainTree.OverlayRoot, "DummyItem", False)
         This.MainWindow.OnEvent("Close", ObjBindMethod(This, "Close"))
     }
@@ -35,6 +36,7 @@ Class Editor {
         This.AddItem(Item, "DummyItem", False)
         If Select
         This.MainWindow.MainTree.Modify(Item)
+        This.UpdateCodeField()
     }
     
     Static CloneObj(Obj) {
@@ -58,7 +60,17 @@ Class Editor {
     }
     
     Static Close(*) {
+        FocusedControl := This.MainWindow.FocusedCtrl
+        This.MainWindow.Opt("+OwnDialogs")
+        This.MainWindow.Opt("+Disabled")
+        ConfirmationDialog := MsgBox("Are you sure you want to quit?", This.AppName, 4)
+        If ConfirmationDialog == "Yes"
         ExitApp
+        This.MainWindow.Show()
+        This.MainWindow.Opt("-Disabled")
+        If FocusedControl
+        FocusedControl.Focus()
+        Return True
     }
     
     Static CreateMenu(Name) {
@@ -159,6 +171,7 @@ Class Editor {
             This.AddItem(Parent, "DummyItem")
             This.MainWindow.MainTree.Delete(Item)
             This.Items.Delete(Item)
+            This.UpdateCodeField()
         }
     }
     
@@ -304,11 +317,9 @@ Class Editor {
                     This.Items[Item].HotkeyParams[Index].Expression := Value
                 }
             }
+            This.UpdateCodeField()
             Close()
         }
-    }
-    
-    Static Export(*) {
     }
     
     Static GetChildItems(Item, IgnoreDummies := False) {
@@ -342,6 +353,9 @@ Class Editor {
         This.TreeHKsOff()
         Send "{Enter}"
         This.TreeHKsOn()
+    }
+    
+    Static Import(*) {
     }
     
     Static ItemDeleteHK() {
@@ -452,6 +466,13 @@ Class Editor {
         Hotkey "F2", "On"
     }
     
+    Static UpdateCodeField() {
+        This.CodeGenerator.Items := This.Items
+        This.CodeGenerator.Tree := This.MainWindow.MainTree
+        This.MainWindow.CodeField.Value := This.CodeGenerator.GenerateOverlays()
+    }
+    
+    #Include <CodeGenerator>
     #Include <ParamHandler>
     
 }
