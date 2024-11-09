@@ -7,6 +7,8 @@ Class ParamHandler {
         Return This.HandleHotkeyCommand(Params*)
         If Not SubStr(Value, -11) = "CustomLabel" And SubStr(Value, -5) = "Label"
         Return This.HandleLabel(Params*)
+        If SubStr(Value, -11) = "OCRLanguage"
+        Return This.HandleOCRLanguage(Params*)
         If Params.Length = 4 {
             Name := Params[1]
             Value := Params[2]
@@ -26,6 +28,16 @@ Class ParamHandler {
     }
     
     Static HandleLabel(Name, Value, Expression, Optional) {
+        If Value = "" And Optional
+        Return Value
+        If Not Expression
+        Return "`"" . Value . "`""
+        If Value = ""
+        Return "`"" . Value . "`""
+        Return Value
+    }
+    
+    Static HandleOCRLanguage(Name, Value, Expression, Optional) {
         If Value = "" And Optional
         Return Value
         If Not Expression

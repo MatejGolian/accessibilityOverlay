@@ -8,46 +8,17 @@ Class Editor {
     Static MainWindow := Object()
     
     Static __New() {
-        This.ItemDefinitions := Map(
-        "AccessibilityOverlay", {Type: "AccessibilityOverlay", CanAdd: ["AccessibilityOverlay", "Button", "Checkbox", "ComboBox", "CustomButton", "CustomCheckbox", "CustomComboBox", "CustomEdit", "CustomToggleButton", "Edit", "GraphicalButton", "GraphicalCheckbox", "GraphicalToggleButton", "HotspotButton", "HotspotCheckbox", "HotspotComboBox", "HotspotEdit", "HotspotToggleButton", "OCRButton", "OCRComboBox", "OCREdit", "OCRText", "StaticText", "TabControl", "ToggleButton"], Expand: True, EditorParams: [{Expression: 2, Name: "CustomLabel", Optional: True, Value: ""}, {Expression: 2, Name: "VarName", Optional: False, Value: "AccessibilityOverlay"}], ConstructorParams: [{Expression: 1, Name: "Label", Optional: True, Value: ""}], HotkeyParams: []},
-        "Button", {Type: "Button", CanAdd: False, Expand: False, EditorParams: [{Expression: 2, Name: "CustomLabel", Optional: True, Value: ""}, {Expression: 2, Name: "VarName", Optional: False, Value: "Button"}], ConstructorParams: [{Expression: 1, Name: "Label", Optional: False, Value: "`"`""}, {Expression: 4, Name: "PreExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PreExecActivationFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecActivationFunctions", Optional: True, Value: ""}], HotkeyParams: [{Expression: 1, Name: "HotkeyCommand", Optional: False, Value: ""}, {Expression: 1, Name: "HotkeyLabel", Optional: True, Value: ""}, {Expression: 4, Name: "HotkeyFunctions", Optional: True, Value: ""}]},
-        "Checkbox", {Type: "Checkbox", CanAdd: False, Expand: False, EditorParams: [{Expression: 2, Name: "CustomLabel", Optional: True, Value: ""}, {Expression: 2, Name: "VarName", Optional: False, Value: "Checkbox"}], ConstructorParams: [{Expression: 1, Name: "Label", Optional: False, Value: "`"`""}, {Expression: 4, Name: "PreExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PreExecActivationFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecActivationFunctions", Optional: True, Value: ""}], HotkeyParams: [{Expression: 1, Name: "HotkeyCommand", Optional: False, Value: ""}, {Expression: 1, Name: "HotkeyLabel", Optional: True, Value: ""}, {Expression: 4, Name: "HotkeyFunctions", Optional: True, Value: ""}]},
-        "ComboBox", {Type: "ComboBox", CanAdd: False, Expand: False, EditorParams: [{Expression: 2, Name: "CustomLabel", Optional: True, Value: ""}, {Expression: 2, Name: "VarName", Optional: False, Value: "ComboBox"}], ConstructorParams: [{Expression: 1, Name: "Label", Optional: False, Value: "`"`""}, {Expression: 4, Name: "PreExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "ChangeFunctions", Optional: True, Value: ""}], HotkeyParams: [{Expression: 1, Name: "HotkeyCommand", Optional: False, Value: ""}, {Expression: 1, Name: "HotkeyLabel", Optional: True, Value: ""}, {Expression: 4, Name: "HotkeyFunctions", Optional: True, Value: ""}]},
-        "CustomButton", {Type: "CustomButton", CanAdd: False, Expand: False, EditorParams: [{Expression: 2, Name: "CustomLabel", Optional: True, Value: ""}, {Expression: 2, Name: "VarName", Optional: False, Value: "CustomButton"}], ConstructorParams: [{Expression: 1, Name: "Label", Optional: False, Value: "`"`""}, {Expression: 4, Name: "PreExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PreExecActivationFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecActivationFunctions", Optional: True, Value: ""}], HotkeyParams: [{Expression: 1, Name: "HotkeyCommand", Optional: False, Value: ""}, {Expression: 1, Name: "HotkeyLabel", Optional: True, Value: ""}, {Expression: 4, Name: "HotkeyFunctions", Optional: True, Value: ""}]},
-        "CustomCheckbox", {Type: "CustomCheckbox", CanAdd: False, Expand: False, EditorParams: [{Expression: 2, Name: "CustomLabel", Optional: True, Value: ""}, {Expression: 2, Name: "VarName", Optional: False, Value: "CustomCheckbox"}], ConstructorParams: [{Expression: 1, Name: "Label", Optional: False, Value: "`"`""}, {Expression: 4, Name: "CheckStateFunction", Optional: True, Value: ""}, {Expression: 4, Name: "PreExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PreExecActivationFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecActivationFunctions", Optional: True, Value: ""}], HotkeyParams: [{Expression: 1, Name: "HotkeyCommand", Optional: False, Value: ""}, {Expression: 1, Name: "HotkeyLabel", Optional: True, Value: ""}, {Expression: 4, Name: "HotkeyFunctions", Optional: True, Value: ""}]},
-        "CustomComboBox", {Type: "CustomComboBox", CanAdd: False, Expand: False, EditorParams: [{Expression: 2, Name: "CustomLabel", Optional: True, Value: ""}, {Expression: 2, Name: "VarName", Optional: False, Value: "CustomComboBox"}], ConstructorParams: [{Expression: 1, Name: "Label", Optional: False, Value: "`"`""}, {Expression: 4, Name: "PreExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "ChangeFunctions", Optional: True, Value: ""}], HotkeyParams: [{Expression: 1, Name: "HotkeyCommand", Optional: False, Value: ""}, {Expression: 1, Name: "HotkeyLabel", Optional: True, Value: ""}, {Expression: 4, Name: "HotkeyFunctions", Optional: True, Value: ""}]},
-        "CustomEdit", {Type: "CustomEdit", CanAdd: False, Expand: False, EditorParams: [{Expression: 2, Name: "CustomLabel", Optional: True, Value: ""}, {Expression: 2, Name: "VarName", Optional: False, Value: "CustomEdit"}], ConstructorParams: [{Expression: 1, Name: "Label", Optional: False, Value: "`"`""}, {Expression: 4, Name: "PreExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecFocusFunctions", Optional: True, Value: ""}], HotkeyParams: [{Expression: 1, Name: "HotkeyCommand", Optional: False, Value: ""}, {Expression: 1, Name: "HotkeyLabel", Optional: True, Value: ""}, {Expression: 4, Name: "HotkeyFunctions", Optional: True, Value: ""}]},
-        "CustomTab", {Type: "CustomTab", CanAdd: ["AccessibilityOverlay", "Button", "Checkbox", "ComboBox", "CustomButton", "CustomCheckbox", "CustomComboBox", "CustomEdit", "CustomToggleButton", "Edit", "GraphicalButton", "GraphicalCheckbox", "GraphicalToggleButton", "HotspotButton", "HotspotCheckbox", "HotspotComboBox", "HotspotEdit", "HotspotToggleButton", "OCRButton", "OCRComboBox", "OCREdit", "OCRText", "StaticText", "TabControl", "ToggleButton"], Expand: True, EditorParams: [{Expression: 2, Name: "CustomLabel", Optional: True, Value: ""}, {Expression: 2, Name: "VarName", Optional: False, Value: "CustomTab"}], ConstructorParams: [{Expression: 1, Name: "Label", Optional: False, Value: "`"`""}, {Expression: 4, Name: "PreExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecFocusFunctions", Optional: True, Value: ""}], HotkeyParams: [{Expression: 1, Name: "HotkeyCommand", Optional: False, Value: ""}, {Expression: 1, Name: "HotkeyLabel", Optional: True, Value: ""}, {Expression: 4, Name: "HotkeyFunctions", Optional: True, Value: ""}]},
-        "CustomToggleButton", {Type: "CustomToggleButton", CanAdd: False, Expand: False, EditorParams: [{Expression: 2, Name: "CustomLabel", Optional: True, Value: ""}, {Expression: 2, Name: "VarName", Optional: False, Value: "CustomToggleButton"}], ConstructorParams: [{Expression: 1, Name: "Label", Optional: False, Value: "`"`""}, {Expression: 4, Name: "CheckStateFunction", Optional: True, Value: ""}, {Expression: 4, Name: "PreExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PreExecActivationFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecActivationFunctions", Optional: True, Value: ""}], HotkeyParams: [{Expression: 1, Name: "HotkeyCommand", Optional: False, Value: ""}, {Expression: 1, Name: "HotkeyLabel", Optional: True, Value: ""}, {Expression: 4, Name: "HotkeyFunctions", Optional: True, Value: ""}]},
-        "DummyItem", {Type: "DummyItem", CanAdd: False, Expand: False, EditorParams: [{Expression: 2, Name: "CustomLabel", Optional: True, Value: "No items"}, {Expression: 2, Name: "VarName", Optional: False, Value: "DummyItem"}], ConstructorParams: [], HotkeyParams: []},
-        "Edit", {Type: "Edit", CanAdd: False, Expand: False, EditorParams: [{Expression: 2, Name: "CustomLabel", Optional: True, Value: ""}, {Expression: 2, Name: "VarName", Optional: False, Value: "Edit"}], ConstructorParams: [{Expression: 1, Name: "Label", Optional: False, Value: "`"`""}, {Expression: 4, Name: "PreExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecFocusFunctions", Optional: True, Value: ""}], HotkeyParams: [{Expression: 1, Name: "HotkeyCommand", Optional: False, Value: ""}, {Expression: 1, Name: "HotkeyLabel", Optional: True, Value: ""}, {Expression: 4, Name: "HotkeyFunctions", Optional: True, Value: ""}]},
-        "GraphicalButton", {Type: "GraphicalButton", CanAdd: False, Expand: False, EditorParams: [{Expression: 2, Name: "CustomLabel", Optional: True, Value: ""}, {Expression: 2, Name: "VarName", Optional: False, Value: "GraphicalButton"}], ConstructorParams: [{Expression: 1, Name: "Label", Optional: False, Value: "`"`""}, {Expression: 4, Name: "X1Coordinate", Optional: False, Value: 0}, {Expression: 4, Name: "Y1Coordinate", Optional: False, Value: 0}, {Expression: 4, Name: "X2Coordinate", Optional: False, Value: 0}, {Expression: 4, Name: "Y2Coordinate", Optional: False, Value: 0}, {Expression: 4, Name: "Images", Optional: False, Value: "`"`""}, {Expression: 4, Name: "PreExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PreExecActivationFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecActivationFunctions", Optional: True, Value: ""}], HotkeyParams: [{Expression: 1, Name: "HotkeyCommand", Optional: False, Value: ""}, {Expression: 1, Name: "HotkeyLabel", Optional: True, Value: ""}, {Expression: 4, Name: "HotkeyFunctions", Optional: True, Value: ""}]},
-        "GraphicalCheckbox", {Type: "GraphicalCheckbox", CanAdd: False, Expand: False, EditorParams: [{Expression: 2, Name: "CustomLabel", Optional: True, Value: ""}, {Expression: 2, Name: "VarName", Optional: False, Value: "GraphicalCheckbox"}], ConstructorParams: [{Expression: 1, Name: "Label", Optional: False, Value: "`"`""}, {Expression: 4, Name: "X1Coordinate", Optional: False, Value: 0}, {Expression: 4, Name: "Y1Coordinate", Optional: False, Value: 0}, {Expression: 4, Name: "X2Coordinate", Optional: False, Value: 0}, {Expression: 4, Name: "Y2Coordinate", Optional: False, Value: 0}, {Expression: 4, Name: "CheckedImages", Optional: False, Value: "`"`""}, {Expression: 4, Name: "UncheckedImages", Optional: False, Value: "`"`""}, {Expression: 4, Name: "PreExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PreExecActivationFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecActivationFunctions", Optional: True, Value: ""}], HotkeyParams: [{Expression: 1, Name: "HotkeyCommand", Optional: False, Value: ""}, {Expression: 1, Name: "HotkeyLabel", Optional: True, Value: ""}, {Expression: 4, Name: "HotkeyFunctions", Optional: True, Value: ""}]},
-        "GraphicalTab", {Type: "GraphicalTab", CanAdd: ["AccessibilityOverlay", "Button", "Checkbox", "ComboBox", "CustomButton", "CustomCheckbox", "CustomComboBox", "CustomEdit", "CustomToggleButton", "Edit", "GraphicalButton", "GraphicalCheckbox", "GraphicalToggleButton", "HotspotButton", "HotspotCheckbox", "HotspotComboBox", "HotspotEdit", "HotspotToggleButton", "OCRButton", "OCRComboBox", "OCREdit", "OCRText", "StaticText", "TabControl", "ToggleButton"], Expand: True, EditorParams: [{Expression: 2, Name: "CustomLabel", Optional: True, Value: ""}, {Expression: 2, Name: "VarName", Optional: False, Value: "GraphicalTab"}], ConstructorParams: [{Expression: 1, Name: "Label", Optional: False, Value: "`"`""}, {Expression: 4, Name: "X1Coordinate", Optional: False, Value: 0}, {Expression: 4, Name: "Y1Coordinate", Optional: False, Value: 0}, {Expression: 4, Name: "X2Coordinate", Optional: False, Value: 0}, {Expression: 4, Name: "Y2Coordinate", Optional: False, Value: 0}, {Expression: 4, Name: "Images", Optional: False, Value: "`"`""}, {Expression: 4, Name: "PreExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecFocusFunctions", Optional: True, Value: ""}], HotkeyParams: [{Expression: 1, Name: "HotkeyCommand", Optional: False, Value: ""}, {Expression: 1, Name: "HotkeyLabel", Optional: True, Value: ""}, {Expression: 4, Name: "HotkeyFunctions", Optional: True, Value: ""}]},
-        "GraphicalToggleButton", {Type: "GraphicalToggleButton", CanAdd: False, Expand: False, EditorParams: [{Expression: 2, Name: "CustomLabel", Optional: True, Value: ""}, {Expression: 2, Name: "VarName", Optional: False, Value: "GraphicalToggleButton"}], ConstructorParams: [{Expression: 1, Name: "Label", Optional: False, Value: "`"`""}, {Expression: 4, Name: "X1Coordinate", Optional: False, Value: 0}, {Expression: 4, Name: "Y1Coordinate", Optional: False, Value: 0}, {Expression: 4, Name: "X2Coordinate", Optional: False, Value: 0}, {Expression: 4, Name: "Y2Coordinate", Optional: False, Value: 0}, {Expression: 4, Name: "OnImages", Optional: False, Value: "`"`""}, {Expression: 4, Name: "OffImages", Optional: True, Value: ""}, {Expression: 4, Name: "PreExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PreExecActivationFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecActivationFunctions", Optional: True, Value: ""}], HotkeyParams: [{Expression: 1, Name: "HotkeyCommand", Optional: False, Value: ""}, {Expression: 1, Name: "HotkeyLabel", Optional: True, Value: ""}, {Expression: 4, Name: "HotkeyFunctions", Optional: True, Value: ""}]},
-        "HotspotButton", {Type: "HotspotButton", CanAdd: False, Expand: False, EditorParams: [{Expression: 2, Name: "CustomLabel", Optional: True, Value: ""}, {Expression: 2, Name: "VarName", Optional: False, Value: "HotspotButton"}], ConstructorParams: [{Expression: 1, Name: "Label", Optional: False, Value: "`"`""}, {Expression: 4, Name: "XCoordinate", Optional: False, Value: 0}, {Expression: 4, Name: "YCoordinate", Optional: False, Value: 0}, {Expression: 4, Name: "PreExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PreExecActivationFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecActivationFunctions", Optional: True, Value: ""}], HotkeyParams: [{Expression: 1, Name: "HotkeyCommand", Optional: False, Value: ""}, {Expression: 1, Name: "HotkeyLabel", Optional: True, Value: ""}, {Expression: 4, Name: "HotkeyFunctions", Optional: True, Value: ""}]},
-        "HotspotCheckbox", {Type: "HotspotCheckbox", CanAdd: False, Expand: False, EditorParams: [{Expression: 2, Name: "CustomLabel", Optional: True, Value: ""}, {Expression: 2, Name: "VarName", Optional: False, Value: "HotspotCheckbox"}], ConstructorParams: [{Expression: 1, Name: "Label", Optional: False, Value: "`"`""}, {Expression: 4, Name: "XCoordinate", Optional: False, Value: 0}, {Expression: 4, Name: "YCoordinate", Optional: False, Value: 0}, {Expression: 4, Name: "OnColors", Optional: False, Value: "`"`""}, {Expression: 4, Name: "OffColors", Optional: False, Value: "`"`""}, {Expression: 4, Name: "PreExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PreExecActivationFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecActivationFunctions", Optional: True, Value: ""}], HotkeyParams: [{Expression: 1, Name: "HotkeyCommand", Optional: False, Value: ""}, {Expression: 1, Name: "HotkeyLabel", Optional: True, Value: ""}, {Expression: 4, Name: "HotkeyFunctions", Optional: True, Value: ""}]},
-        "HotspotComboBox", {Type: "HotspotComboBox", CanAdd: False, Expand: False, EditorParams: [{Expression: 2, Name: "CustomLabel", Optional: True, Value: ""}, {Expression: 2, Name: "VarName", Optional: False, Value: "HotspotComboBox"}], ConstructorParams: [{Expression: 1, Name: "Label", Optional: False, Value: "`"`""}, {Expression: 4, Name: "XCoordinate", Optional: False, Value: 0}, {Expression: 4, Name: "YCoordinate", Optional: False, Value: 0}, {Expression: 4, Name: "PreExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "ChangeFunctions", Optional: True, Value: ""}], HotkeyParams: [{Expression: 1, Name: "HotkeyCommand", Optional: False, Value: ""}, {Expression: 1, Name: "HotkeyLabel", Optional: True, Value: ""}, {Expression: 4, Name: "HotkeyFunctions", Optional: True, Value: ""}]},
-        "HotspotEdit", {Type: "HotspotEdit", CanAdd: False, Expand: False, EditorParams: [{Expression: 2, Name: "CustomLabel", Optional: True, Value: ""}, {Expression: 2, Name: "VarName", Optional: False, Value: "HotspotEdit"}], ConstructorParams: [{Expression: 1, Name: "Label", Optional: False, Value: "`"`""}, {Expression: 4, Name: "XCoordinate", Optional: False, Value: 0}, {Expression: 4, Name: "YCoordinate", Optional: False, Value: 0}, {Expression: 4, Name: "PreExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecFocusFunctions", Optional: True, Value: ""}], HotkeyParams: [{Expression: 1, Name: "HotkeyCommand", Optional: False, Value: ""}, {Expression: 1, Name: "HotkeyLabel", Optional: True, Value: ""}, {Expression: 4, Name: "HotkeyFunctions", Optional: True, Value: ""}]},
-        "HotspotTab", {Type: "HotspotTab", CanAdd: ["AccessibilityOverlay", "Button", "Checkbox", "ComboBox", "CustomButton", "CustomCheckbox", "CustomComboBox", "CustomEdit", "CustomToggleButton", "Edit", "GraphicalButton", "GraphicalCheckbox", "GraphicalToggleButton", "HotspotButton", "HotspotCheckbox", "HotspotComboBox", "HotspotEdit", "HotspotToggleButton", "OCRButton", "OCRComboBox", "OCREdit", "OCRText", "StaticText", "TabControl", "ToggleButton"], Expand: True, EditorParams: [{Expression: 2, Name: "CustomLabel", Optional: True, Value: ""}, {Expression: 2, Name: "VarName", Optional: False, Value: "HotspotTab"}], ConstructorParams: [{Expression: 1, Name: "Label", Optional: False, Value: "`"`""}, {Expression: 4, Name: "XCoordinate", Optional: False, Value: 0}, {Expression: 4, Name: "YCoordinate", Optional: False, Value: 0}, {Expression: 4, Name: "PreExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecFocusFunctions", Optional: True, Value: ""}], HotkeyParams: [{Expression: 1, Name: "HotkeyCommand", Optional: False, Value: ""}, {Expression: 1, Name: "HotkeyLabel", Optional: True, Value: ""}, {Expression: 4, Name: "HotkeyFunctions", Optional: True, Value: ""}]},
-        "HotspotToggleButton", {Type: "HotspotToggleButton", CanAdd: False, Expand: False, EditorParams: [{Expression: 2, Name: "CustomLabel", Optional: True, Value: ""}, {Expression: 2, Name: "VarName", Optional: False, Value: "HotspotToggleButton"}], ConstructorParams: [{Expression: 1, Name: "Label", Optional: False, Value: "`"`""}, {Expression: 4, Name: "XCoordinate", Optional: False, Value: 0}, {Expression: 4, Name: "YCoordinate", Optional: False, Value: 0}, {Expression: 4, Name: "OnColors", Optional: False, Value: "`"`""}, {Expression: 4, Name: "OffColors", Optional: False, Value: "`"`""}, {Expression: 4, Name: "PreExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PreExecActivationFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecActivationFunctions", Optional: True, Value: ""}], HotkeyParams: [{Expression: 1, Name: "HotkeyCommand", Optional: False, Value: ""}, {Expression: 1, Name: "HotkeyLabel", Optional: True, Value: ""}, {Expression: 4, Name: "HotkeyFunctions", Optional: True, Value: ""}]},
-        "OCRButton", {Type: "OCRButton", CanAdd: False, Expand: False, EditorParams: [{Expression: 2, Name: "CustomLabel", Optional: True, Value: ""}, {Expression: 2, Name: "VarName", Optional: False, Value: "OCRButton"}], ConstructorParams: [{Expression: 4, Name: "X1Coordinate", Optional: False, Value: 0}, {Expression: 4, Name: "Y1Coordinate", Optional: False, Value: 0}, {Expression: 4, Name: "X2Coordinate", Optional: False, Value: 0}, {Expression: 4, Name: "Y2Coordinate", Optional: False, Value: 0}, {Expression: 1, Name: "OCRLanguage", Optional: True, Value: ""}, {Expression: 3, Name: "OCRScale", Optional: True, Value: ""}, {Expression: 4, Name: "PreExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PreExecActivationFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecActivationFunctions", Optional: True, Value: ""}], HotkeyParams: [{Expression: 1, Name: "HotkeyCommand", Optional: False, Value: ""}, {Expression: 1, Name: "HotkeyLabel", Optional: True, Value: ""}, {Expression: 4, Name: "HotkeyFunctions", Optional: True, Value: ""}]},
-        "OCRComboBox", {Type: "OCRComboBox", CanAdd: False, Expand: False, EditorParams: [{Expression: 2, Name: "CustomLabel", Optional: True, Value: ""}, {Expression: 2, Name: "VarName", Optional: False, Value: "OCRComboBox"}], ConstructorParams: [{Expression: 1, Name: "Label", Optional: False, Value: "`"`""}, {Expression: 4, Name: "X1Coordinate", Optional: False, Value: 0}, {Expression: 4, Name: "Y1Coordinate", Optional: False, Value: 0}, {Expression: 4, Name: "X2Coordinate", Optional: False, Value: 0}, {Expression: 4, Name: "Y2Coordinate", Optional: False, Value: 0}, {Expression: 1, Name: "OCRLanguage", Optional: True, Value: ""}, {Expression: 3, Name: "OCRScale", Optional: True, Value: ""}, {Expression: 4, Name: "PreExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "ChangeFunctions", Optional: True, Value: ""}], HotkeyParams: [{Expression: 1, Name: "HotkeyCommand", Optional: False, Value: ""}, {Expression: 1, Name: "HotkeyLabel", Optional: True, Value: ""}, {Expression: 4, Name: "HotkeyFunctions", Optional: True, Value: ""}]},
-        "OCREdit", {Type: "OCREdit", CanAdd: False, Expand: False, EditorParams: [{Expression: 2, Name: "CustomLabel", Optional: True, Value: ""}, {Expression: 2, Name: "VarName", Optional: False, Value: "OCREdit"}], ConstructorParams: [{Expression: 1, Name: "Label", Optional: False, Value: "`"`""}, {Expression: 4, Name: "X1Coordinate", Optional: False, Value: 0}, {Expression: 4, Name: "Y1Coordinate", Optional: False, Value: 0}, {Expression: 4, Name: "X2Coordinate", Optional: False, Value: 0}, {Expression: 4, Name: "Y2Coordinate", Optional: False, Value: 0}, {Expression: 1, Name: "OCRLanguage", Optional: True, Value: ""}, {Expression: 3, Name: "OCRScale", Optional: True, Value: ""}, {Expression: 4, Name: "PreExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecFocusFunctions", Optional: True, Value: ""}], HotkeyParams: [{Expression: 1, Name: "HotkeyCommand", Optional: False, Value: ""}, {Expression: 1, Name: "HotkeyLabel", Optional: True, Value: ""}, {Expression: 4, Name: "HotkeyFunctions", Optional: True, Value: ""}]},
-        "OCRTab", {Type: "OCRTab", CanAdd: False, Expand: False, EditorParams: [{Expression: 2, Name: "CustomLabel", Optional: True, Value: ""}, {Expression: 2, Name: "VarName", Optional: False, Value: "OCRTab"}], ConstructorParams: [{Expression: 4, Name: "X1Coordinate", Optional: False, Value: 0}, {Expression: 4, Name: "Y1Coordinate", Optional: False, Value: 0}, {Expression: 4, Name: "X2Coordinate", Optional: False, Value: 0}, {Expression: 4, Name: "Y2Coordinate", Optional: False, Value: 0}, {Expression: 1, Name: "OCRLanguage", Optional: True, Value: ""}, {Expression: 3, Name: "OCRScale", Optional: True, Value: ""}, {Expression: 4, Name: "PreExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecFocusFunctions", Optional: True, Value: ""}], HotkeyParams: [{Expression: 1, Name: "HotkeyCommand", Optional: False, Value: ""}, {Expression: 1, Name: "HotkeyLabel", Optional: True, Value: ""}, {Expression: 4, Name: "HotkeyFunctions", Optional: True, Value: ""}]},
-        "OCRText", {Type: "OCRText", CanAdd: False, Expand: False, EditorParams: [{Expression: 2, Name: "CustomLabel", Optional: True, Value: ""}, {Expression: 2, Name: "VarName", Optional: False, Value: "OCRText"}], ConstructorParams: [{Expression: 4, Name: "X1Coordinate", Optional: False, Value: 0}, {Expression: 4, Name: "Y1Coordinate", Optional: False, Value: 0}, {Expression: 4, Name: "X2Coordinate", Optional: False, Value: 0}, {Expression: 4, Name: "Y2Coordinate", Optional: False, Value: 0}, {Expression: 1, Name: "OCRLanguage", Optional: True, Value: ""}, {Expression: 3, Name: "OCRScale", Optional: True, Value: ""}, {Expression: 4, Name: "PreExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecFocusFunctions", Optional: True, Value: ""}], HotkeyParams: [{Expression: 1, Name: "HotkeyCommand", Optional: False, Value: ""}, {Expression: 1, Name: "HotkeyLabel", Optional: True, Value: ""}, {Expression: 4, Name: "HotkeyFunctions", Optional: True, Value: ""}]},
-        "StaticText", {Type: "StaticText", CanAdd: False, Expand: False, EditorParams: [{Expression: 2, Name: "CustomLabel", Optional: True, Value: ""}, {Expression: 2, Name: "VarName", Optional: False, Value: "StaticText"}], ConstructorParams: [{Expression: 1, Name: "Label", Optional: True, Value: ""}, {Expression: 4, Name: "PreExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecFocusFunctions", Optional: True, Value: ""}], HotkeyParams: [{Expression: 1, Name: "HotkeyCommand", Optional: False, Value: ""}, {Expression: 1, Name: "HotkeyLabel", Optional: True, Value: ""}, {Expression: 4, Name: "HotkeyFunctions", Optional: True, Value: ""}]},
-        "Tab", {Type: "Tab", CanAdd: ["AccessibilityOverlay", "Button", "Checkbox", "ComboBox", "CustomButton", "CustomCheckbox", "CustomComboBox", "CustomEdit", "CustomToggleButton", "Edit", "GraphicalButton", "GraphicalCheckbox", "GraphicalToggleButton", "HotspotButton", "HotspotCheckbox", "HotspotComboBox", "HotspotEdit", "HotspotToggleButton", "OCRButton", "OCRComboBox", "OCREdit", "OCRText", "StaticText", "TabControl", "ToggleButton"], Expand: True, EditorParams: [{Expression: 2, Name: "CustomLabel", Optional: True, Value: ""}, {Expression: 2, Name: "VarName", Optional: False, Value: "Tab"}], ConstructorParams: [{Expression: 1, Name: "Label", Optional: False, Value: "`"`""}, {Expression: 4, Name: "PreExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecFocusFunctions", Optional: True, Value: ""}], HotkeyParams: [{Expression: 1, Name: "HotkeyCommand", Optional: False, Value: ""}, {Expression: 1, Name: "HotkeyLabel", Optional: True, Value: ""}, {Expression: 4, Name: "HotkeyFunctions", Optional: True, Value: ""}]},
-        "TabControl", {Type: "TabControl", CanAdd: ["CustomTab", "GraphicalTab", "HotspotTab", "OCRTab", "Tab"], Expand: True, EditorParams: [{Expression: 2, Name: "CustomLabel", Optional: True, Value: ""}, {Expression: 2, Name: "VarName", Optional: False, Value: "TabControl"}], ConstructorParams: [{Expression: 1, Name: "Label", Optional: True, Value: ""}], HotkeyParams: []},
-        "ToggleButton", {Type: "ToggleButton", CanAdd: False, Expand: False, EditorParams: [{Expression: 2, Name: "CustomLabel", Optional: True, Value: ""}, {Expression: 2, Name: "VarName", Optional: False, Value: "ToggleButton"}], ConstructorParams: [{Expression: 1, Name: "Label", Optional: False, Value: "`"`""}, {Expression: 4, Name: "PreExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecFocusFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PreExecActivationFunctions", Optional: True, Value: ""}, {Expression: 4, Name: "PostExecActivationFunctions", Optional: True, Value: ""}], HotkeyParams: [{Expression: 1, Name: "HotkeyCommand", Optional: False, Value: ""}, {Expression: 1, Name: "HotkeyLabel", Optional: True, Value: ""}, {Expression: 4, Name: "HotkeyFunctions", Optional: True, Value: ""}]},
-        )
+        #Include ../Includes/ItemDefinitions.ahk
         This.MainWindow := Gui("+OwnDialogs", This.AppName)
         This.MainWindow.AddButton("vExportButton", "Export").OnEvent("Click", ObjBindMethod(This, "Export"))
         This.MainWindow.ExportButton := This.MainWindow["ExportButton"]
-        This.MainWindow.AddTreeView("Section XS vMainTree").OnEvent("ContextMenu", ObjBindMethod(This, "ShowEditMenu"))
+        This.MainWindow.AddText("Section XS", "Items")
+        This.MainWindow.AddTreeView("XS vMainTree").OnEvent("ContextMenu", ObjBindMethod(This, "ShowEditMenu"))
+        This.MainWindow.AddText("YS", "Code")
+        This.MainWindow.AddEdit("XM +ReadOnly")
         This.MainWindow.MainTree := This.MainWindow["MainTree"]
-        OverlayRoot := This.MainWindow.MainTree.Add("Overlays",, "Expand")
-        This.AddItem(OverlayRoot, "DummyItem", False)
+        This.MainWindow.MainTree.OverlayRoot := This.MainWindow.MainTree.Add("Overlays",, "Expand")
+        This.AddItem(This.MainWindow.MainTree.OverlayRoot, "DummyItem", False)
         This.MainWindow.OnEvent("Close", ObjBindMethod(This, "Close"))
     }
     
@@ -92,6 +63,30 @@ Class Editor {
     
     Static CreateMenu(Name) {
         Switch Name {
+            Case "Add":
+            Selection := This.MainWindow.MainTree.GetSelection()
+            Parent := This.MainWindow.MainTree.GetParent(Selection)
+            If Not Parent And                        Not This.MainWindow.MainTree.Get(Selection, "Expanded") {
+                Return False
+            }
+            Else If Not Parent And                        This.MainWindow.MainTree.Get(Selection, "Expanded") {
+                Return False
+            }
+            Else If Not This.Items.Has(Parent) {
+                AddMenu := Menu()
+                AddMenu.Add("AccessibilityOverlay", AddMenuHandler)
+                Return AddMenu
+            }
+            Else {
+                AddMenu := False
+                MenuSource := This.Items[Parent]
+                If MenuSource.CanAdd {
+                    AddMenu := Menu()
+                    For ItemType In MenuSource.CanAdd
+                    AddMenu.Add(ItemType, AddMenuHandler)
+                }
+                Return AddMenu
+            }
             Case "Edit":
             Selection := This.MainWindow.MainTree.GetSelection()
             Parent := This.MainWindow.MainTree.GetParent(Selection)
@@ -104,8 +99,8 @@ Class Editor {
             Else If Not This.Items.Has(Parent) {
                 EditMenu := Menu()
                 Item := This.Items[Selection]
-                AddMenu := Menu()
-                AddMenu.Add("AccessibilityOverlay", AddMenuHandler)
+                AddMenu := This.CreateMenu("Add")
+                If AddMenu Is Menu
                 EditMenu.Add("Add", AddMenu)
                 EditMenu.Add("Delete...", EditMenuHandler)
                 EditMenu.Add("Properties...", EditMenuHandler)
@@ -118,13 +113,9 @@ Class Editor {
             Else {
                 EditMenu := Menu()
                 Item := This.Items[Selection]
-                MenuSource := This.Items[Parent]
-                If MenuSource.CanAdd {
-                    AddMenu := Menu()
-                    For ItemType In MenuSource.CanAdd
-                    AddMenu.Add(ItemType, AddMenuHandler)
-                    EditMenu.Add("Add", AddMenu)
-                }
+                AddMenu := This.CreateMenu("Add")
+                If AddMenu Is Menu
+                EditMenu.Add("Add", AddMenu)
                 EditMenu.Add("Delete...", EditMenuHandler)
                 EditMenu.Add("Properties...", EditMenuHandler)
                 If Item.Type = "DummyItem" {
@@ -320,10 +311,14 @@ Class Editor {
     Static Export(*) {
     }
     
-    Static GetChildItems(Item) {
+    Static GetChildItems(Item, IgnoreDummies := False) {
         ChildItems := Array()
         ChildItem := This.MainWindow.MainTree.GetChild(Item)
         While ChildItem {
+            If Not IgnoreDummies
+            ChildItems.Push(ChildItem)
+            Else
+            If This.Items.Has(ChildItem) And Not This.Items[ChildItem].Type = "DummyItem"
             ChildItems.Push(ChildItem)
             ChildItem := This.MainWindow.MainTree.GetNext(ChildItem)
         }
@@ -336,6 +331,17 @@ Class Editor {
         If Param.Name = ParamName
         Return Param.Value
         Return False
+    }
+    
+    Static ItemAddHK() {
+        Item := This.MainWindow.MainTree.GetSelection()
+        If This.MainWindow.MainTree.Focused And This.Items.Has(Item) {
+            This.ShowAddMenu()
+            Return
+        }
+        This.TreeHKsOff()
+        Send "{Enter}"
+        This.TreeHKsOn()
     }
     
     Static ItemDeleteHK() {
@@ -414,6 +420,15 @@ Class Editor {
         This.MainWindow.MainTree.Focus()
     }
     
+    Static ShowAddMenu(*) {
+        CreatedMenu := This.CreateMenu("Add")
+        If CreatedMenu {
+            This.TreeHKsOff()
+            CreatedMenu.Show()
+            This.TreeHKsOn()
+        }
+    }
+    
     Static ShowEditMenu(*) {
         CreatedMenu := This.CreateMenu("Edit")
         If CreatedMenu {
@@ -426,12 +441,14 @@ Class Editor {
     Static TreeHKsOff() {
         HotIfWinActive("Overlay Editor ahk_class AutoHotkeyGUI")
         Hotkey "Delete", "Off"
+        Hotkey "Enter", "Off"
         Hotkey "F2", "Off"
     }
     
     Static TreeHKsOn() {
         HotIfWinActive("Overlay Editor ahk_class AutoHotkeyGUI")
         Hotkey "Delete", "On"
+        Hotkey "Enter", "On"
         Hotkey "F2", "On"
     }
     
