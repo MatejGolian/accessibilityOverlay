@@ -564,24 +564,22 @@ Class Editor {
         }
     }
     
-    Static TreeHKsOff() {
+    Static ToggleTreeHKs(Value) {
         HotIfWinActive("Overlay Editor ahk_class AutoHotkeyGUI")
-        Hotkey "^C", "Off"
-        Hotkey "^V", "Off"
-        Hotkey "^X", "Off"
-        Hotkey "Delete", "Off"
-        Hotkey "Enter", "Off"
-        Hotkey "F2", "Off"
+        Hotkey "^C", Value
+        Hotkey "^V", Value
+        Hotkey "^X", Value
+        Hotkey "Delete", Value
+        Hotkey "Enter", Value
+        Hotkey "F2", Value
+    }
+    
+    Static TreeHKsOff() {
+        This.ToggleTreeHKs("Off")
     }
     
     Static TreeHKsOn() {
-        HotIfWinActive("Overlay Editor ahk_class AutoHotkeyGUI")
-        Hotkey "^C", "On"
-        Hotkey "^V", "On"
-        Hotkey "^X", "On"
-        Hotkey "Delete", "On"
-        Hotkey "Enter", "On"
-        Hotkey "F2", "On"
+        This.ToggleTreeHKs("On")
     }
     
     Static UpdateCodeField() {
