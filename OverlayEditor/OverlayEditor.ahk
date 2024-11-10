@@ -18,6 +18,8 @@ Editor.Show()
 
 #HotIf WinActive("Overlay Editor ahk_class AutoHotkeyGUI")
 
+^C::Editor.ItemCopyHK()
+^V::Editor.ItemPasteHK()
 Delete::Editor.ItemDeleteHK()
 Enter::Editor.ItemAddHK()
 F2::Editor.ItemEditHK()

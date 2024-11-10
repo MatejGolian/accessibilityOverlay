@@ -3,6 +3,7 @@
 Class Editor {
     
     Static AppName := "Overlay Editor"
+    Static EditorBuffer := ""
     Static Items := Map()
     Static ItemDefinitions := Map()
     Static MainWindow := Object()
@@ -10,7 +11,7 @@ Class Editor {
     Static __New() {
         #Include ../Includes/ItemDefinitions.ahk
         This.MainWindow := Gui("+OwnDialogs", This.AppName)
-        This.MainWindow.AddButton("vImportButton", "Import").OnEvent("Click", ObjBindMethod(This, "Import"))
+        This.MainWindow.AddButton("vImportButton +Disabled", "Import").OnEvent("Click", ObjBindMethod(This, "Import"))
         This.MainWindow.AddText("Section XS", "Items")
         This.MainWindow.AddTreeView("XS vMainTree").OnEvent("ContextMenu", ObjBindMethod(This, "ShowEditMenu"))
         This.MainWindow.AddText("YS", "Code")
@@ -37,6 +38,7 @@ Class Editor {
         If Select
         This.MainWindow.MainTree.Modify(Item)
         This.UpdateCodeField()
+        Return Item
     }
     
     Static CloneObj(Obj) {
@@ -71,6 +73,26 @@ Class Editor {
         If FocusedControl
         FocusedControl.Focus()
         Return True
+    }
+    
+    Static CopyItem(Item) {
+        Item := This.MainWindow.MainTree.GetSelection()
+        If This.MainWindow.MainTree.Focused And This.Items.Has(Item) And Not This.Items[Item].Type = "DummyItem"
+        If This.CopyToBuffer(Item) {
+            This.EditorBuffer := This.CopyToBuffer(Item)
+            Return This.EditorBuffer
+        }
+        Return False
+    }
+    
+    Static CopyToBuffer(Item) {
+        If This.Items.Has(Item) {
+            EditorBuffer := Map("RootItem", This.CloneObj(This.Items[Item]), "ChildItems", [])
+            For ChildItem In This.GetChildItems(Item)
+            EditorBuffer["ChildItems"].Push(This.CopyToBuffer(ChildItem))
+            Return EditorBuffer
+        }
+        Return False
     }
     
     Static CreateMenu(Name) {
@@ -114,9 +136,12 @@ Class Editor {
                 AddMenu := This.CreateMenu("Add")
                 If AddMenu Is Menu
                 EditMenu.Add("Add", AddMenu)
+                EditMenu.Add("Copy", EditMenuHandler)
+                EditMenu.Add("Paste", EditMenuHandler)
                 EditMenu.Add("Delete...", EditMenuHandler)
                 EditMenu.Add("Properties...", EditMenuHandler)
                 If Item.Type = "DummyItem" {
+                    EditMenu.Disable("Copy")
                     EditMenu.Disable("Delete...")
                     EditMenu.Disable("Properties...")
                 }
@@ -128,9 +153,12 @@ Class Editor {
                 AddMenu := This.CreateMenu("Add")
                 If AddMenu Is Menu
                 EditMenu.Add("Add", AddMenu)
+                EditMenu.Add("Copy", EditMenuHandler)
+                EditMenu.Add("Paste", EditMenuHandler)
                 EditMenu.Add("Delete...", EditMenuHandler)
                 EditMenu.Add("Properties...", EditMenuHandler)
                 If Item.Type = "DummyItem" {
+                    EditMenu.Disable("Copy")
                     EditMenu.Disable("Delete...")
                     EditMenu.Disable("Properties...")
                 }
@@ -145,6 +173,10 @@ Class Editor {
         }
         EditMenuHandler(ItemName, ItemNumber, EditMenu) {
             Selection := This.MainWindow.MainTree.GetSelection()
+            If ItemName = "Copy" And Selection
+            This.CopyItem(Selection)
+            If ItemName = "Paste" And Selection
+            This.PasteItem(Selection)
             If ItemName = "Delete..." And Selection
             This.DeleteItem(Selection)
             If ItemName = "Properties..." And Selection
@@ -355,6 +387,28 @@ Class Editor {
         This.TreeHKsOn()
     }
     
+    Static ItemCopyHK() {
+        Item := This.MainWindow.MainTree.GetSelection()
+        If This.MainWindow.MainTree.Focused And This.Items.Has(Item) And Not This.Items[Item].Type = "DummyItem" {
+            This.CopyItem(Item)
+            Return
+        }
+        This.TreeHKsOff()
+        Send "^C"
+        This.TreeHKsOn()
+    }
+    
+    Static ItemPasteHK() {
+        Item := This.MainWindow.MainTree.GetSelection()
+        If This.MainWindow.MainTree.Focused And This.Items.Has(Item) {
+            This.PasteItem(Item)
+            Return
+        }
+        This.TreeHKsOff()
+        Send "^V"
+        This.TreeHKsOn()
+    }
+    
     Static Import(*) {
     }
     
@@ -378,6 +432,36 @@ Class Editor {
         This.TreeHKsOff()
         Send "{F2}"
         This.TreeHKsOn()
+    }
+    
+    Static PasteItem(Item, Parent := False, EditorBuffer := False, Select := True) {
+        If Not EditorBuffer
+        EditorBuffer := This.EditorBuffer
+        If Not EditorBuffer Is Map Or Not EditorBuffer.Has("RootItem")
+        Return False
+        If Not EditorBuffer["RootItem"].HasOwnProp("Type")
+        Return False
+        If Not Parent
+        Parent := This.MainWindow.MainTree.GetParent(Item)
+        If Parent = This.MainWindow.MainTree.OverlayRoot And Not EditorBuffer["RootItem"].Type = "AccessibilityOverlay"
+        Parent := This.AddItem(Parent, "AccessibilityOverlay", False)
+        If Not Parent = This.MainWindow.MainTree.OverlayRoot And This.Items[Parent].Type = "TabControl" And Not SubStr(EditorBuffer["RootItem"].Type, -3) = "Tab"
+        Parent := This.AddItem(Parent, "Tab", False)
+        If Not Parent = This.MainWindow.MainTree.OverlayRoot And Not This.Items[Parent].Type = "TabControl" And SubStr(EditorBuffer["RootItem"].Type, -3) = "Tab"
+        Parent := This.AddItem(Parent, "TabControl", False)
+        Proceed()
+        Return True
+        Proceed() {
+            Item := This.AddItem(Parent, EditorBuffer["RootItem"].Type, False)
+            This.Items[Item] := This.CloneObj(EditorBuffer["RootItem"])
+            This.SetItemParam(Item)
+            If EditorBuffer.Has("ChildItems") And EditorBuffer["ChildItems"] Is Array
+            For ChildItem In EditorBuffer["ChildItems"]
+            This.PasteItem(Item, Item, ChildItem, False)
+            If Select
+            This.MainWindow.MainTree.Modify(Item)
+            This.UpdateCodeField()
+        }
     }
     
     Static SetItemParam(Item, ParamGroup := False, ParamName := False, ParamValue := False) {
@@ -454,6 +538,8 @@ Class Editor {
     
     Static TreeHKsOff() {
         HotIfWinActive("Overlay Editor ahk_class AutoHotkeyGUI")
+        Hotkey "^C", "Off"
+        Hotkey "^V", "Off"
         Hotkey "Delete", "Off"
         Hotkey "Enter", "Off"
         Hotkey "F2", "Off"
@@ -461,6 +547,8 @@ Class Editor {
     
     Static TreeHKsOn() {
         HotIfWinActive("Overlay Editor ahk_class AutoHotkeyGUI")
+        Hotkey "^C", "On"
+        Hotkey "^V", "On"
         Hotkey "Delete", "On"
         Hotkey "Enter", "On"
         Hotkey "F2", "On"
