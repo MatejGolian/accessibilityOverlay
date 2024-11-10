@@ -20,6 +20,7 @@ Editor.Show()
 
 ^C::Editor.ItemCopyHK()
 ^V::Editor.ItemPasteHK()
+^X::Editor.ItemCutHK()
 Delete::Editor.ItemDeleteHK()
 Enter::Editor.ItemAddHK()
 F2::Editor.ItemEditHK()

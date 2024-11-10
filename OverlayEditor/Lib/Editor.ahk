@@ -136,11 +136,13 @@ Class Editor {
                 AddMenu := This.CreateMenu("Add")
                 If AddMenu Is Menu
                 EditMenu.Add("Add", AddMenu)
+                EditMenu.Add("Cut", EditMenuHandler)
                 EditMenu.Add("Copy", EditMenuHandler)
                 EditMenu.Add("Paste", EditMenuHandler)
                 EditMenu.Add("Delete...", EditMenuHandler)
                 EditMenu.Add("Properties...", EditMenuHandler)
                 If Item.Type = "DummyItem" {
+                    EditMenu.Disable("Cut")
                     EditMenu.Disable("Copy")
                     EditMenu.Disable("Delete...")
                     EditMenu.Disable("Properties...")
@@ -153,11 +155,13 @@ Class Editor {
                 AddMenu := This.CreateMenu("Add")
                 If AddMenu Is Menu
                 EditMenu.Add("Add", AddMenu)
+                EditMenu.Add("Cut", EditMenuHandler)
                 EditMenu.Add("Copy", EditMenuHandler)
                 EditMenu.Add("Paste", EditMenuHandler)
                 EditMenu.Add("Delete...", EditMenuHandler)
                 EditMenu.Add("Properties...", EditMenuHandler)
                 If Item.Type = "DummyItem" {
+                    EditMenu.Disable("Cut")
                     EditMenu.Disable("Copy")
                     EditMenu.Disable("Delete...")
                     EditMenu.Disable("Properties...")
@@ -173,6 +177,8 @@ Class Editor {
         }
         EditMenuHandler(ItemName, ItemNumber, EditMenu) {
             Selection := This.MainWindow.MainTree.GetSelection()
+            If ItemName = "Cut" And Selection
+            This.CutItem(Selection)
             If ItemName = "Copy" And Selection
             This.CopyItem(Selection)
             If ItemName = "Paste" And Selection
@@ -182,6 +188,17 @@ Class Editor {
             If ItemName = "Properties..." And Selection
             This.EditItem(Selection)
         }
+    }
+    
+    Static CutItem(Item) {
+        Item := This.MainWindow.MainTree.GetSelection()
+        If This.MainWindow.MainTree.Focused And This.Items.Has(Item) And Not This.Items[Item].Type = "DummyItem"
+        If This.CopyToBuffer(Item) {
+            This.EditorBuffer := This.CopyToBuffer(Item)
+            This.DeleteItem(Item, False)
+            Return This.EditorBuffer
+        }
+        Return False
     }
     
     Static DeleteItem(Item, Confirmation := True) {
@@ -398,6 +415,17 @@ Class Editor {
         This.TreeHKsOn()
     }
     
+    Static ItemCutHK() {
+        Item := This.MainWindow.MainTree.GetSelection()
+        If This.MainWindow.MainTree.Focused And This.Items.Has(Item) And Not This.Items[Item].Type = "DummyItem" {
+            This.CutItem(Item)
+            Return
+        }
+        This.TreeHKsOff()
+        Send "^X"
+        This.TreeHKsOn()
+    }
+    
     Static ItemPasteHK() {
         Item := This.MainWindow.MainTree.GetSelection()
         If This.MainWindow.MainTree.Focused And This.Items.Has(Item) {
@@ -540,6 +568,7 @@ Class Editor {
         HotIfWinActive("Overlay Editor ahk_class AutoHotkeyGUI")
         Hotkey "^C", "Off"
         Hotkey "^V", "Off"
+        Hotkey "^X", "Off"
         Hotkey "Delete", "Off"
         Hotkey "Enter", "Off"
         Hotkey "F2", "Off"
@@ -549,6 +578,7 @@ Class Editor {
         HotIfWinActive("Overlay Editor ahk_class AutoHotkeyGUI")
         Hotkey "^C", "On"
         Hotkey "^V", "On"
+        Hotkey "^X", "On"
         Hotkey "Delete", "On"
         Hotkey "Enter", "On"
         Hotkey "F2", "On"
