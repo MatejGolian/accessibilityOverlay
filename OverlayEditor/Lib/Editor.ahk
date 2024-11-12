@@ -11,7 +11,7 @@ Class Editor {
     Static __New() {
         #Include ../Includes/ItemDefinitions.ahk
         This.MainWindow := Gui("+OwnDialogs", This.AppName)
-        This.MainWindow.AddButton("vImportButton +Disabled", "Import").OnEvent("Click", ObjBindMethod(This, "Import"))
+        This.MainWindow.AddButton("vImportButton", "Import").OnEvent("Click", ObjBindMethod(This, "Import"))
         This.MainWindow.AddText("Section XS", "Items")
         This.MainWindow.AddTreeView("XS vMainTree").OnEvent("ContextMenu", ObjBindMethod(This, "ShowEditMenu"))
         This.MainWindow.AddText("YS", "Code")
@@ -226,7 +226,7 @@ Class Editor {
     
     Static EditItem(Item) {
         ItemType := This.Items[Item].Type
-        ParamBox := GUI("+OwnDialogs +owner" This.MainWindow.Hwnd, ItemType . " Properties")
+        ParamBox := GUI("+OwnDialogs +owner" . This.MainWindow.Hwnd, ItemType . " Properties")
         EditorBoxes := Map()
         EditorExpressionBoxes := Map()
         ControlIndex := 0
@@ -438,31 +438,48 @@ Class Editor {
     }
     
     Static Import(*) {
-    }
-    
-    Static ItemDeleteHK() {
+        ImportBox := GUI("+OwnDialogs +owner" . This.MainWindow.Hwnd, "Import Overlay")
+        ImportBox.AddText(" W396 X2 Y2", "Paste your code into the field below and press OK.")
+        ImportBox.AddEdit("R4  W396 X2 Y63")
+        ImportBox.AddButton("H30 W199 X1 Y124", "OK").OnEvent("Click", Proceed)
+        ImportBox.AddButton("H30 W199 X200 Y124", "Cancel").OnEvent("Click", Close)
+        ImportBox.OnEvent("Close", Close)
+        ImportBox.OnEvent("Escape", Close)
+        This.MainWindow.Opt("+Disabled")
+        ImportBox.Show()
+        Close(*) {
+        This.MainWindow.Opt("-Disabled")
+        ImportBox.Destroy()
+        }
+        Proceed(*) {
+        ImportBox.Opt("+OwnDialogs")
+        Close()
+        }
+        }
+        
+        Static ItemDeleteHK() {
         Item := This.MainWindow.MainTree.GetSelection()
         If This.MainWindow.MainTree.Focused And This.Items.Has(Item) And Not This.Items[Item].Type = "DummyItem" {
-            This.DeleteItem(Item)
-            Return
+        This.DeleteItem(Item)
+        Return
         }
         This.TreeHKsOff()
         Send "{Delete}"
         This.TreeHKsOn()
-    }
-    
-    Static ItemEditHK() {
+        }
+        
+        Static ItemEditHK() {
         Item := This.MainWindow.MainTree.GetSelection()
         If This.MainWindow.MainTree.Focused And This.Items.Has(Item) And Not This.Items[Item].Type = "DummyItem" {
-            This.EditItem(Item)
-            Return
+        This.EditItem(Item)
+        Return
         }
         This.TreeHKsOff()
         Send "{F2}"
         This.TreeHKsOn()
-    }
-    
-    Static PasteItem(Item, Parent := False, EditorBuffer := False, Select := True) {
+        }
+        
+        Static PasteItem(Item, Parent := False, EditorBuffer := False, Select := True) {
         If Not EditorBuffer
         EditorBuffer := This.EditorBuffer
         If Not EditorBuffer Is Map Or Not EditorBuffer.Has("RootItem")
@@ -480,91 +497,91 @@ Class Editor {
         Proceed()
         Return True
         Proceed() {
-            Item := This.AddItem(Parent, EditorBuffer["RootItem"].Type, False)
-            This.Items[Item] := This.CloneObj(EditorBuffer["RootItem"])
-            This.SetItemParam(Item)
-            If EditorBuffer.Has("ChildItems") And EditorBuffer["ChildItems"] Is Array
-            For ChildItem In EditorBuffer["ChildItems"]
-            This.PasteItem(Item, Item, ChildItem, False)
-            If Select
-            This.MainWindow.MainTree.Modify(Item)
-            This.UpdateCodeField()
+        Item := This.AddItem(Parent, EditorBuffer["RootItem"].Type, False)
+        This.Items[Item] := This.CloneObj(EditorBuffer["RootItem"])
+        This.SetItemParam(Item)
+        If EditorBuffer.Has("ChildItems") And EditorBuffer["ChildItems"] Is Array
+        For ChildItem In EditorBuffer["ChildItems"]
+        This.PasteItem(Item, Item, ChildItem, False)
+        If Select
+        This.MainWindow.MainTree.Modify(Item)
+        This.UpdateCodeField()
         }
-    }
-    
-    Static SetItemParam(Item, ParamGroup := False, ParamName := False, ParamValue := False) {
+        }
+        
+        Static SetItemParam(Item, ParamGroup := False, ParamName := False, ParamValue := False) {
         If This.Items.Has(Item) And ParamGroup  And This.Items[Item].HasOwnProp(ParamGroup . "Params")  And ParamName
         For Index, Param In This.Items[Item].%ParamGroup%Params
         If Param.Name = ParamName {
-            This.Items[Item].%ParamGroup%Params[Index].Value := ParamValue
-            Break
+        This.Items[Item].%ParamGroup%Params[Index].Value := ParamValue
+        Break
         }
         If This.Items.Has(Item) {
-            Code := This.Items[Item].Type . "("
-            If This.Items[Item].HasOwnProp("ConstructorParams") {
-                Added := 0
-                Optional := 0
-                For Param In This.Items[Item].ConstructorParams {
-                    Added++
-                    Code .= Param.Value . ", "
-                    If Param.Optional
-                    Optional++
-                }
-                If Added
-                Code := SubStr(Code, 1, StrLen(Code) - 2)
-                If Optional
-                While Substr(Code, -2) = ", "
-                Code := SubStr(Code, 1, StrLen(Code) -2)
-            }
-            Code .= ")"
-            HotkeyCommand := This.GetItemParam(Item, "Hotkey", "HotkeyCommand")
-            If HotkeyCommand {
-                Optional := 0
-                Code .= ".SetHotkey("
-                For Param In This.Items[Item].HotkeyParams {
-                    Code .= Param.Value . ", "
-                    If Param.Optional
-                    Optional++
-                }
-                Code := SubStr(Code, 1, StrLen(Code) - 2)
-                If Optional
-                While Substr(Code, -2) = ", "
-                Code := SubStr(Code, 1, StrLen(Code) -2)
-                Code .= ")"
-            }
-            This.Items[Item].Code := Code
-            CustomLabel := This.GetItemParam(Item, "Editor", "CustomLabel")
-            If CustomLabel
-            This.MainWindow.MainTree.Modify(Item,, CustomLabel)
-            Else
-            This.MainWindow.MainTree.Modify(Item,, Code)
+        Code := This.Items[Item].Type . "("
+        If This.Items[Item].HasOwnProp("ConstructorParams") {
+        Added := 0
+        Optional := 0
+        For Param In This.Items[Item].ConstructorParams {
+        Added++
+        Code .= Param.Value . ", "
+        If Param.Optional
+        Optional++
         }
-    }
-    
-    Static Show() {
+        If Added
+        Code := SubStr(Code, 1, StrLen(Code) - 2)
+        If Optional
+        While Substr(Code, -2) = ", "
+        Code := SubStr(Code, 1, StrLen(Code) -2)
+        }
+        Code .= ")"
+        HotkeyCommand := This.GetItemParam(Item, "Hotkey", "HotkeyCommand")
+        If HotkeyCommand {
+        Optional := 0
+        Code .= ".SetHotkey("
+        For Param In This.Items[Item].HotkeyParams {
+        Code .= Param.Value . ", "
+        If Param.Optional
+        Optional++
+        }
+        Code := SubStr(Code, 1, StrLen(Code) - 2)
+        If Optional
+        While Substr(Code, -2) = ", "
+        Code := SubStr(Code, 1, StrLen(Code) -2)
+        Code .= ")"
+        }
+        This.Items[Item].Code := Code
+        CustomLabel := This.GetItemParam(Item, "Editor", "CustomLabel")
+        If CustomLabel
+        This.MainWindow.MainTree.Modify(Item,, CustomLabel)
+        Else
+        This.MainWindow.MainTree.Modify(Item,, Code)
+        }
+        }
+        
+        Static Show() {
         This.MainWindow.Show()
         This.MainWindow.MainTree.Focus()
-    }
-    
-    Static ShowAddMenu(*) {
+        }
+        
+        Static ShowAddMenu(*) {
         CreatedMenu := This.CreateMenu("Add")
         If CreatedMenu {
-            This.TreeHKsOff()
-            CreatedMenu.Show()
-            This.TreeHKsOn()
+        This.TreeHKsOff()
+        CreatedMenu.Show()
+        This.TreeHKsOn()
         }
-    }
-    
-    Static ShowEditMenu(*) {
+        }
+        
+        Static ShowEditMenu(*) {
         CreatedMenu := This.CreateMenu("Edit")
         If CreatedMenu {
-            This.TreeHKsOff()
-            CreatedMenu.Show()
-            This.TreeHKsOn()
+        This.TreeHKsOff()
+        CreatedMenu.Show()
+        This.TreeHKsOn()
         }
-    }
-    
-    Static ToggleTreeHKs(Value) {
+        }
+        
+        Static ToggleTreeHKs(Value) {
         HotIfWinActive("Overlay Editor ahk_class AutoHotkeyGUI")
         Hotkey "^C", Value
         Hotkey "^V", Value
@@ -572,23 +589,25 @@ Class Editor {
         Hotkey "Delete", Value
         Hotkey "Enter", Value
         Hotkey "F2", Value
-    }
-    
-    Static TreeHKsOff() {
+        }
+        
+        Static TreeHKsOff() {
         This.ToggleTreeHKs("Off")
-    }
-    
-    Static TreeHKsOn() {
+        }
+        
+        Static TreeHKsOn() {
         This.ToggleTreeHKs("On")
-    }
-    
-    Static UpdateCodeField() {
+        }
+        
+        Static UpdateCodeField() {
         This.CodeGenerator.Items := This.Items
         This.CodeGenerator.Tree := This.MainWindow.MainTree
         This.MainWindow.CodeField.Value := This.CodeGenerator.GenerateOverlays()
-    }
-    
-    #Include <CodeGenerator>
-    #Include <ParamHandler>
-    
-}
+        }
+        
+        #Include <CodeGenerator>
+        #Include <CodeParser>
+        #Include <ParamHandler>
+        
+        }
+        
