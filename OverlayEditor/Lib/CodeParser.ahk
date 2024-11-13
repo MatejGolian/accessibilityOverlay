@@ -2,10 +2,14 @@
 
 Class CodeParser {
     
+    ItemMap := Map()
     Lines := Array()
+    MasterOverlay := False
     SkipSequences := Array(
     "```"",
     )
+    StartingLine := False
+    TempItem := False
     Tags := Map(
     "`"", "`"",
     "(", ")",
@@ -35,6 +39,51 @@ Class CodeParser {
         If Name = VarName
         Return Value
         Return False
+    }
+    
+    ImportOverlay(OverlayCode) {
+        This.MasterOverlay := False
+        This.StartingLine := False
+        This.TempItem := False
+        If Not Editor.ItemDefinitions.Has("CodeParserTemp") {
+            CodeParserTemp := {Type: "CodeParserTemp", CanAdd: [], Expand: True, EditorParams: [{Expression: 2, Name: "CustomLabel", Optional: True, Value: ""}, {Expression: 2, Name: "VarName", Optional: False, Value: "CodeParserTemp"}], ConstructorParams: [], HotkeyParams: []}
+            For ItemName, ItemDefinition In Editor.ItemDefinitions
+            If ItemDefinition Is Object And ItemDefinition.CanAdd And ItemDefinition.CanAdd Is Array
+            For ItemType In ItemDefinition.CanAdd {
+                For Value In CodeParserTemp.CanAdd
+                If Value = ItemType
+                Continue 2
+                CodeParserTemp.CanAdd.Push(ItemType)
+            }
+            Editor.ItemDefinitions.Set("CodeParserTemp", CodeParserTemp)
+        }
+        This.ParseString(OverlayCode)
+        If This.Lines.Length = 0 Or This.Vars.Count = 0 {
+            MsgBox "Nothing to import.", "Error"
+            Return False
+        }
+        For Name, Value In This.Vars
+        This.ItemMap.Set(Name, {ID: "", Type: ""})
+        For LineNumber, Line In This.Lines
+        If Line.Length > 1 And Line[1].Type = "Var" And Line[2].Type = "Func" And Line[2].Name = "AccessibilityOverlay" {
+            This.StartingLine := LineNumber
+            Break
+        }
+        If Not This.StartingLine {
+            MsgBox "No importable overlays found.", "Error"
+            Return False
+        }
+        For LineNumber, Line In This.Lines
+        If LineNumber >= This.StartingLine
+        If Not This.ProcessLine(LineNumber, Line) {
+            Editor.DeleteItem(This.MasterOverlay, False)
+            Editor.DeleteItem(This.TempItem, False)
+            MsgBox "Import failed on line " . LineNumber . ".", "Error"
+            Return False
+        }
+        Editor.DeleteItem(This.TempItem, False)
+        MsgBox "Operation succeeded.", "import Overlay"
+        Return True
     }
     
     Join(Segments, Subpattern := "") {
@@ -86,7 +135,6 @@ Class CodeParser {
             Params := Array()
             For Key, Value In SplitParams {
                 Value := Trim(Value)
-                If Value
                 Params.Push(Value)
             }
             Return {Type: "Func", Name: Name, Params: Params}
@@ -128,6 +176,126 @@ Class CodeParser {
             ReturnArray.Push(This.ParseSegment(Subpattern))
             If ReturnArray.Length > 0
             This.Lines.Push(ReturnArray)
+        }
+    }
+    
+    ProcessLine(LineNumber, Line) {
+        If Line.Length > 1 And Line[1].Type = "Var" {
+            If LineNumber = This.StartingLine
+            This.TempItem := Editor.AddItem(Editor.MainWindow.MainTree.OverlayRoot, "CodeParserTemp", False)
+            Var1 := Line[1].Name
+            Var1ID := False
+            Var1Type := False
+            Var2 := False
+            Var2ID := False
+            Var2Type := False
+            StartingIndex := 2
+            If Line[2].Type = "Var" {
+                Var2 := Line[2].Name
+                If This.ItemMap.Has(Var2) {
+                    Var2ID := This.ItemMap[Var2].ID
+                    Var2Type := This.ItemMap[Var2].Type
+                }
+                StartingIndex := 3
+            }
+            If LineNumber = This.StartingLine {
+                Var1ID := Editor.AddItem(Editor.MainWindow.MainTree.OverlayRoot, "AccessibilityOverlay")
+                Var1Type := "AccessibilityOverlay"
+                This.ItemMap[Var1].ID := Var1ID
+                This.ItemMap[Var1].Type := "AccessibilityOverlay"
+                This.MasterOverlay := Var1ID
+            }
+            Else {
+                If This.ItemMap.Has(Var1) {
+                    Var1ID := This.ItemMap[Var1].ID
+                    Var1Type := This.ItemMap[Var1].Type
+                    If Not Var1ID {
+                        Var1ID := This.TempItem
+                        Var1Type := "CodeParserTemp"
+                        This.ItemMap[Var1].ID := Var1ID
+                        This.ItemMap[Var1].Type := Var1Type
+                    }
+                }
+            }
+            If Var2 And Not Var2ID
+            Return False
+            If Line.Length = 2 And Line[2].Type = "Var" And This.ItemMap.Has(Line[2].Name) {
+                ItemID := This.ItemMap[Line[2].Name].ID
+                ItemType := This.ItemMap[Line[2].Name].Type
+                This.ItemMap[Var1].ID := ItemID
+                This.ItemMap[Var1].Type := ItemType
+            }
+            For Index, Segment In Line
+            If Index >= StartingIndex {
+                If Index = 2 And LineNumber = This.StartingLine
+                Continue
+                If Segment.Type = "Func" {
+                    ItemID := Var1ID
+                    ItemType := Var1Type
+                    If Var2 {
+                        ItemID := Var2ID
+                        ItemType := Var2Type
+                    }
+                    If Index = 2 And Editor.ItemDefinitions.Has(Segment.Name) And Editor.CanAdd(ItemType, Segment.Name) {
+                        AddedItem := Editor.AddItem(ItemID, Segment.Name, False)
+                        ItemID := AddedItem
+                        ItemType := Segment.Name
+                        SetConstructorParams(Segment.Params, ItemID)
+                        This.ItemMap[Var1].ID := ItemID
+                        This.ItemMap[Var1].Type := ItemType
+                        Continue
+                    }
+                    If SubStr(Segment.Name, 1, 3) = "Add" And Editor.ItemDefinitions.Has(SubStr(Segment.Name, 4)) And Editor.CanAdd(ItemType, SubStr(Segment.Name, 4)) {
+                        AddedItem := Editor.AddItem(ItemID, SubStr(Segment.Name, 4), False)
+                        ItemID := AddedItem
+                        ItemType := SubStr(Segment.Name, 4)
+                        SetConstructorParams(Segment.Params, ItemID)
+                        If Var2 {
+                            This.ItemMap[Var1].ID := ItemID
+                            This.ItemMap[Var1].Type := ItemType
+                        }
+                        Continue
+                    }
+                    If ItemType = "TabControl" And Segment.Type = "Func" And Segment.Name = "AddTabs" {
+                        For Param In Segment.Params {
+                            ParamID := False
+                            ParamType := False
+                            If This.ItemMap.Has(Param) And This.ItemMap[Param].ID And This.ItemMap[Param].Type {
+                                ParamID := This.ItemMap[Param].ID
+                                ParamType := This.ItemMap[Param].Type
+                            }
+                            If Editor.CanAdd(ItemType, ParamType) {
+                                ChildItems := Editor.GetChildItems(ItemID)
+                                If ChildItems.Length > 0 {
+                                    Editor.CutItem(ParamID)
+                                    LastChild := ChildItems[ChildItems.Length]
+                                    Editor.PasteItem(LastChild,,, False)
+                                }
+                            }
+                        }
+                        Break
+                    }
+                    If Segment.Name = "SetHotkey" {
+                        SetHotkeyParams(Segment.Params, ItemID)
+                        Break
+                    }
+                }
+            }
+        }
+        Return True
+        SetConstructorParams(Params, ItemID) {
+            For ParamNumber, Param In Params
+            If Editor.Items[ItemID].ConstructorParams.Length >= ParamNumber {
+                Editor.Items[ItemID].ConstructorParams[ParamNumber].Value := Param
+                Editor.SetItemParam(ItemID)
+            }
+        }
+        SetHotkeyParams(Params, ItemID) {
+            For ParamNumber, Param In Params
+            If Editor.Items[ItemID].HotkeyParams.Length >= ParamNumber {
+                Editor.Items[ItemID].HotkeyParams[ParamNumber].Value := Param
+                Editor.SetItemParam(ItemID)
+            }
         }
     }
     
