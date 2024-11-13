@@ -201,6 +201,7 @@ Class CodeParser {
             If LineNumber = This.StartingLine {
                 Var1ID := Editor.AddItem(Editor.MainWindow.MainTree.OverlayRoot, "AccessibilityOverlay")
                 Var1Type := "AccessibilityOverlay"
+                SetConstructorParams(Line[2].Params, Var1ID)
                 This.ItemMap[Var1].ID := Var1ID
                 This.ItemMap[Var1].Type := "AccessibilityOverlay"
                 This.MasterOverlay := Var1ID
