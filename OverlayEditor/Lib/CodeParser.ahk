@@ -285,18 +285,25 @@ Class CodeParser {
         }
         Return True
         SetConstructorParams(Params, ItemID) {
-            For ParamNumber, Param In Params
-            If Editor.Items[ItemID].ConstructorParams.Length >= ParamNumber {
-                Editor.Items[ItemID].ConstructorParams[ParamNumber].Value := Param
-                Editor.SetItemParam(ItemID)
-            }
+            SetParams("Constructor", Params, ItemID)
         }
         SetHotkeyParams(Params, ItemID) {
+            SetParams("Hotkey", Params, ItemID)
+        }
+        SetParams(ParamGroup, Params, ItemID) {
             For ParamNumber, Param In Params
-            If Editor.Items[ItemID].HotkeyParams.Length >= ParamNumber {
-                Editor.Items[ItemID].HotkeyParams[ParamNumber].Value := Param
-                Editor.SetItemParam(ItemID)
+            If Editor.Items[ItemID].%ParamGroup%Params.Length >= ParamNumber {
+                Expression := Editor.Items[ItemID].%ParamGroup%Params[ParamNumber].Expression
+                If Expression = 1 Or Expression = 3 {
+                    StringTest := This.Join(This.Split(Param, "`""))
+                    If SubStr(Param, 2, -1) = StringTest
+                    Editor.Items[ItemID].%ParamGroup%Params[ParamNumber].Expression := 1
+                    Else
+                    Editor.Items[ItemID].%ParamGroup%Params[ParamNumber].Expression := 3
+                }
+                Editor.Items[ItemID].%ParamGroup%Params[ParamNumber].Value := Param
             }
+            Editor.SetItemParam(ItemID)
         }
     }
     
