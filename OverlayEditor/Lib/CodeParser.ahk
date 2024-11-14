@@ -259,13 +259,24 @@ Class CodeParser {
                     }
                     If Segment.Name = "AddControl" And Segment.Params.Length = 1 {
                         IsValid := True
+                        ItemCheck := False
                         ItemToAdd := Segment.Params[1]
+                        SetConstructor := False
                         TypeToAdd := False
                         ValidTypes := ["AccessibilityOverlay", "CustomTab", "GraphicalTab", "HotspotTab", "OCRTab", "Tab"]
                         If Not This.Vars.Has(ItemToAdd) Or Not This.Vars[ItemToAdd].Type
                         IsValid := False
                         Else
                         TypeToAdd := This.Vars[ItemToAdd].Type
+                        If Not IsValid {
+                            ItemCheck := This.CheckSegment(ItemToAdd)
+                            If ItemCheck.Type = "Func" {
+                                IsValid := True
+                                ItemCheck := This.ParseSegment(ItemToAdd)
+                                SetConstructor := True
+                                TypeToAdd := ItemCheck.Name
+                            }
+                        }
                         If IsValid
                         For ValidType In ValidTypes
                         If ItemType = ValidType {
@@ -276,6 +287,8 @@ Class CodeParser {
                             AddedItem := Editor.AddItem(ItemID, TypeToAdd, False)
                             ItemID := AddedItem
                             ItemType := TypeToAdd
+                            If SetConstructor
+                            SetConstructorParams(ItemCheck.Params, ItemID)
                             If Var2 {
                                 This.ItemMap[Var1].ID := ItemID
                                 This.ItemMap[Var1].Type := ItemType
