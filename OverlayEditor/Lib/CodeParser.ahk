@@ -227,6 +227,7 @@ Class CodeParser {
                 This.ItemMap[Var1].ID := ItemID
                 This.ItemMap[Var1].Type := ItemType
             }
+            AddedItem := False
             For Index, Segment In Line
             If Index >= StartingIndex {
                 If Index = 2 And LineNumber = This.StartingLine
@@ -322,7 +323,13 @@ Class CodeParser {
                         Break
                     }
                     If Segment.Name = "SetHotkey" {
-                        SetHotkeyParams(Segment.Params, ItemID)
+                        If Index = 2
+                        SetHotkeyParams(Segment.Params, This.ItemMap[Var1].ID)
+                        Else If Var2 And Index = 3
+                        SetHotkeyParams(Segment.Params, This.ItemMap[Var2].ID)
+                        Else
+                        If AddedItem
+                        SetHotkeyParams(Segment.Params, AddedItem)
                         Break
                     }
                 }
