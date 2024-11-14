@@ -257,6 +257,32 @@ Class CodeParser {
                         }
                         Continue
                     }
+                    If Segment.Name = "AddControl" And Segment.Params.Length = 1 {
+                        IsValid := True
+                        ItemToAdd := Segment.Params[1]
+                        TypeToAdd := False
+                        ValidTypes := ["AccessibilityOverlay", "CustomTab", "GraphicalTab", "HotspotTab", "OCRTab", "Tab"]
+                        If Not This.Vars.Has(ItemToAdd) Or Not This.Vars[ItemToAdd].Type
+                        IsValid := False
+                        Else
+                        TypeToAdd := This.Vars[ItemToAdd].Type
+                        If IsValid
+                        For ValidType In ValidTypes
+                        If ItemType = ValidType {
+                            IsValid := True
+                            Break
+                        }
+                        If IsValid And Editor.ItemDefinitions.Has(TypeToAdd) And Editor.CanAdd(ItemType, TypeToAdd) {
+                            AddedItem := Editor.AddItem(ItemID, TypeToAdd, False)
+                            ItemID := AddedItem
+                            ItemType := TypeToAdd
+                            If Var2 {
+                                This.ItemMap[Var1].ID := ItemID
+                                This.ItemMap[Var1].Type := ItemType
+                            }
+                        }
+                        Continue
+                    }
                     If ItemType = "TabControl" And Segment.Type = "Func" And Segment.Name = "AddTabs" {
                         For Param In Segment.Params {
                             ParamID := False
@@ -268,9 +294,11 @@ Class CodeParser {
                             If Editor.CanAdd(ItemType, ParamType) {
                                 ChildItems := Editor.GetChildItems(ItemID)
                                 If ChildItems.Length > 0 {
+                                    BufferBackup := Editor.EditorBuffer
                                     Editor.CutItem(ParamID)
                                     LastChild := ChildItems[ChildItems.Length]
                                     Editor.PasteItem(LastChild,,, False)
+                                    Editor.EditorBuffer := BufferBackup
                                 }
                             }
                         }
