@@ -201,6 +201,7 @@ Class CodeParser {
             If LineNumber = This.StartingLine {
                 Var1ID := Editor.AddItem(Editor.MainWindow.MainTree.OverlayRoot, "AccessibilityOverlay")
                 Var1Type := "AccessibilityOverlay"
+                Editor.SetItemParam(Var1ID, "Editor", "VarName", Var1)
                 SetConstructorParams(Line[2].Params, Var1ID)
                 This.ItemMap[Var1].ID := Var1ID
                 This.ItemMap[Var1].Type := "AccessibilityOverlay"
@@ -239,6 +240,7 @@ Class CodeParser {
                     }
                     If Index = 2 And Editor.ItemDefinitions.Has(Segment.Name) And Editor.CanAdd(ItemType, Segment.Name) {
                         AddedItem := Editor.AddItem(ItemID, Segment.Name, False)
+                        Editor.SetItemParam(AddedItem, "Editor", "VarName", Var1)
                         ItemID := AddedItem
                         ItemType := Segment.Name
                         SetConstructorParams(Segment.Params, ItemID)
@@ -252,6 +254,7 @@ Class CodeParser {
                         ItemType := SubStr(Segment.Name, 4)
                         SetConstructorParams(Segment.Params, ItemID)
                         If Var2 {
+                            Editor.SetItemParam(AddedItem, "Editor", "VarName", Var1)
                             This.ItemMap[Var1].ID := ItemID
                             This.ItemMap[Var1].Type := ItemType
                         }
@@ -290,6 +293,7 @@ Class CodeParser {
                             If SetConstructor
                             SetConstructorParams(ItemCheck.Params, ItemID)
                             If Var2 {
+                                Editor.SetItemParam(AddedItem, "Editor", "VarName", Var1)
                                 This.ItemMap[Var1].ID := ItemID
                                 This.ItemMap[Var1].Type := ItemType
                             }
