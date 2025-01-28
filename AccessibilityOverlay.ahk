@@ -616,6 +616,10 @@ Class AccessibilityOverlay Extends AccessibilityControl {
     
     Static OCR(X1Coordinate, Y1Coordinate, X2Coordinate, Y2Coordinate, OCRLanguage := "", OCRScale := 1) {
         If IsSet(OCR) {
+            If A_CoordModeMouse := "Client"
+            ClientOnly := 1
+            Else
+            ClientOnly := 0
             AvailableLanguages := OCR.GetAvailableLanguages()
             FirstAvailableLanguage := False
             PreferredLanguage := False
@@ -628,12 +632,12 @@ Class AccessibilityOverlay Extends AccessibilityControl {
                 }
             }
             If PreferredLanguage = False And Not FirstAvailableLanguage = False {
-                OCRResult := OCR.FromWindow("A", FirstAvailableLanguage, OCRScale)
+                OCRResult := OCR.FromWindow("A", FirstAvailableLanguage, OCRScale, ClientOnly)
                 OCRResult := OCRResult.Crop(X1Coordinate, Y1Coordinate, X2Coordinate, Y2Coordinate)
                 Return OCRResult.Text
             }
             Else If PreferredLanguage = OCRLanguage{
-                OCRResult := OCR.FromWindow("A", PreferredLanguage, OCRScale)
+                OCRResult := OCR.FromWindow("A", PreferredLanguage, OCRScale, ClientOnly)
                 OCRResult := OCRResult.Crop(X1Coordinate, Y1Coordinate, X2Coordinate, Y2Coordinate)
                 Return OCRResult.Text
             }
@@ -1790,30 +1794,30 @@ Class GraphicalSlider Extends FocusableGraphic {
     GetPosition() {
         If This.Type = "Horizontal" {
             If This.FoundXCoordinate <= This.Start {
-                Return "0 %"
+                Return 0
             }
             Else If This.FoundXCoordinate >= This.End {
-                Return "100 %"
+                Return 100
             }
             Else {
-                Value := Round((This.FoundXCoordinate + Floor(AccessibilityOverlay.GetImgSize(This.FoundImage).W / 2) - This.Start) / (This.Size / 100), 0)
-                If Value > 100
-                Value := 100
-                Return Value . " %"
+                Position := Round((This.FoundXCoordinate + Floor(AccessibilityOverlay.GetImgSize(This.FoundImage).W / 2) - This.Start) / (This.Size / 100), 0)
+                If Position > 100
+                Position := 100
+                Return Position
             }
         }
         Else If This.Type = "Vertical" {
             If This.FoundYCoordinate <= This.Y1Coordinate {
-                Return "100 %"
+                Return 100
             }
             Else If This.FoundYCoordinate >= This.Y2Coordinate {
-                Return "0 %"
+                Return 0
             }
             Else {
-                Value := Round((This.End - This.FoundYCoordinate + Floor(AccessibilityOverlay.GetImgSize(This.FoundImage).H / 2)) / (This.Size / 100), 0)
-                If Value > 100
-                Value := 100
-                Return Value . " %"
+                Position := Round((This.End - This.FoundYCoordinate + Floor(AccessibilityOverlay.GetImgSize(This.FoundImage).H / 2)) / (This.Size / 100), 0)
+                If Position > 100
+                Position := 100
+                Return Position
             }
         }
         Else {
@@ -1822,7 +1826,11 @@ Class GraphicalSlider Extends FocusableGraphic {
     }
     
     GetValue() {
-        This.Value := This.GetPosition()
+        Position := This.GetPosition()
+        If Not Position = ""
+        This.Value := This.GetPosition() . " %"
+        Else
+        This.Value := ""
         Return This.Value
     }
     
@@ -1831,40 +1839,58 @@ Class GraphicalSlider Extends FocusableGraphic {
     }
     
     Move(Value) {
+        Critical
         If This.Type = "Horizontal" Or This.Type = "Vertical" {
-            TargetXCoordinate := 0
-            TargetYCoordinate := 0
+            TargetCoordinate := 0
             If This.Type = "Horizontal"
             Coordinate := "X"
             Else
             Coordinate := "Y"
             This.CheckState()
             If This.State = 1 {
-                FoundCoordinate := This.Found%Coordinate%Coordinate
+                StartCoordinate := This.Found%Coordinate%Coordinate
+                StartPosition := This.GetPosition()
+                CurrentPosition := StartPosition
+                If Coordinate = "X"
+                StartCoordinate := StartCoordinate + Floor(AccessibilityOverlay.GetImgSize(This.FoundImage).W / 2)
+                Else
+                StartCoordinate := StartCoordinate + Floor(AccessibilityOverlay.GetImgSize(This.FoundImage).H / 2)
                 OnePercent := Ceil(This.Size / 100)
                 If OnePercent < 1
                 OnePercent := 1
-                If Value = -1 {
-                    Target%Coordinate%Coordinate := This.Found%Coordinate%Coordinate - OnePercent
+                If Value = -1
+                TargetCoordinate := StartCoordinate - OnePercent
+                Else
+                TargetCoordinate := StartCoordinate + OnePercent
+                If Not TargetCoordinate = StartCoordinate
+                While CurrentPosition = StartPosition {
+                    Drag()
+                    CurrentPosition := This.GetPosition()
+                    If CurrentPosition = 0 And TargetCoordinate < StartCoordinate
+                    Break
+                    If CurrentPosition = 100 And TargetCoordinate > StartCoordinate
+                    Break
+                    If CurrentPosition = ""
+                    Break
+                    If  TargetCoordinate < StartCoordinate
+                    TargetCoordinate := TargetCoordinate - 1
+                    Else If  TargetCoordinate > StartCoordinate
+                    TargetCoordinate := TargetCoordinate + 1
+                    Else
+                    Break
                 }
-                Else {
-                    Target%Coordinate%Coordinate := This.Found%Coordinate%Coordinate + OnePercent
-                }
-                If Not Target%Coordinate%Coordinate = This.Found%Coordinate%Coordinate
-                While This.Found%Coordinate%Coordinate = FoundCoordinate
-                Drag()
             }
             If This.State = 1 {
                 This.CenterMouse()
-                AccessibilityOverlay.Speak(This.GetPosition())
+                AccessibilityOverlay.Speak(This.GetValue())
             }
         }
         Drag() {
             If Coordinate = "X"
-            MouseClickDrag "Left", This.FoundXCoordinate + Floor(AccessibilityOverlay.GetImgSize(This.FoundImage).W / 2), This.FoundYCoordinate + Floor(AccessibilityOverlay.GetImgSize(This.FoundImage).H / 2), TargetXCoordinate, This.FoundYCoordinate, 0
+            MouseClickDrag "Left", This.FoundXCoordinate + Floor(AccessibilityOverlay.GetImgSize(This.FoundImage).W / 2), This.FoundYCoordinate + Floor(AccessibilityOverlay.GetImgSize(This.FoundImage).H / 2), TargetCoordinate, This.FoundYCoordinate + Floor(AccessibilityOverlay.GetImgSize(This.FoundImage).H / 2), 0
             Else
-            MouseClickDrag "Left", This.FoundXCoordinate + Floor(AccessibilityOverlay.GetImgSize(This.FoundImage).W / 2), This.FoundYCoordinate + Floor(AccessibilityOverlay.GetImgSize(This.FoundImage).H / 2), This.FoundYCoordinate, TargetYCoordinate, 0
-            Sleep 100
+            MouseClickDrag "Left", This.FoundXCoordinate + Floor(AccessibilityOverlay.GetImgSize(This.FoundImage).W / 2), This.FoundYCoordinate + Floor(AccessibilityOverlay.GetImgSize(This.FoundImage).H / 2), This.FoundYCoordinate + Floor(AccessibilityOverlay.GetImgSize(This.FoundImage).H / 2), TargetCoordinate, 0
+            Sleep 25
             This.CheckState()
         }
     }
@@ -2132,6 +2158,7 @@ Class HotspotTab Extends Tab {
 Class OCRButton Extends Button {
     
     DefaultLabel := ""
+    LabelPrefix := ""
     OCRLanguage := ""
     OCRScale := 1
     X1Coordinate := 0
@@ -2139,8 +2166,10 @@ Class OCRButton Extends Button {
     X2Coordinate := 0
     Y2Coordinate := 0
     
-    __New(X1Coordinate, Y1Coordinate, X2Coordinate, Y2Coordinate, OCRLanguage := "", OCRScale := 1, PreExecFocusFunctions := "", PostExecFocusFunctions := "", PreExecActivationFunctions := "", PostExecActivationFunctions := "") {
+    __New(LabelPrefix, DefaultLabel, X1Coordinate, Y1Coordinate, X2Coordinate, Y2Coordinate, OCRLanguage := "", OCRScale := 1, PreExecFocusFunctions := "", PostExecFocusFunctions := "", PreExecActivationFunctions := "", PostExecActivationFunctions := "") {
         Super.__New("", PreExecFocusFunctions, PostExecFocusFunctions, PreExecActivationFunctions, PostExecActivationFunctions)
+        This.DefaultLabel := DefaultLabel
+        This.LabelPrefix := LabelPrefix
         This.OCRLanguage := OCRLanguage
         This.OCRScale := OCRScale
         This.X1Coordinate := X1Coordinate
@@ -2164,15 +2193,16 @@ Class OCRButton Extends Button {
     SpeakOnActivation(Speak := True) {
         Message := ""
         CheckResult := This.GetState()
-        LabelString := AccessibilityOverlay.OCR(This.X1Coordinate, This.Y1Coordinate, This.X2Coordinate, This.Y2Coordinate, This.OCRLanguage, This.OCRScale)
-        This.Label := LabelString
-        If LabelString = ""
-        LabelString := This.DefaultLabel
+        This.Label := AccessibilityOverlay.OCR(This.X1Coordinate, This.Y1Coordinate, This.X2Coordinate, This.Y2Coordinate, This.OCRLanguage, This.OCRScale)
+        If This.Label = ""
+        This.Label := This.DefaultLabel
+        Else
+        This.Label := This.LabelPrefix . " " . This.Label
         StateString := ""
         If This.States.Has(CheckResult)
         StateString := This.States[CheckResult]
         If Not This.controlID = AccessibilityOverlay.PreviousControlID
-        Message := LabelString . " " . This.ControlTypeLabel . " " . StateString
+        Message := This.Label . " " . This.ControlTypeLabel . " " . StateString
         Else
         If This.States.Count > 1
         Message := StateString
@@ -2183,14 +2213,16 @@ Class OCRButton Extends Button {
     SpeakOnFocus(Speak := True) {
         Message := ""
         CheckResult := This.GetState()
-        LabelString := AccessibilityOverlay.OCR(This.X1Coordinate, This.Y1Coordinate, This.X2Coordinate, This.Y2Coordinate, This.OCRLanguage, This.OCRScale)
-        If LabelString = ""
-        LabelString := This.DefaultLabel
+        This.Label := AccessibilityOverlay.OCR(This.X1Coordinate, This.Y1Coordinate, This.X2Coordinate, This.Y2Coordinate, This.OCRLanguage, This.OCRScale)
+        If This.Label = ""
+        This.Label := This.DefaultLabel
+        Else
+        This.Label := This.LabelPrefix . " " . This.Label
         StateString := ""
         If This.States.Has(CheckResult)
         StateString := This.States[CheckResult]
         If Not This.ControlID = AccessibilityOverlay.PreviousControlID Or (This.GetMasterControl() Is AccessibilityOverlay And This.GetMasterControl().GetFocusableControlIDs().Length = 1)
-        Message := LabelString . " " . This.ControlTypeLabel . " " . StateString . " " . This.HotkeyLabel
+        Message := This.Label . " " . This.ControlTypeLabel . " " . StateString . " " . This.HotkeyLabel
         If Speak
         AccessibilityOverlay.Speak(Message)
     }
@@ -2307,8 +2339,9 @@ Class OCRTab Extends Tab {
     X2Coordinate := 0
     Y2Coordinate := 0
     
-    __New(X1Coordinate, Y1Coordinate, X2Coordinate, Y2Coordinate, OCRLanguage := "", OCRScale := 1, PreExecFocusFunctions := "", PostExecFocusFunctions := "") {
+    __New(DefaultLabel, X1Coordinate, Y1Coordinate, X2Coordinate, Y2Coordinate, OCRLanguage := "", OCRScale := 1, PreExecFocusFunctions := "", PostExecFocusFunctions := "") {
         Super.__New("", PreExecFocusFunctions, PostExecFocusFunctions)
+        This.DefaultLabel := DefaultLabel
         This.OCRLanguage := OCRLanguage
         This.OCRScale := OCRScale
         This.X1Coordinate := X1Coordinate
@@ -2344,6 +2377,7 @@ Class OCRTab Extends Tab {
 Class OCRText Extends FocusableControl {
     
     ControlType := "Text"
+    DefaultValue := ""
     OCRLanguage := ""
     OCRScale := 1
     X1Coordinate := 0
@@ -2351,8 +2385,9 @@ Class OCRText Extends FocusableControl {
     X2Coordinate := 0
     Y2Coordinate := 0
     
-    __New(X1Coordinate, Y1Coordinate, X2Coordinate, Y2Coordinate, OCRLanguage := "", OCRScale := 1, PreExecFocusFunctions := "", PostExecFocusFunctions := "") {
+    __New(DefaultValue, X1Coordinate, Y1Coordinate, X2Coordinate, Y2Coordinate, OCRLanguage := "", OCRScale := 1, PreExecFocusFunctions := "", PostExecFocusFunctions := "") {
         Super.__New("", PreExecFocusFunctions, PostExecFocusFunctions)
+        This.DefaultValue := DefaultValue
         This.OCRLanguage := OCRLanguage
         This.OCRScale := OCRScale
         This.X1Coordinate := X1Coordinate
@@ -2368,6 +2403,8 @@ Class OCRText Extends FocusableControl {
         If This.States.Has(CheckResult)
         StateString := This.States[CheckResult]
         ValueString := AccessibilityOverlay.OCR(This.X1Coordinate, This.Y1Coordinate, This.X2Coordinate, This.Y2Coordinate, This.OCRLanguage, This.OCRScale)
+        If ValueString = ""
+        ValueString := This.DefaultValue
         This.Value := ValueString
         If Not This.ControlID = AccessibilityOverlay.PreviousControlID Or (This.GetMasterControl() Is AccessibilityOverlay And This.GetMasterControl().GetFocusableControlIDs().Length = 1)
         Message := ValueString . " " . StateString . " " . This.HotkeyLabel
