@@ -2,7 +2,7 @@
 
 #MaxThreadsPerHotkey 1
 #NoTrayIcon
-#SingleInstance Ignore
+#SingleInstance Force
 #Warn All
 CoordMode "Caret", "Client"
 CoordMode "Menu", "Client"

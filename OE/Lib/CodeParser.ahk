@@ -77,11 +77,11 @@ Class CodeParser {
         If LineNumber >= This.StartingLine
         If Not This.ProcessLine(LineNumber, Line) {
             Editor.DeleteItem(This.MasterOverlay, False)
-            Editor.DeleteItem(This.TempItem, False)
+;            Editor.DeleteItem(This.TempItem, False)
             MsgBox "Import failed on line " . LineNumber . ".", "Error"
             Return False
         }
-        Editor.DeleteItem(This.TempItem, False)
+;        Editor.DeleteItem(This.TempItem, False)
         MsgBox "Operation succeeded.", "import Overlay"
         Return True
     }
@@ -244,7 +244,19 @@ Class CodeParser {
                         Editor.SetItemParam(AddedItem, "Editor", "VarName", Var1)
                         ItemID := AddedItem
                         ItemType := Segment.Name
-                        SetConstructorParams(Segment.Params, ItemID)
+                        If Not ItemType = "TabControl" {
+                            SetConstructorParams(Segment.Params, ItemID)
+                        }
+                        Else {
+                            ConstructorParams := Array()
+                            If Segment.Params.Length > 0
+                            ConstructorParams.Push(Segment.Params[1])
+                            SetConstructorParams(ConstructorParams, ItemID)
+                            SegmentParams := Segment.Params
+                            If SegmentParams.Length > 0
+                            SegmentParams.RemoveAt(1)
+                            AddTabs(ItemID, ItemType, SegmentParams)
+                        }
                         This.ItemMap[Var1].ID := ItemID
                         This.ItemMap[Var1].Type := ItemType
                         Continue
@@ -253,7 +265,20 @@ Class CodeParser {
                         AddedItem := Editor.AddItem(ItemID, SubStr(Segment.Name, 4), False)
                         ItemID := AddedItem
                         ItemType := SubStr(Segment.Name, 4)
-                        SetConstructorParams(Segment.Params, ItemID)
+                        If Not ItemType = "TabControl" {
+                            SetConstructorParams(Segment.Params, ItemID)
+                        }
+                        Else {
+                                                    MsgBox Var1 . " " . Var1Type . " " . ItemType
+                                                        SegmentParams := Segment.Params
+                            ConstructorParams := Array()
+                            If SegmentParams.Length > 0
+                            ConstructorParams.Push(SegmentParams[1])
+                            SetConstructorParams(ConstructorParams, ItemID)
+                            If SegmentParams.Length > 0
+                            SegmentParams.RemoveAt(1)
+                            AddTabs(ItemID, ItemType, SegmentParams)
+                        }
                         If Var2 {
                             Editor.SetItemParam(AddedItem, "Editor", "VarName", Var1)
                             This.ItemMap[Var1].ID := ItemID
@@ -292,7 +317,19 @@ Class CodeParser {
                             ItemID := AddedItem
                             ItemType := TypeToAdd
                             If SetConstructor
-                            SetConstructorParams(ItemCheck.Params, ItemID)
+                            If Not ItemType = "TabControl" {
+                                SetConstructorParams(ItemCheck.Params, ItemID)
+                            }
+                            Else {
+                                ConstructorParams := Array()
+                                If ItemCheck.Params.Length > 0
+                                ConstructorParams.Push(ItemCheck.Params[1])
+                                SetConstructorParams(ConstructorParams, ItemID)
+                                SegmentParams := ItemCheck.Params
+                                If SegmentParams.Length > 0
+                                SegmentParams.RemoveAt(1)
+                                AddTabs(ItemID, ItemType, SegmentParams)
+                            }
                             If Var2 {
                                 Editor.SetItemParam(AddedItem, "Editor", "VarName", Var1)
                                 This.ItemMap[Var1].ID := ItemID
@@ -302,24 +339,8 @@ Class CodeParser {
                         Continue
                     }
                     If ItemType = "TabControl" And Segment.Type = "Func" And Segment.Name = "AddTabs" {
-                        For Param In Segment.Params {
-                            ParamID := False
-                            ParamType := False
-                            If This.ItemMap.Has(Param) And This.ItemMap[Param].ID And This.ItemMap[Param].Type {
-                                ParamID := This.ItemMap[Param].ID
-                                ParamType := This.ItemMap[Param].Type
-                            }
-                            If Editor.CanAdd(ItemType, ParamType) {
-                                ChildItems := Editor.GetChildItems(ItemID)
-                                If ChildItems.Length > 0 {
-                                    BufferBackup := Editor.EditorBuffer
-                                    Editor.CutItem(ParamID)
-                                    LastChild := ChildItems[ChildItems.Length]
-                                    Editor.PasteItem(LastChild,,, False)
-                                    Editor.EditorBuffer := BufferBackup
-                                }
-                            }
-                        }
+                        SegmentParams := Segment.Params
+                        AddTabs(ItemID, ItemType, SegmentParams)
                         Break
                     }
                     If Segment.Name = "SetHotkey" {
@@ -336,6 +357,27 @@ Class CodeParser {
             }
         }
         Return True
+        AddTabs(ItemID, ItemType, SegmentParams) {
+            For Param In SegmentParams {
+                ParamID := False
+                ParamType := False
+                If This.ItemMap.Has(Param) And This.ItemMap[Param].ID And This.ItemMap[Param].Type {
+                    ParamID := This.ItemMap[Param].ID
+                    ParamType := This.ItemMap[Param].Type
+                }
+                If Editor.CanAdd(ItemType, ParamType) {
+                    ChildItems := Editor.GetChildItems(ItemID)
+                    If ChildItems.Length > 0 {
+                        BufferBackup := Editor.EditorBuffer
+                        Editor.CopyItem(ParamID)
+                        LastChild := ChildItems[ChildItems.Length]
+                        NewID := Editor.PasteItem(LastChild,,, False)
+                                            This.ItemMap[Param].ID := NewID
+                        Editor.EditorBuffer := BufferBackup
+                    }
+                }
+            }
+        }
         SetConstructorParams(Params, ItemID) {
             SetParams("Constructor", Params, ItemID)
         }

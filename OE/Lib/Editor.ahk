@@ -96,7 +96,7 @@ Class Editor {
     Static CopyToBuffer(Item) {
         If This.Items.Has(Item) {
             EditorBuffer := Map("RootItem", This.CloneObj(This.Items[Item]), "ChildItems", [])
-            For ChildItem In This.GetChildItems(Item)
+            For ChildItem In This.GetChildItems(Item, True)
             EditorBuffer["ChildItems"].Push(This.CopyToBuffer(ChildItem))
             Return EditorBuffer
         }
@@ -500,9 +500,9 @@ Class Editor {
         Parent := This.MainWindow.MainTree.GetParent(Item)
         If Parent = This.MainWindow.MainTree.OverlayRoot And Not EditorBuffer["RootItem"].Type = "AccessibilityOverlay"
         Parent := This.AddItem(Parent, "AccessibilityOverlay", False)
-        If Not Parent = This.MainWindow.MainTree.OverlayRoot And This.Items[Parent].Type = "TabControl" And Not SubStr(EditorBuffer["RootItem"].Type, -3) = "Tab"
+        If Not Parent = This.MainWindow.MainTree.OverlayRoot And This.Items[Parent].Type = "TabControl" And Not SubStr(EditorBuffer["RootItem"].Type, -3) = "Tab" And EditorBuffer["ChildItems"].Length > 0
         Parent := This.AddItem(Parent, "Tab", False)
-        If Not Parent = This.MainWindow.MainTree.OverlayRoot And Not This.Items[Parent].Type = "TabControl" And SubStr(EditorBuffer["RootItem"].Type, -3) = "Tab"
+        If Not Parent = This.MainWindow.MainTree.OverlayRoot And Not This.Items[Parent].Type = "TabControl" And Not This.Items[Parent].Type = "CodeParserTemp" And SubStr(EditorBuffer["RootItem"].Type, -3) = "Tab"
         Parent := This.AddItem(Parent, "TabControl", False)
         Proceed()
         Return True
@@ -516,6 +516,7 @@ Class Editor {
             If Select
             This.MainWindow.MainTree.Modify(Item)
             This.UpdateCodeField()
+            Return Item
         }
     }
     
