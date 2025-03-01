@@ -614,38 +614,15 @@ Class AccessibilityOverlay Extends AccessibilityControl {
         Return ReturnObject
     }
     
-    Static OCR(X1Coordinate, Y1Coordinate, X2Coordinate, Y2Coordinate, OCRLanguage := "", OCRScale := 1) {
-        If IsSet(OCR) {
-            If A_CoordModeMouse := "Client"
-            ClientOnly := 1
-            Else
-            ClientOnly := 0
-            AvailableLanguages := OCR.GetAvailableLanguages()
-            FirstAvailableLanguage := False
-            PreferredLanguage := False
-            Loop Parse, AvailableLanguages, "`n" {
-                If A_Index = 1 And Not A_LoopField = ""
-                FirstAvailableLanguage := A_LoopField
-                If A_LoopField = OCRLanguage And Not OCRLanguage = "" {
-                    PreferredLanguage := OCRLanguage
-                    Break
-                }
-            }
-            If PreferredLanguage = False And Not FirstAvailableLanguage = False {
-                OCRResult := OCR.FromWindow("A", FirstAvailableLanguage, OCRScale, ClientOnly)
-                OCRResult := OCRResult.Crop(X1Coordinate, Y1Coordinate, X2Coordinate, Y2Coordinate)
-                Return OCRResult.Text
-            }
-            Else If PreferredLanguage = OCRLanguage{
-                OCRResult := OCR.FromWindow("A", PreferredLanguage, OCRScale, ClientOnly)
-                OCRResult := OCRResult.Crop(X1Coordinate, Y1Coordinate, X2Coordinate, Y2Coordinate)
-                Return OCRResult.Text
-            }
-            Else {
-                Return ""
-            }
-        }
-        Return ""
+    Static OCR(OCRType, X1Coordinate, Y1Coordinate, X2Coordinate, Y2Coordinate, OCRLanguage := "", OCRScale := "") {
+        If OCRType = "Tesseract" Or OCRType = "TesseractLegacy"
+        Return AccessibilityOverlay.TesseractOCR(X1Coordinate, Y1Coordinate, X2Coordinate, Y2Coordinate, OCRLanguage, OCRScale, 3)
+        Else If OCRType = "TesseractBest"
+        Return AccessibilityOverlay.TesseractOCR(X1Coordinate, Y1Coordinate, X2Coordinate, Y2Coordinate, OCRLanguage, OCRScale, 1)
+        Else If OCRType = "TesseractFast"
+        Return AccessibilityOverlay.TesseractOCR(X1Coordinate, Y1Coordinate, X2Coordinate, Y2Coordinate, OCRLanguage, OCRScale, 2)
+        Else
+        Return AccessibilityOverlay.UWPOCR(X1Coordinate, Y1Coordinate, X2Coordinate, Y2Coordinate, OCRLanguage, OCRScale)
     }
     
     Static Speak(Message) {
@@ -673,6 +650,65 @@ Class AccessibilityOverlay Extends AccessibilityControl {
         If (Not AccessibilityOverlay.JAWS = False Or Not ProcessExist("jfw.exe")) And (Not FileExist("NvdaControllerClient" . A_PtrSize * 8 . ".dll") Or DllCall("NvdaControllerClient" . A_PtrSize * 8 . ".dll\nvdaController_testIfRunning"))
         If Not AccessibilityOverlay.SAPI = False
         AccessibilityOverlay.SAPI.Speak("", 0x1|0x2)
+    }
+    
+    Static TesseractOCR(X1Coordinate, Y1Coordinate, X2Coordinate, Y2Coordinate, OCRLanguage := "", OCRScale := "", OCRType := "") {
+        If IsSet(Tesseract) {
+            Try {
+                If A_CoordModeMouse := "Client"
+                WinGetClientPos &WinX, &WinY,,, "A"
+                Else
+                WinGetPos &WinX, &WinY,,, "A"
+            }
+            Catch {
+                WinX := 0
+                WinY := 0
+            }
+            X1Coordinate := WinX + X1Coordinate
+            Y1Coordinate := WinY + Y1Coordinate
+            X2Coordinate := WinX + X2Coordinate
+            Y2Coordinate := WinY + Y2Coordinate
+            RectWidth := X2Coordinate - X1Coordinate
+            RectHeight := Y2Coordinate - Y1Coordinate
+            Return Trim(Tesseract.FromRect(X1Coordinate, Y1Coordinate, RectWidth, RectHeight, OCRLanguage, OCRScale, OCRType))
+        }
+        Return ""
+    }
+    
+    Static UWPOCR(X1Coordinate, Y1Coordinate, X2Coordinate, Y2Coordinate, OCRLanguage := "", OCRScale := "") {
+        If IsSet(OCR) {
+            If A_CoordModeMouse := "Client"
+            ClientOnly := 1
+            Else
+            ClientOnly := 0
+            AvailableLanguages := OCR.GetAvailableLanguages()
+            FirstAvailableLanguage := False
+            PreferredLanguage := False
+            Loop Parse, AvailableLanguages, "`n" {
+                If A_Index = 1 And Not A_LoopField = ""
+                FirstAvailableLanguage := A_LoopField
+                If A_LoopField = OCRLanguage And Not OCRLanguage = "" {
+                    PreferredLanguage := OCRLanguage
+                    Break
+                }
+            }
+            If PreferredLanguage = False And Not FirstAvailableLanguage = False {
+                If Not OCRScale
+                OCRScale := 1
+                OCRResult := OCR.FromWindow("A", FirstAvailableLanguage, OCRScale, ClientOnly)
+                OCRResult := OCRResult.Crop(X1Coordinate, Y1Coordinate, X2Coordinate, Y2Coordinate)
+                Return Trim(OCRResult.Text)
+            }
+            Else If PreferredLanguage = OCRLanguage{
+                OCRResult := OCR.FromWindow("A", PreferredLanguage, OCRScale, ClientOnly)
+                OCRResult := OCRResult.Crop(X1Coordinate, Y1Coordinate, X2Coordinate, Y2Coordinate)
+                Return Trim(OCRResult.Text)
+            }
+            Else {
+                Return ""
+            }
+        }
+        Return ""
     }
     
 }
@@ -726,6 +762,8 @@ Class FocusableControl Extends AccessibilityControl {
         FocusFunction.Call(This)
         This.CheckFocus()
         If This.HasFocus() {
+            If This.HasMethod("GetValue")
+            This.GetValue()
             If This.HasMethod("ExecuteOnFocusPreSpeech")
             This.ExecuteOnFocusPreSpeech()
             This.CheckState()
@@ -742,6 +780,8 @@ Class FocusableControl Extends AccessibilityControl {
     }
     
     GetValue() {
+        Value := This.Value
+        This.Value := Value
         Return This.Value
     }
     
@@ -750,8 +790,7 @@ Class FocusableControl Extends AccessibilityControl {
     }
     
     ReportValue() {
-        This.Value := This.GetValue()
-        If This.Value
+        If Not This.Value = ""
         AccessibilityOverlay.Speak(This.Value)
         Else
         AccessibilityOverlay.Speak(This.DefaultValue)
@@ -779,7 +818,7 @@ Class FocusableControl Extends AccessibilityControl {
         LabelString := This.Label
         If LabelString = ""
         LabelString := This.DefaultLabel
-        ValueString := This.GetValue()
+        ValueString := This.Value
         If ValueString = ""
         ValueString := This.DefaultValue
         StateString := ""
@@ -844,7 +883,7 @@ Class ActivatableControl Extends FocusableControl {
         LabelString := This.Label
         If LabelString = ""
         LabelString := This.DefaultLabel
-        ValueString := This.GetValue()
+        ValueString := This.Value
         If ValueString = ""
         ValueString := This.DefaultValue
         StateString := ""
@@ -863,12 +902,16 @@ Class ActivatableControl Extends FocusableControl {
 
 Class FocusableCustom Extends FocusableControl {
     
+    ControlType := "Custom"
+    
     SpeakOnFocus(*) {
     }
     
 }
 
 Class ActivatableCustom Extends ActivatableControl {
+    
+    ControlType := "Custom"
     
     SpeakOnActivation(*) {
     }
@@ -1007,7 +1050,7 @@ Class ActivatableGraphic Extends FocusableGraphic {
         LabelString := This.Label
         If LabelString = ""
         LabelString := This.DefaultLabel
-        ValueString := This.GetValue()
+        ValueString := This.Value
         If ValueString = ""
         ValueString := This.DefaultValue
         StateString := ""
@@ -1136,7 +1179,7 @@ Class ActivatableNative Extends FocusableNative {
         LabelString := This.Label
         If LabelString = ""
         LabelString := This.DefaultLabel
-        ValueString := This.GetValue()
+        ValueString := This.Value
         If ValueString = ""
         ValueString := This.DefaultValue
         StateString := ""
@@ -1274,7 +1317,7 @@ Class ActivatableUIA Extends FocusableUIA {
         LabelString := This.Label
         If LabelString = ""
         LabelString := This.DefaultLabel
-        ValueString := This.GetValue()
+        ValueString := This.Value
         If ValueString = ""
         ValueString := This.DefaultValue
         StateString := ""
@@ -1360,11 +1403,9 @@ Class ComboBox Extends FocusableControl {
             This.CurrentOption++
             This.Value := This.Options[This.CurrentOption]
         }
-        If Not CurrentOption = This.CurrentOption {
-            For ChangeFunction In This.ChangeFunctions
-            ChangeFunction.Call(This)
-            This.ReportValue()
-        }
+        For ChangeFunction In This.ChangeFunctions
+        ChangeFunction.Call(This)
+        This.ReportValue()
     }
     
     SelectOption(Option) {
@@ -1375,11 +1416,9 @@ Class ComboBox Extends FocusableControl {
         This.CurrentOption := Option
         If This.Options.Has(Option)
         This.Value := This.Options[Option]
-        If Not CurrentOption = This.CurrentOption {
-            For ChangeFunction In This.ChangeFunctions
-            ChangeFunction.Call(This)
-            This.ReportValue()
-        }
+        For ChangeFunction In This.ChangeFunctions
+        ChangeFunction.Call(This)
+        This.ReportValue()
     }
     
     SelectPreviousOption() {
@@ -1389,11 +1428,9 @@ Class ComboBox Extends FocusableControl {
             This.CurrentOption--
             This.Value := This.Options[This.CurrentOption]
         }
-        If Not CurrentOption = This.CurrentOption {
-            For ChangeFunction In This.ChangeFunctions
-            ChangeFunction.Call(This)
-            This.ReportValue()
-        }
+        For ChangeFunction In This.ChangeFunctions
+        ChangeFunction.Call(This)
+        This.ReportValue()
     }
     
     SetOptions(Options, DefaultOption := 1) {
@@ -1567,6 +1604,22 @@ Class TabControl Extends FocusableControl {
         Return This.Tabs.Get(This.CurrentTab, 0)
     }
     
+    GetNextTab() {
+        If This.CurrentTab < This.Tabs.Length
+        TabNumber := This.CurrentTab + 1
+        Else
+        TabNumber := 1
+        Return This.Tabs.Get(TabNumber, 0)
+    }
+    
+    GetPreviousTab() {
+        If This.CurrentTab <= 1
+        TabNumber := This.Tabs.Length
+        Else
+        TabNumber := This.CurrentTab - 1
+        Return This.Tabs.Get(TabNumber, 0)
+    }
+    
     GetTab(TabNumber) {
         Return This.Tabs.Get(TabNumber, 0)
     }
@@ -1588,7 +1641,7 @@ Class TabControl Extends FocusableControl {
         LabelString := This.Label
         If LabelString = ""
         LabelString := This.DefaultLabel
-        ValueString := This.GetValue()
+        ValueString := This.Value
         If ValueString = ""
         ValueString := This.DefaultValue
         If This.controlID = AccessibilityOverlay.PreviousControlID
@@ -2164,18 +2217,20 @@ Class OCRButton Extends Button {
     DefaultLabel := ""
     LabelPrefix := ""
     OCRLanguage := ""
-    OCRScale := 1
+    OCRScale := ""
+    OCRType := "UWP"
     X1Coordinate := 0
     Y1Coordinate := 0
     X2Coordinate := 0
     Y2Coordinate := 0
     
-    __New(LabelPrefix, DefaultLabel, X1Coordinate, Y1Coordinate, X2Coordinate, Y2Coordinate, OCRLanguage := "", OCRScale := 1, PreExecFocusFunctions := "", PostExecFocusFunctions := "", PreExecActivationFunctions := "", PostExecActivationFunctions := "") {
+    __New(LabelPrefix, DefaultLabel, OCRType, X1Coordinate, Y1Coordinate, X2Coordinate, Y2Coordinate, OCRLanguage := "", OCRScale := "", PreExecFocusFunctions := "", PostExecFocusFunctions := "", PreExecActivationFunctions := "", PostExecActivationFunctions := "") {
         Super.__New("", PreExecFocusFunctions, PostExecFocusFunctions, PreExecActivationFunctions, PostExecActivationFunctions)
         This.DefaultLabel := DefaultLabel
         This.LabelPrefix := LabelPrefix
         This.OCRLanguage := OCRLanguage
         This.OCRScale := OCRScale
+        This.OCRType := (OCRType = "Tesseract" Or OCRType = "TesseractBest" Or OCRType = "TesseractFast" Or OCRType = "TesseractLegacy" Or OCRType = "UWP" ? OCRType : This.OCRType)
         This.X1Coordinate := X1Coordinate
         This.Y1Coordinate := Y1Coordinate
         This.X2Coordinate := X2Coordinate
@@ -2197,7 +2252,7 @@ Class OCRButton Extends Button {
     SpeakOnActivation(Speak := True) {
         Message := ""
         CheckResult := This.GetState()
-        This.Label := AccessibilityOverlay.OCR(This.X1Coordinate, This.Y1Coordinate, This.X2Coordinate, This.Y2Coordinate, This.OCRLanguage, This.OCRScale)
+        This.Label := AccessibilityOverlay.OCR(This.OCRType, This.X1Coordinate, This.Y1Coordinate, This.X2Coordinate, This.Y2Coordinate, This.OCRLanguage, This.OCRScale)
         If This.Label = ""
         This.Label := This.DefaultLabel
         Else
@@ -2217,7 +2272,7 @@ Class OCRButton Extends Button {
     SpeakOnFocus(Speak := True) {
         Message := ""
         CheckResult := This.GetState()
-        This.Label := AccessibilityOverlay.OCR(This.X1Coordinate, This.Y1Coordinate, This.X2Coordinate, This.Y2Coordinate, This.OCRLanguage, This.OCRScale)
+        This.Label := AccessibilityOverlay.OCR(This.OCRType, This.X1Coordinate, This.Y1Coordinate, This.X2Coordinate, This.Y2Coordinate, This.OCRLanguage, This.OCRScale)
         If This.Label = ""
         This.Label := This.DefaultLabel
         Else
@@ -2236,17 +2291,19 @@ Class OCRButton Extends Button {
 Class OCRComboBox Extends ComboBox {
     
     OCRLanguage := ""
-    OCRScale := 1
+    OCRScale := ""
+    OCRType := "UWP"
     X1Coordinate := 0
     Y1Coordinate := 0
     X2Coordinate := 0
     Y2Coordinate := 0
     
-    __New(Label, DefaultValue, X1Coordinate, Y1Coordinate, X2Coordinate, Y2Coordinate, OCRLanguage := "", OCRScale := 1, PreExecFocusFunctions := "", PostExecFocusFunctions := "", ChangeFunctions := "") {
+    __New(Label, DefaultValue, OCRType, X1Coordinate, Y1Coordinate, X2Coordinate, Y2Coordinate, OCRLanguage := "", OCRScale := "", PreExecFocusFunctions := "", PostExecFocusFunctions := "", ChangeFunctions := "") {
         Super.__New(Label, PreExecFocusFunctions, PostExecFocusFunctions, ChangeFunctions)
         This.DefaultValue := DefaultValue
         This.OCRLanguage := OCRLanguage
         This.OCRScale := OCRScale
+        This.OCRType := (OCRType = "Tesseract" Or OCRType = "TesseractBest" Or OCRType = "TesseractFast" Or OCRType = "TesseractLegacy" Or OCRType = "UWP" ? OCRType : This.OCRType)
         This.X1Coordinate := X1Coordinate
         This.Y1Coordinate := Y1Coordinate
         This.X2Coordinate := X2Coordinate
@@ -2260,19 +2317,31 @@ Class OCRComboBox Extends ComboBox {
     }
     
     GetValue() {
-        This.Value := AccessibilityOverlay.OCR(This.X1Coordinate, This.Y1Coordinate, This.X2Coordinate, This.Y2Coordinate, This.OCRLanguage, This.OCRScale)
+        This.Value := AccessibilityOverlay.OCR(This.OCRType, This.X1Coordinate, This.Y1Coordinate, This.X2Coordinate, This.Y2Coordinate, This.OCRLanguage, This.OCRScale)
         Return This.Value
     }
     
     SelectNextOption() {
-        For ChangeFunction In This.ChangeFunctions
-        ChangeFunction.Call(This)
+        If This.ChangeFunctions.Length = 0
+        If This.HasMethod("GetValue")
+        This.GetValue()
+        For ChangeFunction In This.ChangeFunctions {
+            If This.HasMethod("GetValue")
+            This.GetValue()
+            ChangeFunction.Call(This)
+        }
         This.ReportValue()
     }
     
     SelectPreviousOption() {
-        For ChangeFunction In This.ChangeFunctions
-        ChangeFunction.Call(This)
+        If This.ChangeFunctions.Length = 0
+        If This.HasMethod("GetValue")
+        This.GetValue()
+        For ChangeFunction In This.ChangeFunctions {
+            If This.HasMethod("GetValue")
+            This.GetValue()
+            ChangeFunction.Call(This)
+        }
         This.ReportValue()
     }
     
@@ -2282,7 +2351,7 @@ Class OCRComboBox Extends ComboBox {
         LabelString := This.Label
         If LabelString = ""
         LabelString := This.DefaultLabel
-        ValueString := This.GetValue()
+        ValueString := This.Value
         If ValueString = ""
         ValueString := This.DefaultValue
         StateString := ""
@@ -2299,16 +2368,18 @@ Class OCRComboBox Extends ComboBox {
 Class OCREdit Extends Edit {
     
     OCRLanguage := ""
-    OCRScale := 1
+    OCRScale := ""
+    OCRType := "UWP"
     X1Coordinate := 0
     Y1Coordinate := 0
     X2Coordinate := 0
     Y2Coordinate := 0
     
-    __New(Label, X1Coordinate, Y1Coordinate, X2Coordinate, Y2Coordinate, OCRLanguage := "", OCRScale := 1, PreExecFocusFunctions := "", PostExecFocusFunctions := "") {
+    __New(Label, OCRType, X1Coordinate, Y1Coordinate, X2Coordinate, Y2Coordinate, OCRLanguage := "", OCRScale := "", PreExecFocusFunctions := "", PostExecFocusFunctions := "") {
         Super.__New(Label, PreExecFocusFunctions, PostExecFocusFunctions)
         This.OCRLanguage := OCRLanguage
         This.OCRScale := OCRScale
+        This.OCRType := (OCRType = "Tesseract" Or OCRType = "TesseractBest" Or OCRType = "TesseractFast" Or OCRType = "TesseractLegacy" Or OCRType = "UWP" ? OCRType : This.OCRType)
         This.X1Coordinate := X1Coordinate
         This.Y1Coordinate := Y1Coordinate
         This.X2Coordinate := X2Coordinate
@@ -2322,7 +2393,7 @@ Class OCREdit Extends Edit {
     }
     
     GetValue() {
-        This.Value := AccessibilityOverlay.OCR(This.X1Coordinate, This.Y1Coordinate, This.X2Coordinate, This.Y2Coordinate, This.OCRLanguage, This.OCRScale)
+        This.Value := AccessibilityOverlay.OCR(This.OCRType, This.X1Coordinate, This.Y1Coordinate, This.X2Coordinate, This.Y2Coordinate, This.OCRLanguage, This.OCRScale)
         Return This.Value
     }
     
@@ -2332,7 +2403,7 @@ Class OCREdit Extends Edit {
         LabelString := This.Label
         If LabelString = ""
         LabelString := This.DefaultLabel
-        ValueString := This.GetValue()
+        ValueString := This.Value
         If ValueString = ""
         ValueString := This.DefaultValue
         StateString := ""
@@ -2350,17 +2421,19 @@ Class OCRTab Extends Tab {
     
     DefaultLabel := ""
     OCRLanguage := ""
-    OCRScale := 1
+    OCRScale := ""
+    OCRType := "UWP"
     X1Coordinate := 0
     Y1Coordinate := 0
     X2Coordinate := 0
     Y2Coordinate := 0
     
-    __New(DefaultLabel, X1Coordinate, Y1Coordinate, X2Coordinate, Y2Coordinate, OCRLanguage := "", OCRScale := 1, PreExecFocusFunctions := "", PostExecFocusFunctions := "") {
+    __New(DefaultLabel, OCRType, X1Coordinate, Y1Coordinate, X2Coordinate, Y2Coordinate, OCRLanguage := "", OCRScale := "", PreExecFocusFunctions := "", PostExecFocusFunctions := "") {
         Super.__New("", PreExecFocusFunctions, PostExecFocusFunctions)
         This.DefaultLabel := DefaultLabel
         This.OCRLanguage := OCRLanguage
         This.OCRScale := OCRScale
+        This.OCRType := (OCRType = "Tesseract" Or OCRType = "TesseractBest" Or OCRType = "TesseractFast" Or OCRType = "TesseractLegacy" Or OCRType = "UWP" ? OCRType : This.OCRType)
         This.X1Coordinate := X1Coordinate
         This.Y1Coordinate := Y1Coordinate
         This.X2Coordinate := X2Coordinate
@@ -2376,7 +2449,7 @@ Class OCRTab Extends Tab {
     SpeakOnFocus(Speak := True) {
         Message := ""
         CheckResult := This.GetState()
-        LabelString := AccessibilityOverlay.OCR(This.X1Coordinate, This.Y1Coordinate, This.X2Coordinate, This.Y2Coordinate, This.OCRLanguage, This.OCRScale)
+        LabelString := AccessibilityOverlay.OCR(This.OCRLanguage, This.X1Coordinate, This.Y1Coordinate, This.X2Coordinate, This.Y2Coordinate, This.OCRLanguage, This.OCRScale)
         This.Label := LabelString
         If LabelString = ""
         LabelString := This.DefaultLabel
@@ -2396,17 +2469,19 @@ Class OCRText Extends FocusableControl {
     ControlType := "Text"
     DefaultValue := ""
     OCRLanguage := ""
-    OCRScale := 1
+    OCRScale := ""
+    OCRType := "UWP"
     X1Coordinate := 0
     Y1Coordinate := 0
     X2Coordinate := 0
     Y2Coordinate := 0
     
-    __New(DefaultValue, X1Coordinate, Y1Coordinate, X2Coordinate, Y2Coordinate, OCRLanguage := "", OCRScale := 1, PreExecFocusFunctions := "", PostExecFocusFunctions := "") {
+    __New(DefaultValue, OCRType, X1Coordinate, Y1Coordinate, X2Coordinate, Y2Coordinate, OCRLanguage := "", OCRScale := "", PreExecFocusFunctions := "", PostExecFocusFunctions := "") {
         Super.__New("", PreExecFocusFunctions, PostExecFocusFunctions)
         This.DefaultValue := DefaultValue
         This.OCRLanguage := OCRLanguage
         This.OCRScale := OCRScale
+        This.OCRType := (OCRType = "Tesseract" Or OCRType = "TesseractBest" Or OCRType = "TesseractFast" Or OCRType = "TesseractLegacy" Or OCRType = "UWP" ? OCRType : This.OCRType)
         This.X1Coordinate := X1Coordinate
         This.Y1Coordinate := Y1Coordinate
         This.X2Coordinate := X2Coordinate
@@ -2419,7 +2494,7 @@ Class OCRText Extends FocusableControl {
         StateString := ""
         If This.States.Has(CheckResult)
         StateString := This.States[CheckResult]
-        ValueString := AccessibilityOverlay.OCR(This.X1Coordinate, This.Y1Coordinate, This.X2Coordinate, This.Y2Coordinate, This.OCRLanguage, This.OCRScale)
+        ValueString := AccessibilityOverlay.OCR(This.OCRType, This.X1Coordinate, This.Y1Coordinate, This.X2Coordinate, This.Y2Coordinate, This.OCRLanguage, This.OCRScale)
         If ValueString = ""
         ValueString := This.DefaultValue
         This.Value := ValueString
