@@ -60,8 +60,8 @@ Right::
 ^Tab::NotepadOverlay.FocusNextTab()
 Left::
 ^+Tab::NotepadOverlay.FocusPreviousTab()
-^A::NotepadOverlay.ActivateControl(NestedTab1Button1.ControlID)
-^F::NotepadOverlay.FocusControl(NestedTab1Button1.ControlID)
+^A::NotepadOverlay.ActivateControlID(NestedTab1Button1.ControlID)
+^F::NotepadOverlay.FocusControlID(NestedTab1Button1.ControlID)
 Space::
 Enter::NotepadOverlay.ActivateCurrentControl()
 Ctrl::AccessibilityOverlay.StopSpeech()
