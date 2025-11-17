@@ -57,10 +57,8 @@ Class AccessibilityOverlay Extends AccessibilityControl {
     ChildControls := Array()
     ControlType := "Overlay"
     ControlTypeLabel := "overlay"
-    CurrentControlID := 0
     DefaultLabel := ""
     Label := ""
-    PreviousControlID := 0
     Static AllControls := Array()
     Static CurrentControlID := 0
     Static JAWS := False
@@ -87,14 +85,15 @@ Class AccessibilityOverlay Extends AccessibilityControl {
         If This.ChildControls.Length > 0
         If ChildNumber > 0 And This.ChildControls.Length >= ChildNumber {
             ControlID := This.ChildControls[ChildNumber].ControlID
-            Return This.ActivateControlID(ControlID)
+            This.ActivateControlID(ControlID)
         }
+        Return This.CurrentControl
     }
     
     ActivateControlID(ControlID) {
         If This.ChildControls.Length > 0 {
             If ControlID = This.CurrentControlID {
-                Return This.ActivateCurrentControl()
+                This.ActivateCurrentControl()
             }
             Else {
                 Found := This.FindFocusableControlID(ControlID)
@@ -104,10 +103,10 @@ Class AccessibilityOverlay Extends AccessibilityControl {
                     This.SetCurrentControlID(ControlID)
                     If TargetControl.HasMethod("Activate")
                     TargetControl.Activate()
-                    Return TargetControl
                 }
             }
         }
+        Return This.CurrentControl
     }
     
     ActivateControlNumber(ControlNumber) {
@@ -116,7 +115,7 @@ Class AccessibilityOverlay Extends AccessibilityControl {
             If ControlNumber > 0 And FocusableControlIDs.Length >= ControlNumber {
                 ControlID := FocusableControlIDs[ControlNumber]
                 If ControlID = This.CurrentControlID {
-                    Return This.ActivateCurrentControl()
+                    This.ActivateCurrentControl()
                 }
                 Else {
                     TargetControl := AccessibilityOverlay.GetControl(ControlID)
@@ -124,10 +123,10 @@ Class AccessibilityOverlay Extends AccessibilityControl {
                     This.SetCurrentControlID(TargetControl.ControlID)
                     If TargetControl.HasMethod("Activate")
                     TargetControl.Activate()
-                    Return TargetControl
                 }
             }
         }
+        Return This.CurrentControl
     }
     
     ActivateCurrentControl() {
@@ -148,9 +147,9 @@ Class AccessibilityOverlay Extends AccessibilityControl {
                 If CurrentControl Is Checkbox Or CurrentControl Is ToggleButton Or CurrentControl Is GraphicalCheckbox Or CurrentControl Is GraphicalToggleButton {
                     This.SetPreviousControlID(TruePrev)
                 }
-                Return CurrentControl
             }
         }
+        Return This.CurrentControl
     }
     
     AddControl(Control) {
@@ -175,7 +174,6 @@ Class AccessibilityOverlay Extends AccessibilityControl {
         Clone := AccessibilityControl()
         Clone.Base := This.Base
         Clone.ChildControls := Array()
-        Clone.CurrentControlID := 0
         For PropertyName, PropertyValue In This.OwnProps()
         If Not PropertyName = "ChildControls" And Not PropertyName = "ControlID" And Not PropertyName = "CurrentControlID" And Not PropertyName = "SuperordinateControlID"
         Clone.%PropertyName% := PropertyValue
@@ -245,22 +243,24 @@ Class AccessibilityOverlay Extends AccessibilityControl {
                         TruePrev := AccessibilityOverlay.PreviousControlID
                         This.SetPreviousControlID(0)
                     }
+                    If Not TargetControl Is PassThrough
                     TargetControl.Focus(Speak)
                     If Speak {
                         This.SetPreviousControlID(TruePrev)
                     }
                 }
-                Return TargetControl
             }
         }
+        Return This.CurrentControl
     }
     
     FocusChildNumber(ChildNumber) {
         If This.ChildControls.Length > 0
         If ChildNumber > 0 And This.ChildControls.Length >= ChildNumber {
             ControlID := This.ChildControls[ChildNumber].ControlID
-            Return This.FocusControlID(ControlID)
+            This.FocusControlID(ControlID)
         }
+        Return This.CurrentControl
     }
     
     FocusControlID(ControlID) {
@@ -272,9 +272,9 @@ Class AccessibilityOverlay Extends AccessibilityControl {
                 This.SetCurrentControlID(ControlID)
                 If TargetControl.HasMethod("Focus")
                 TargetControl.Focus()
-                Return TargetControl
             }
         }
+        Return This.CurrentControl
     }
     
     FocusControlNumber(ControlNumber) {
@@ -287,9 +287,9 @@ Class AccessibilityOverlay Extends AccessibilityControl {
                 This.SetCurrentControlID(TargetControl.ControlID)
                 If TargetControl.HasMethod("Focus")
                 TargetControl.Focus()
-                Return TargetControl
             }
         }
+        Return This.CurrentControl
     }
     
     FocusCurrentControl() {
@@ -299,48 +299,61 @@ Class AccessibilityOverlay Extends AccessibilityControl {
                 CurrentControl := AccessibilityOverlay.GetControl(This.CurrentControlID)
                 If CurrentControl.HasMethod("Focus")
                 CurrentControl.Focus()
-                Return CurrentControl
             }
         }
+        Return This.CurrentControl
     }
     
     FocusNextControl() {
         If This.ChildControls.Length > 0 {
             FocusableControlIDs := This.GetFocusableControlIDs()
-            Found := This.FindFocusableControlID(This.CurrentControlID)
-            If FocusableControlIDs.Length = 0
             ControlID := 0
-            Else If Found = 0 Or Found = FocusableControlIDs.Length
-            ControlID := FocusableControlIDs[1]
-            Else
-            ControlID := FocusableControlIDs[Found + 1]
-            TargetControl := AccessibilityOverlay.GetControl(ControlID)
+            CurrentControl := This.CurrentControl
+            TargetControl := False
+            If CurrentControl Is PassThrough And CurrentControl.CheckState()
+            TargetControl := CurrentControl
+            If Not TargetControl {
+                Found := This.FindFocusableControlID(This.CurrentControlID)
+                If FocusableControlIDs.Length = 0
+                ControlID := 0
+                Else If Found = 0 Or Found = FocusableControlIDs.Length
+                ControlID := FocusableControlIDs[1]
+                Else
+                ControlID := FocusableControlIDs[Found + 1]
+                TargetControl := AccessibilityOverlay.GetControl(ControlID)
+            }
             This.SetPreviousControlID(This.CurrentControlID)
             This.SetCurrentControlID(TargetControl.ControlID)
-            If TargetControl Is Object And TargetControl.HasMethod("Focus")
+            If TargetControl.HasMethod("Focus")
             TargetControl.Focus()
-            Return TargetControl
         }
+        Return This.CurrentControl
     }
     
     FocusPreviousControl() {
         If This.ChildControls.Length > 0 {
             ControlID := 0
-            FocusableControlIDs := This.GetFocusableControlIDs()
-            Found := This.FindFocusableControlID(This.CurrentControlID)
-            If FocusableControlIDs.Length = 0
-            ControlID := 0
-            Else If Found <= 1
-            ControlID := FocusableControlIDs[FocusableControlIDs.Length]
-            Else
-            ControlID := FocusableControlIDs[Found - 1]
-            TargetControl := AccessibilityOverlay.GetControl(ControlID)
+            CurrentControl := This.CurrentControl
+            TargetControl := False
+            If CurrentControl Is PassThrough And CurrentControl.CheckState()
+            TargetControl := CurrentControl
+            If Not TargetControl {
+                FocusableControlIDs := This.GetFocusableControlIDs()
+                Found := This.FindFocusableControlID(This.CurrentControlID)
+                If FocusableControlIDs.Length = 0
+                ControlID := 0
+                Else If Found <= 1
+                ControlID := FocusableControlIDs[FocusableControlIDs.Length]
+                Else
+                ControlID := FocusableControlIDs[Found - 1]
+                TargetControl := AccessibilityOverlay.GetControl(ControlID)
+            }
             This.SetPreviousControlID(This.CurrentControlID)
             This.SetCurrentControlID(TargetControl.ControlID)
-            If TargetControl Is Object And TargetControl.HasMethod("Focus")
+            If TargetControl.HasMethod("Focus")
             TargetControl.Focus()
-            Return TargetControl
         }
+        Return This.CurrentControl
     }
     
     FocusNextTab(Wrap := True) {
@@ -357,6 +370,7 @@ Class AccessibilityOverlay Extends AccessibilityControl {
                 }
             }
         }
+        Return This.CurrentControl
     }
     
     FocusPreviousTab(Wrap := True) {
@@ -373,6 +387,7 @@ Class AccessibilityOverlay Extends AccessibilityControl {
                 }
             }
         }
+        Return This.CurrentControl
     }
     
     GetAllControls() {
@@ -410,11 +425,11 @@ Class AccessibilityOverlay Extends AccessibilityControl {
     }
     
     GetCurrentControl() {
-        Return AccessibilityOverlay.GetControl(This.CurrentControlID)
+        Return AccessibilityOverlay.GetControl(AccessibilityOverlay.CurrentControlID)
     }
     
     GetCurrentControlID() {
-        Return This.CurrentControlID
+        Return AccessibilityOverlay.CurrentControlID
     }
     
     GetCurrentControlNumber() {
@@ -479,6 +494,10 @@ Class AccessibilityOverlay Extends AccessibilityControl {
     
     GetPreviousControl() {
         Return AccessibilityOverlay.GetControl(AccessibilityOverlay.PreviousControlID)
+    }
+    
+    GetPreviousControlID() {
+        Return AccessibilityOverlay.PreviousControlID
     }
     
     GetReachableControls() {
@@ -613,12 +632,10 @@ Class AccessibilityOverlay Extends AccessibilityControl {
     }
     
     SetCurrentControlID(ControlID) {
-        This.CurrentControlID := ControlID
         AccessibilityOverlay.CurrentControlID := ControlID
     }
     
     SetPreviousControlID(ControlID) {
-        This.PreviousControlID := ControlID
         AccessibilityOverlay.PreviousControlID := ControlID
     }
     
@@ -731,6 +748,13 @@ Class AccessibilityOverlay Extends AccessibilityControl {
         Return UIAWindow
     }
     
+    Static InArray(Needle, Haystack) {
+        For FoundIndex, FoundValue In Haystack
+        If FoundValue == Needle
+        Return FoundIndex
+        Return False
+    }
+    
     Static OCR(OCRType, X1Coordinate, Y1Coordinate, X2Coordinate, Y2Coordinate, OCRLanguage := "", OCRScale := "") {
         If OCRType = "Tesseract" Or OCRType = "TesseractLegacy"
         Return This.TesseractOCR(X1Coordinate, Y1Coordinate, X2Coordinate, Y2Coordinate, OCRLanguage, OCRScale, 3)
@@ -740,6 +764,21 @@ Class AccessibilityOverlay Extends AccessibilityControl {
         Return This.TesseractOCR(X1Coordinate, Y1Coordinate, X2Coordinate, Y2Coordinate, OCRLanguage, OCRScale, 2)
         Else
         Return This.UWPOCR(X1Coordinate, Y1Coordinate, X2Coordinate, Y2Coordinate, OCRLanguage, OCRScale)
+    }
+    
+    Static PassThroughHotkey(ThisHotkey) {
+        Match := RegExMatch(ThisHotkey, "[a-zA-Z]")
+        If Match > 0 {
+            Modifiers := SubStr(ThisHotkey, 1, Match - 1)
+            KeyName := SubStr(ThisHotkey, Match)
+            If StrLen(KeyName) > 1
+            KeyName := "{" . KeyName . "}"
+            Try
+            Hotkey ThisHotkey, "Off"
+            Send Modifiers . KeyName
+            Try
+            Hotkey ThisHotkey, "On"
+        }
     }
     
     Static Speak(Message := "") {
@@ -1383,7 +1422,6 @@ Class FocusableUIA Extends FocusableControl {
     
     FindElement() {
         Window := AccessibilityOverlay.GetUIAWindow()
-        If Window
         This.Window := Window
         If Not Window
         Return False
@@ -1857,6 +1895,69 @@ Class CustomComboBox Extends ComboBox {
 }
 
 Class CustomEdit Extends Edit {
+}
+
+Class CustomPassThrough Extends PassThrough {
+    
+    WrapperFunctions := Array()
+    
+    __New(Label, ForwardHks, BackHKs, WrapperFunctions := "", FirstItemFunctions := "", LastItemFunctions := "", PreExecFocusFunctions := "", PostExecFocusFunctions := "", PreExecActivationFunctions := "", PostExecActivationFunctions := "") {
+        Super.__New(Label, ForwardHks, BackHKs, 1, FirstItemFunctions, LastItemFunctions, PreExecFocusFunctions, PostExecFocusFunctions, PreExecActivationFunctions, PostExecActivationFunctions)
+        If Not WrapperFunctions = "" {
+            If Not WrapperFunctions Is Array
+            WrapperFunctions := Array(WrapperFunctions)
+            For WrapperFunction In WrapperFunctions
+            If WrapperFunction Is Object And WrapperFunction.HasMethod("Call")
+            This.WrapperFunctions.Push(WrapperFunction)
+        }
+    }
+    
+    CheckState() {
+        Critical
+        This.GetHKState()
+        Result := False
+        For WrapperFunction In This.WrapperFunctions
+        Result := WrapperFunction.Call(This)
+        If Result {
+            This.CurrentItem := 0
+            This.Size := 1
+            This.State := 0
+            Return This.State
+        }
+        This.State := 1
+        Return This.State
+    }
+    
+    ExecuteOnFocusPreSpeech() {
+        Critical
+        Super.ExecuteOnFocusPreSpeech()
+        ValidState := This.CheckState()
+        If ValidState {
+            This.Size := This.CurrentItem + 1
+        }
+        Else {
+            MasterOverlay := This.MasterControl
+            If MasterOverlay Is Object And This.LastDirection = 1 {
+                FocusableControlIDs := MasterOverlay.GetFocusableControlIDs()
+                Found := MasterOverlay.FindFocusableControlID(This.ControlID)
+                If FocusableControlIDs.Length = 0
+                ControlID := 0
+                Else If Found = 0 Or Found = FocusableControlIDs.Length
+                ControlID := FocusableControlIDs[1]
+                Else
+                ControlID := FocusableControlIDs[Found + 1]
+                TargetControl := AccessibilityOverlay.GetControl(ControlID)
+                MasterOverlay.SetPreviousControlID(This.ControlID)
+                MasterOverlay.SetCurrentControlID(TargetControl.ControlID)
+                If TargetControl.HasMethod("Focus")
+                TargetControl.Focus()
+            }
+        }
+    }
+    
+    Reset() {
+    }
+    
 }
 
 Class CustomTab Extends Tab {
@@ -2664,6 +2765,145 @@ Class OCRText Extends FocusableControl {
         Message := ValueString . " " . StateString . " " . This.HotkeyLabel
         If Speak
         AccessibilityOverlay.Speak(Message)
+    }
+    
+}
+
+Class PassThrough Extends ActivatableControl {
+    
+    BackHKs := Array()
+    ControlType := "PassThrough control"
+    ControlTypeLabel := "pass through"
+    CurrentItem := 0
+    FirstItemFunctions := Array()
+    ForwardHks := Array()
+    LastDirection := 0
+    LastItemFunctions := Array()
+    Size := 1
+    State := 1
+    
+    __New(Label, ForwardHks, BackHKs, Size := 1, FirstItemFunctions := "", LastItemFunctions := "", PreExecFocusFunctions := "", PostExecFocusFunctions := "", PreExecActivationFunctions := "", PostExecActivationFunctions := "") {
+        Super.__New(Label, PreExecFocusFunctions, PostExecFocusFunctions, PreExecActivationFunctions, PostExecActivationFunctions)
+        If Not ForwardHks = "" {
+            If Not ForwardHks Is Array
+            ForwardHks := Array(ForwardHks)
+            For ForwardHk In ForwardHks
+            If ForwardHk Is String
+            This.ForwardHks.Push(ForwardHk)
+        }
+        If Not BackHKs = "" {
+            If Not BackHKs Is Array
+            BackHKs := Array(BackHKs)
+            For BackHK In BackHKs
+            If BackHK Is String
+            This.BackHKs.Push(BackHK)
+        }
+        If Size Is Integer And Size > 0
+        This.Size := Size
+        If Not FirstItemFunctions = "" {
+            If Not FirstItemFunctions Is Array
+            FirstItemFunctions := Array(FirstItemFunctions)
+            For ItemFunction In FirstItemFunctions
+            If ItemFunction Is Object And ItemFunction.HasMethod("Call")
+            This.FirstItemFunctions.Push(ItemFunction)
+        }
+        If Not LastItemFunctions = "" {
+            If Not LastItemFunctions Is Array
+            LastItemFunctions := Array(LastItemFunctions)
+            For ItemFunction In LastItemFunctions
+            If ItemFunction Is Object And ItemFunction.HasMethod("Call")
+            This.LastItemFunctions.Push(ItemFunction)
+        }
+    }
+    
+    CheckState() {
+        Critical
+        This.GetHKState(&ForwardHK, &BackHK)
+        This.State := 0
+        If ForwardHK And This.CurrentItem >= 1 And This.CurrentItem <= This.Size - 1 {
+            This.State := 1
+        }
+        Else If BackHK And This.CurrentItem = 1 {
+            This.State := 0
+        }
+        Else {
+            If BackHK And This.CurrentItem > 1 And This.CurrentItem <= This.Size
+            This.State := 1
+        }
+        Return This.State
+    }
+    
+    ExecuteOnActivationPreSpeech() {
+        AccessibilityOverlay.PassThroughHotkey(A_ThisHotkey)
+    }
+    
+    ExecuteOnFocusPreSpeech() {
+        Critical
+        This.GetHKState(&ForwardHK, &BackHK)
+        If ForwardHK {
+            This.CurrentItem++
+        }
+        Else {
+            If BackHK
+            This.CurrentItem--
+        }
+        This.TriggerItemFunctions(ForwardHK, BackHK)
+    }
+    
+    Focus(*) {
+        This.Reset()
+        Super.Focus(False)
+    }
+    
+    GetHKState(&ForwardHK := False, &BackHK := False) {
+        ForwardHk := False
+        BackHK := False
+        If AccessibilityOverlay.InArray(A_ThisHotkey, This.ForwardHks) {
+            ForwardHk := True
+            This.LastDirection := 1
+        }
+        Else {
+            If AccessibilityOverlay.InArray(A_ThisHotkey, This.BackHKs) {
+                BackHK := True
+                This.LastDirection := -1
+            }
+        }
+    }
+    
+    Reset() {
+        This.GetHKState(&ForwardHK, &BackHK)
+        If Not This.ControlID = AccessibilityOverlay.PreviousControlID
+        This.CurrentItem := 0
+        If ForwardHK And Not This.CheckState()
+        This.CurrentItem := 0
+        Else
+        If BackHK And Not This.CheckState()
+        This.CurrentItem := This.Size + 1
+    }
+    
+    SpeakOnActivation(*) {
+    }
+    
+    SpeakOnFocus(*) {
+    }
+    
+    TriggerItemFunctions(ForwardHK, BackHK) {
+        If Not ForwardHK and Not BackHK
+        Return
+        If ForwardHk And This.CurrentItem = 1 And This.FirstItemFunctions.Length > 0 {
+            For ItemFunction In This.FirstItemFunctions
+            ItemFunction.Call(This)
+        }
+        Else If ForwardHk {
+            AccessibilityOverlay.PassThroughHotkey(A_ThisHotkey)
+        }
+        Else If BackHK And This.CurrentItem = This.Size And This.LastItemFunctions.Length > 0 {
+            For ItemFunction In This.LastItemFunctions
+            ItemFunction.Call(This)
+        }
+        Else {
+            AccessibilityOverlay.PassThroughHotkey(A_ThisHotkey)
+        }
     }
     
 }
