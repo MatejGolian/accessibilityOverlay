@@ -1956,6 +1956,18 @@ Class CustomPassThrough Extends PassThrough {
     }
     
     Reset() {
+        This.GetHKState(&ForwardHK, &BackHK)
+        If Not This.ControlID = AccessibilityOverlay.PreviousControlID
+        If ForwardHK {
+            This.CurrentItem := 0
+            This.Size := 1
+        }
+        Else {
+            If BackHK {
+                This.CurrentItem := 3
+                This.Size := 2
+            }
+        }
     }
     
 }
