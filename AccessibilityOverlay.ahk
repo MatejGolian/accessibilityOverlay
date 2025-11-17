@@ -30,6 +30,10 @@ Class AccessibilityControl {
         Return 0
     }
     
+    GetMasterOverlay() {
+        Return This.GetMasterControl()
+    }
+    
     GetParentOverlay() {
         CurrentControl := This
         Loop AccessibilityOverlay.TotalNumberOfControls {
@@ -1915,17 +1919,32 @@ Class CustomPassThrough Extends PassThrough {
     CheckState() {
         Critical
         This.GetHKState()
-        Result := False
-        For WrapperFunction In This.WrapperFunctions
-        Result := WrapperFunction.Call(This)
+        Result := This.CheckWrap()
         If Result {
             This.CurrentItem := 0
             This.Size := 1
             This.State := 0
-            Return This.State
+            Return 0
         }
         This.State := 1
-        Return This.State
+        Return 1
+    }
+    
+    CheckWrap() {
+        For WrapperFunction In This.WrapperFunctions {
+            Result := WrapperFunction.Call(This)
+            If Result {
+                If Not This.ControlID = AccessibilityOverlay.PreviousControlID And This.LastDirection = 1
+                Return False
+                Else If This.ControlID = AccessibilityOverlay.PreviousControlID And This.LastDirection = 1
+                Return True
+                Else If This.LastDirection = 1
+                Return False
+                Else
+                Return True
+            }
+        }
+        Return False
     }
     
     ExecuteOnFocusPreSpeech() {
