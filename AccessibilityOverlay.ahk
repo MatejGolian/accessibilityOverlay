@@ -1903,46 +1903,57 @@ Class CustomEdit Extends Edit {
 
 Class CustomPassThrough Extends PassThrough {
     
-    WrapperFunctions := Array()
+    EndWrapperFunctions := Array()
+    StartWrapperFunctions := Array()
     
-    __New(Label, ForwardHks, BackHKs, WrapperFunctions := "", FirstItemFunctions := "", LastItemFunctions := "", PreExecFocusFunctions := "", PostExecFocusFunctions := "", PreExecActivationFunctions := "", PostExecActivationFunctions := "") {
+    __New(Label, ForwardHks, BackHKs, StartWrapperFunctions := "", EndWrapperFunctions := "", FirstItemFunctions := "", LastItemFunctions := "", PreExecFocusFunctions := "", PostExecFocusFunctions := "", PreExecActivationFunctions := "", PostExecActivationFunctions := "") {
         Super.__New(Label, ForwardHks, BackHKs, 1, FirstItemFunctions, LastItemFunctions, PreExecFocusFunctions, PostExecFocusFunctions, PreExecActivationFunctions, PostExecActivationFunctions)
-        If Not WrapperFunctions = "" {
-            If Not WrapperFunctions Is Array
-            WrapperFunctions := Array(WrapperFunctions)
-            For WrapperFunction In WrapperFunctions
+        If Not StartWrapperFunctions = "" {
+            If Not StartWrapperFunctions Is Array
+            StartWrapperFunctions := Array(StartWrapperFunctions)
+            For WrapperFunction In StartWrapperFunctions
             If WrapperFunction Is Object And WrapperFunction.HasMethod("Call")
-            This.WrapperFunctions.Push(WrapperFunction)
+            This.StartWrapperFunctions.Push(WrapperFunction)
         }
+        If Not EndWrapperFunctions = "" {
+            If Not EndWrapperFunctions Is Array
+            EndWrapperFunctions := Array(EndWrapperFunctions)
+            For WrapperFunction In EndWrapperFunctions
+            If WrapperFunction Is Object And WrapperFunction.HasMethod("Call")
+            This.EndWrapperFunctions.Push(WrapperFunction)
+        }
+    }
+    
+    CheckEndWrap() {
+        For WrapperFunction In This.EndWrapperFunctions {
+            Result := WrapperFunction.Call(This)
+            If Result
+            Return True
+        }
+        Return False
     }
     
     CheckState() {
         Critical
-        This.GetHKState()
-        Result := This.CheckWrap()
-        If Result {
-            This.CurrentItem := 0
-            This.Size := 1
-            This.State := 0
-            Return 0
-        }
+        This.GetHKState(&ForwardHK, &BackHK)
+        If ForwardHK
+        Result := This.CheckEndWrap()
+        Else If BackHK
+        Result := This.CheckStartWrap()
+        Else
+        Result := False
+        If Result
+        This.State := 0
+        Else
         This.State := 1
-        Return 1
+        Return This.State
     }
     
-    CheckWrap() {
-        For WrapperFunction In This.WrapperFunctions {
+    CheckStartWrap() {
+        For WrapperFunction In This.StartWrapperFunctions {
             Result := WrapperFunction.Call(This)
-            If Result {
-                If Not This.ControlID = AccessibilityOverlay.PreviousControlID And This.LastDirection = 1
-                Return False
-                Else If This.ControlID = AccessibilityOverlay.PreviousControlID And This.LastDirection = 1
-                Return True
-                Else If This.LastDirection = 1
-                Return False
-                Else
-                Return True
-            }
+            If Result
+            Return True
         }
         Return False
     }
@@ -1951,25 +1962,6 @@ Class CustomPassThrough Extends PassThrough {
         Critical
         Super.ExecuteOnFocusPreSpeech()
         This.Size := This.CurrentItem + 1
-        ValidState := This.CheckState()
-        If Not ValidState {
-            MasterOverlay := This.MasterControl
-            If MasterOverlay Is Object And This.LastDirection = 1 {
-                FocusableControlIDs := MasterOverlay.GetFocusableControlIDs()
-                Found := MasterOverlay.FindFocusableControlID(This.ControlID)
-                If FocusableControlIDs.Length = 0
-                ControlID := 0
-                Else If Found = 0 Or Found = FocusableControlIDs.Length
-                ControlID := FocusableControlIDs[1]
-                Else
-                ControlID := FocusableControlIDs[Found + 1]
-                TargetControl := AccessibilityOverlay.GetControl(ControlID)
-                MasterOverlay.SetPreviousControlID(This.ControlID)
-                MasterOverlay.SetCurrentControlID(TargetControl.ControlID)
-                If TargetControl.HasMethod("Focus")
-                TargetControl.Focus()
-            }
-        }
     }
     
     Reset() {
