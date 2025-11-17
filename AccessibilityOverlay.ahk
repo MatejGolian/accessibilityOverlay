@@ -1950,11 +1950,9 @@ Class CustomPassThrough Extends PassThrough {
     ExecuteOnFocusPreSpeech() {
         Critical
         Super.ExecuteOnFocusPreSpeech()
+        This.Size := This.CurrentItem + 1
         ValidState := This.CheckState()
-        If ValidState {
-            This.Size := This.CurrentItem + 1
-        }
-        Else {
+        If Not ValidState {
             MasterOverlay := This.MasterControl
             If MasterOverlay Is Object And This.LastDirection = 1 {
                 FocusableControlIDs := MasterOverlay.GetFocusableControlIDs()
