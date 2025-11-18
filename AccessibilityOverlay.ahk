@@ -1954,8 +1954,10 @@ Class CustomPassThrough Extends PassThrough {
     
     ExecuteOnFocusPreSpeech() {
         Critical
-        Super.ExecuteOnFocusPreSpeech()
-        This.Size := This.CurrentItem + 1
+        This.GetHKState(&ForwardHK, &BackHK)
+        This.CurrentItem++
+        This.TriggerItemFunctions(ForwardHK, BackHK)
+        This.Size := This.CurrentItem + 2
     }
     
     Reset() {
@@ -1967,7 +1969,7 @@ Class CustomPassThrough Extends PassThrough {
         }
         Else {
             If BackHK {
-                This.CurrentItem := 2
+                This.CurrentItem := 0
                 This.Size := 1
             }
         }
