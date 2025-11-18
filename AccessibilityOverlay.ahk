@@ -247,7 +247,6 @@ Class AccessibilityOverlay Extends AccessibilityControl {
                         TruePrev := AccessibilityOverlay.PreviousControlID
                         This.SetPreviousControlID(0)
                     }
-                    If Not TargetControl Is PassThrough
                     TargetControl.Focus(Speak)
                     If Speak {
                         This.SetPreviousControlID(TruePrev)
@@ -328,8 +327,12 @@ Class AccessibilityOverlay Extends AccessibilityControl {
             }
             This.SetPreviousControlID(This.CurrentControlID)
             This.SetCurrentControlID(TargetControl.ControlID)
-            If TargetControl.HasMethod("Focus")
-            TargetControl.Focus()
+            If TargetControl.HasMethod("Focus") {
+                If TargetControl Is PassThrough
+                TargetControl.Focus(False, True)
+                Else
+                TargetControl.Focus()
+            }
         }
         Return This.CurrentControl
     }
@@ -354,8 +357,12 @@ Class AccessibilityOverlay Extends AccessibilityControl {
             }
             This.SetPreviousControlID(This.CurrentControlID)
             This.SetCurrentControlID(TargetControl.ControlID)
-            If TargetControl.HasMethod("Focus")
-            TargetControl.Focus()
+            If TargetControl.HasMethod("Focus") {
+                If TargetControl Is PassThrough
+                TargetControl.Focus(False, True)
+                Else
+                TargetControl.Focus()
+            }
         }
         Return This.CurrentControl
     }
@@ -2867,9 +2874,19 @@ Class PassThrough Extends ActivatableControl {
         This.TriggerItemFunctions(ForwardHK, BackHK)
     }
     
-    Focus(*) {
+    Focus(Speak := False, Move := False) {
         This.Reset()
-        Super.Focus(False)
+        For FocusFunction In This.PreExecFocusFunctions
+        FocusFunction.Call(This)
+        This.CheckFocus()
+        If This.HasFocus() {
+            If Move And This.HasMethod("ExecuteOnFocusPreSpeech")
+            This.ExecuteOnFocusPreSpeech()
+            If Move And This.HasMethod("ExecuteOnFocusPostSpeech")
+            This.ExecuteOnFocusPostSpeech()
+            For FocusFunction In This.PostExecFocusFunctions
+            FocusFunction.Call(This)
+        }
     }
     
     GetHKState(&ForwardHK := False, &BackHK := False) {
