@@ -1906,8 +1906,8 @@ Class CustomPassThrough Extends PassThrough {
     EndWrapperFunctions := Array()
     StartWrapperFunctions := Array()
     
-    __New(Label, ForwardHks, BackHKs, StartWrapperFunctions := "", EndWrapperFunctions := "", FirstItemFunctions := "", LastItemFunctions := "", PreExecFocusFunctions := "", PostExecFocusFunctions := "", PreExecActivationFunctions := "", PostExecActivationFunctions := "") {
-        Super.__New(Label, ForwardHks, BackHKs, 1, FirstItemFunctions, LastItemFunctions, PreExecFocusFunctions, PostExecFocusFunctions, PreExecActivationFunctions, PostExecActivationFunctions)
+    __New(Label, ForwardHks, BackHKs, StartWrapperFunctions := "", EndWrapperFunctions := "", FirstItemFunctions := "", LastItemFunctions := "", PreExecFocusFunctions := "", PostExecFocusFunctions := "", PreExecActivationFunctions := "", PostExecActivationFunctions := "", HotkeyCommand := "", HotkeyLabel := "", HotkeyFunctions := "") {
+        Super.__New(Label, ForwardHks, BackHKs, 1, FirstItemFunctions, LastItemFunctions, PreExecFocusFunctions, PostExecFocusFunctions, PreExecActivationFunctions, PostExecActivationFunctions, HotkeyCommand, HotkeyLabel, HotkeyFunctions)
         If Not StartWrapperFunctions = "" {
             If Not StartWrapperFunctions Is Array
             StartWrapperFunctions := Array(StartWrapperFunctions)
@@ -2799,8 +2799,8 @@ Class PassThrough Extends ActivatableControl {
     Size := 1
     State := 1
     
-    __New(Label, ForwardHks, BackHKs, Size := 1, FirstItemFunctions := "", LastItemFunctions := "", PreExecFocusFunctions := "", PostExecFocusFunctions := "", PreExecActivationFunctions := "", PostExecActivationFunctions := "") {
-        Super.__New(Label, PreExecFocusFunctions, PostExecFocusFunctions, PreExecActivationFunctions, PostExecActivationFunctions)
+    __New(Label, ForwardHks, BackHKs, Size := 1, FirstItemFunctions := "", LastItemFunctions := "", PreExecFocusFunctions := "", PostExecFocusFunctions := "", PreExecActivationFunctions := "", PostExecActivationFunctions := "", HotkeyCommand := "", HotkeyLabel := "", HotkeyFunctions := "") {
+        Super.__New(Label, PreExecFocusFunctions, PostExecFocusFunctions, PreExecActivationFunctions, PostExecActivationFunctions, HotkeyCommand, HotkeyLabel, HotkeyFunctions)
         If Not ForwardHks = "" {
             If Not ForwardHks Is Array
             ForwardHks := Array(ForwardHks)
