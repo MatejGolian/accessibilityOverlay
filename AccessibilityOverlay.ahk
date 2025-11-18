@@ -1924,38 +1924,32 @@ Class CustomPassThrough Extends PassThrough {
         }
     }
     
-    CheckEndWrap() {
-        For WrapperFunction In This.EndWrapperFunctions {
-            Result := WrapperFunction.Call(This)
-            If Result
-            Return True
-        }
-        Return False
-    }
-    
     CheckState() {
         Critical
         This.GetHKState(&ForwardHK, &BackHK)
-        If ForwardHK
-        Result := This.CheckEndWrap()
-        Else If BackHK
-        Result := This.CheckStartWrap()
-        Else
         Result := False
+        If ForwardHK {
+            For WrapperFunction In This.EndWrapperFunctions {
+                Result := WrapperFunction.Call(This)
+                If Result
+                Break
+            }
+        }
+        Else If BackHK {
+            For WrapperFunction In This.StartWrapperFunctions {
+                Result := WrapperFunction.Call(This)
+                If Result
+                Break
+            }
+        }
+        Else {
+            Result := False
+        }
         If Result
         This.State := 0
         Else
         This.State := 1
         Return This.State
-    }
-    
-    CheckStartWrap() {
-        For WrapperFunction In This.StartWrapperFunctions {
-            Result := WrapperFunction.Call(This)
-            If Result
-            Return True
-        }
-        Return False
     }
     
     ExecuteOnFocusPreSpeech() {
@@ -1973,8 +1967,8 @@ Class CustomPassThrough Extends PassThrough {
         }
         Else {
             If BackHK {
-                This.CurrentItem := 3
-                This.Size := 2
+                This.CurrentItem := 2
+                This.Size := 1
             }
         }
     }
