@@ -2923,9 +2923,6 @@ Class PassThrough Extends ActivatableControl {
     SpeakOnActivation(*) {
     }
     
-    SpeakOnFocus(*) {
-    }
-    
     TriggerItems(ForwardHK, BackHK) {
         If Not ForwardHK and Not BackHK
         Return
