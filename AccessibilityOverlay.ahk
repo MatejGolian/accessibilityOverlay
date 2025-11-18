@@ -2862,6 +2862,9 @@ Class PassThrough Extends ActivatableControl {
         AccessibilityOverlay.PassThroughHotkey(A_ThisHotkey)
     }
     
+    ExecuteOnFocusPostSpeech(Move := True) {
+    }
+    
     ExecuteOnFocusPreSpeech(Move := True) {
         Critical
         This.GetHKState(&ForwardHK, &BackHK)
