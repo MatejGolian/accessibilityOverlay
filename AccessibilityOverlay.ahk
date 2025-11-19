@@ -1959,11 +1959,10 @@ Class CustomPassThrough Extends PassThrough {
         Return This.State
     }
     
-    ExecuteOnFocusPreSpeech(Move := True) {
+    ExecuteOnFocusPreSpeech() {
         Critical
         This.GetHKState(&ForwardHK, &BackHK)
         This.CurrentItem++
-        If Move
         This.TriggerItems(ForwardHK, BackHK)
         This.Size := This.CurrentItem + 2
     }
@@ -2862,10 +2861,7 @@ Class PassThrough Extends ActivatableControl {
         AccessibilityOverlay.PassThroughHotkey(A_ThisHotkey)
     }
     
-    ExecuteOnFocusPostSpeech(Move := True) {
-    }
-    
-    ExecuteOnFocusPreSpeech(Move := True) {
+    ExecuteOnFocusPreSpeech() {
         Critical
         This.GetHKState(&ForwardHK, &BackHK)
         If ForwardHK {
@@ -2875,7 +2871,6 @@ Class PassThrough Extends ActivatableControl {
             If BackHK
             This.CurrentItem--
         }
-        If Move
         This.TriggerItems(ForwardHK, BackHK)
     }
     
@@ -2885,10 +2880,10 @@ Class PassThrough Extends ActivatableControl {
         FocusFunction.Call(This)
         This.CheckFocus()
         If This.HasFocus() {
-            If This.HasMethod("ExecuteOnFocusPreSpeech")
-            This.ExecuteOnFocusPreSpeech(Move)
-            If This.HasMethod("ExecuteOnFocusPostSpeech")
-            This.ExecuteOnFocusPostSpeech(Move)
+            If Move And This.HasMethod("ExecuteOnFocusPreSpeech")
+            This.ExecuteOnFocusPreSpeech()
+            If Move And This.HasMethod("ExecuteOnFocusPostSpeech")
+            This.ExecuteOnFocusPostSpeech()
             For FocusFunction In This.PostExecFocusFunctions
             FocusFunction.Call(This)
         }
