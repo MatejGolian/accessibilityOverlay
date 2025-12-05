@@ -924,9 +924,9 @@ Class AccessibilityOverlay Extends AccessibilityControl {
             Return UIAWindow
         }
         
-        Static _InArray(Needle, Haystack, CaseSense := False) {
+        Static _InArray(Needle, Haystack, CaseSensitive := False) {
             For FoundIndex, FoundValue In Haystack
-            If CaseSense {
+            If CaseSensitive {
                 If FoundValue == Needle
                 Return FoundIndex
             }
