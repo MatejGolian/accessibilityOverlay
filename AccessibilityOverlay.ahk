@@ -845,27 +845,95 @@ Class AccessibilityOverlay Extends AccessibilityControl {
             Throw PropertyError("This value of type `"" . This.__Class . "`" has no property named `"" . Name . "`".", -1)
         }
         
-        Static _FocusUIAElement(MainElement, Number) {
+        Static _FocusFocusableUIAElement(MainElement, ElementOrNumber) {
             Critical
             Try {
-                UIAElement := This._GetUIAElement(MainElement, Number)
-                UIAElement.SetFocus()
+                If ElementOrNumber Is Integer
+                Element := This._GetFocusableUIAElement(MainElement, ElementOrNumber)
+                Else
+                Element := ElementOrNumber
+                Element.SetFocus()
             }
             Catch {
                 Return False
             }
-            Return UIAElement
+            Return Element
+        }
+        
+        Static _FocusUIAElement(MainElement, ElementOrNumber) {
+            Critical
+            Try {
+                If ElementOrNumber Is Integer
+                Element := This._GetUIAElement(MainElement, ElementOrNumber)
+                Else
+                Element := ElementOrNumber
+                Element.SetFocus()
+            }
+            Catch {
+                Return False
+            }
+            Return Element
+        }
+        
+        Static _GetFocusableUIAElement(MainElement, Number) {
+            If Not MainElement Is UIA.IUIAutomationElement
+            Return False
+            Element := False
+            Elements := This._GetFocusableUIAElements(MainElement)
+            If Elements.Length > 0 {
+                If Number = 0 {
+                    Element := Elements[Elements.Length]
+                }
+                Else {
+                    If Number <= Elements.Length
+                    Element := Elements[Number]
+                    Else
+                    Return False
+                }
+            }
+            Return Element
         }
         
         Static _GetFocusableUIAElements(MainElement) {
-            FocusableElements := Array()
+            Elements := Array()
             If Not MainElement Is UIA.IUIAutomationElement
-            Return FocusableElements
+            Return Elements
             Try
-            FocusableElements := MainElement.FindElements({IsKeyboardFocusable: True})
+            Elements := MainElement.FindElements({IsKeyboardFocusable: True})
             Catch
-            FocusableElements := Array()
-            Return FocusableElements
+            Elements := Array()
+            Return Elements
+        }
+        
+        Static _GetFocusableUIAPaths(MainElement) {
+            UIAPaths := Array()
+            Elements := This._GetFocusableUIAElements(MainElement)
+            For Element In Elements {
+                Try
+                UIAPath := MainElement.GetUIAPath(Element)
+                Catch
+                UIAPath := False
+                If UIAPath
+                UIAPaths.Push(UIAPath)
+            }
+            Return UIAPaths
+        }
+        
+        Static _GetFocusedUIAElement() {
+            Try
+            Return UIA.GetFocusedElement()
+            Return False
+        }
+        
+        Static _GetFocusedUIAElementPath(MainElement) {
+            Try
+            FocusedElement := This._GetFocusedUIAElement()
+            Catch
+            Return False
+            If FocusedElement Is UIA.IUIAutomationElement
+            Try
+            Return MainElement.GetUIAPath(FocusedElement)
+            Return False
         }
         
         Static _GetImgSize(Img) {
@@ -891,20 +959,56 @@ Class AccessibilityOverlay Extends AccessibilityControl {
         Static _GetUIAElement(MainElement, Number) {
             If Not MainElement Is UIA.IUIAutomationElement
             Return False
-            UIAElement := False
-            FocusableElements := This._GetFocusableUIAElements(MainElement)
-            If FocusableElements.Length > 0 {
+            Element := False
+            Elements := This._GetUIAElements(MainElement)
+            If Elements.Length > 0 {
                 If Number = 0 {
-                    UIAElement := FocusableElements[FocusableElements.Length]
+                    Element := Elements[Elements.Length]
                 }
                 Else {
-                    If Number <= FocusableElements.Length
-                    UIAElement := FocusableElements[Number]
+                    If Number <= Elements.Length
+                    Element := Elements[Number]
                     Else
                     Return False
                 }
             }
-            Return UIAElement
+            Return Element
+        }
+        
+        Static _GetUIAElementPath(MainElement, ElementOrNumber) {
+            If ElementOrNumber Is Integer
+            Element := This._GetUIAElement(MainElement, ElementOrNumber)
+            Else
+            Element := ElementOrNumber
+            If Element Is UIA.IUIAutomationElement
+            Try
+            Return MainElement.GetUIAPath(Element)
+            Return False
+        }
+        
+        Static _GetUIAElements(MainElement) {
+            Elements := Array()
+            If Not MainElement Is UIA.IUIAutomationElement
+            Return Elements
+            Try
+            Elements := MainElement.FindElements({})
+            Catch
+            Elements := Array()
+            Return Elements
+        }
+        
+        Static _GetUIAPaths(MainElement) {
+            UIAPaths := Array()
+            Elements := This._GetUIAElements(MainElement)
+            For Element In Elements {
+                Try
+                UIAPath := MainElement.GetUIAPath(Element)
+                Catch
+                UIAPath := False
+                If UIAPath
+                UIAPaths.Push(UIAPath)
+            }
+            Return UIAPaths
         }
         
         Static _GetUIAWindow() {
@@ -918,10 +1022,10 @@ Class AccessibilityOverlay Extends AccessibilityControl {
             Until WinID
             CacheRequest := UIA.CreateCacheRequest(["Type", "LocalizedType", "AutomationId", "Name", "Value", "ClassName", "AcceleratorKey", "WindowCanMaximize"], ["Window"], "Subtree")
             Try
-            UIAWindow := UIA.ElementFromHandle("ahk_id " . WinID, CacheRequest)
+            Window := UIA.ElementFromHandle("ahk_id " . WinID, CacheRequest)
             Catch
             Return False
-            Return UIAWindow
+            Return Window
         }
         
         Static _InArray(Needle, Haystack, CaseSensitive := False) {
@@ -1029,30 +1133,6 @@ Class AccessibilityOverlay Extends AccessibilityControl {
                 }
             }
             Return ""
-        }
-        
-        Static _WrapUIAPassThrough(MainElement, Number) {
-            Critical
-            If Not MainElement Is UIA.IUIAutomationElement
-            Return False
-            Try
-            FocusedElement := UIA.GetFocusedElement()
-            Catch
-            Return False
-            Try
-            WrappingElement := This._GetUIAElement(MainElement, Number)
-            Catch
-            Return False
-            Try
-            If FocusedElement Is UIA.IUIAutomationElement And WrappingElement Is UIA.IUIAutomationElement {
-                If MainElement.GetUIAPath(FocusedElement) = MainElement.GetUIAPath(WrappingElement)
-                Return True
-            }
-            Else {
-                If Not WrappingElement Is UIA.IUIAutomationElement
-                Return True
-            }
-            Return False
         }
         
     }
@@ -2112,9 +2192,10 @@ Class CustomEdit Extends Edit {
 Class CustomPassThrough Extends PassThrough {
     
     EndWrapperFunctions := Array()
+    PassThroughFunctions := Array()
     StartWrapperFunctions := Array()
     
-    __New(Label, ForwardHks, BackHKs, StartWrapperFunctions := "", EndWrapperFunctions := "", FirstItemFunctions := "", LastItemFunctions := "", PreExecFocusFunctions := "", PostExecFocusFunctions := "", PreExecActivationFunctions := "", PostExecActivationFunctions := "", HotkeyCommand := "", HotkeyLabel := "", HotkeyFunctions := "") {
+    __New(Label, ForwardHks, BackHKs, StartWrapperFunctions := "", EndWrapperFunctions := "", FirstItemFunctions := "", LastItemFunctions := "", PassThroughFunctions := "", PreExecFocusFunctions := "", PostExecFocusFunctions := "", PreExecActivationFunctions := "", PostExecActivationFunctions := "", HotkeyCommand := "", HotkeyLabel := "", HotkeyFunctions := "") {
         Super.__New(Label, ForwardHks, BackHKs, 1, FirstItemFunctions, LastItemFunctions, PreExecFocusFunctions, PostExecFocusFunctions, PreExecActivationFunctions, PostExecActivationFunctions, HotkeyCommand, HotkeyLabel, HotkeyFunctions)
         If Not StartWrapperFunctions = "" {
             If Not StartWrapperFunctions Is Array
@@ -2129,6 +2210,13 @@ Class CustomPassThrough Extends PassThrough {
             For WrapperFunction In EndWrapperFunctions
             If WrapperFunction Is Object And WrapperFunction.HasMethod("Call")
             This.EndWrapperFunctions.Push(WrapperFunction)
+        }
+        If Not PassThroughFunctions = "" {
+            If Not PassThroughFunctions Is Array
+            PassThroughFunctions := Array(PassThroughFunctions)
+            For PassThroughFunction In PassThroughFunctions
+            If PassThroughFunction Is Object And PassThroughFunction.HasMethod("Call")
+            This.PassThroughFunctions.Push(PassThroughFunction)
         }
     }
     
@@ -2166,6 +2254,14 @@ Class CustomPassThrough Extends PassThrough {
         This.CurrentItem++
         This.TriggerItems(ForwardHK, BackHK)
         This.Size := This.CurrentItem + 2
+    }
+    
+    HandlePassThrough() {
+        If This.PassThroughFunctions.Length = 0
+        AccessibilityOverlay.Helpers.PassThroughHotkey(A_ThisHotkey)
+        Else
+        For PassThroughFunction In This.PassThroughFunctions
+        PassThroughFunction.Call(This)
     }
     
     Reset() {
@@ -3110,6 +3206,10 @@ Class PassThrough Extends ActivatableControl {
         }
     }
     
+    HandlePassThrough() {
+        AccessibilityOverlay.Helpers.PassThroughHotkey(A_ThisHotkey)
+    }
+    
     Reset() {
         This.GetHKState(&ForwardHK, &BackHK)
         If This.MasterControl Is AccessibilityOverlay And Not This.ControlID = This.MasterControl.PreviousControlID
@@ -3132,7 +3232,7 @@ Class PassThrough Extends ActivatableControl {
             ItemFunction.Call(This)
         }
         Else If ForwardHk {
-            AccessibilityOverlay.Helpers.PassThroughHotkey(A_ThisHotkey)
+            This.HandlePassThrough()
         }
         Else If BackHK And This.CurrentItem = This.Size And This.LastItemFunctions.Length > 0 {
             For ItemFunction In This.LastItemFunctions
@@ -3140,7 +3240,7 @@ Class PassThrough Extends ActivatableControl {
         }
         Else {
             If BackHK
-            AccessibilityOverlay.Helpers.PassThroughHotkey(A_ThisHotkey)
+            This.HandlePassThrough()
         }
     }
     
